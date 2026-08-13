@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// Branding is never hard-coded per property. It is always fetched from
-/// `GET /api/v1/app/config` (and refreshed as part of the dashboard/profile
-/// payload) so the same binary can serve every CPMSPro-managed property.
+/// Branding is never hard-coded per property. Today it is parsed only from
+/// the `property_branding` object embedded in the login/profile response
+/// (see [StaffUser.fromJson]) so the same binary can serve every
+/// CPMSPro-managed property. `GET /api/v1/app/config` is defined in
+/// [ApiEndpoints.appConfig] for a future pre-login branding lookup (e.g. by
+/// subdomain) but no repository calls it yet — see
+/// docs/BACKEND_INTEGRATION_AUDIT.md.
 class AppBranding {
   const AppBranding({
     required this.cpmsproLogoUrl,
