@@ -1,0 +1,372 @@
+/*
+ * CPMS v3.3.7 — Unified Responsive UI Foundation
+ * Loaded last so it can safely correct legacy and module-level layouts.
+ */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+    max-width: 100%;
+    font: inherit;
+}
+
+button,
+.btn,
+.budget-btn,
+.so-button,
+.so-btn {
+    min-height: 44px;
+}
+
+.admin-shell,
+.admin-main,
+.admin-content,
+.admin-content > *,
+.so-dashboard,
+.so-panel,
+.so-card,
+.wrap,
+.card,
+.panel,
+.pms-shell,
+.pms-main {
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* Reusable responsive grids. */
+.form-grid,
+.filter-grid,
+.action-grid,
+.stats-grid,
+.kpi-grid,
+.summary-grid,
+.metric-grid {
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(min(100%, 220px), 1fr)
+    );
+}
+
+/* Wide data stays readable and scrolls within its own section. */
+.table-wrap,
+.smart-table-wrap,
+.responsive-table,
+.admin-table-wrap,
+.so-table-wrap,
+.history-table-wrap,
+.budget-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+.admin-content table,
+.so-dashboard table,
+.cpms-hq-page table,
+.cpms-security-page table {
+    min-width: 720px;
+}
+
+.admin-content th,
+.admin-content td,
+.so-dashboard th,
+.so-dashboard td,
+.cpms-hq-page th,
+.cpms-hq-page td,
+.cpms-security-page th,
+.cpms-security-page td {
+    vertical-align: middle;
+}
+
+/* Prevent amounts, statuses and action links from breaking by letter. */
+.budget-table th,
+.budget-table td,
+.budget-badge,
+.budget-edit,
+.status,
+.badge,
+.table-actions,
+td[data-label="Tindakan"] {
+    white-space: nowrap;
+    word-break: normal;
+    overflow-wrap: normal;
+}
+
+/* Preventive Maintenance budget: form first, full-width table second. */
+.budget-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px !important;
+}
+
+.budget-layout > .budget-card {
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.budget-table {
+    width: 100% !important;
+    min-width: 940px;
+    table-layout: auto !important;
+}
+
+.budget-table th,
+.budget-table td {
+    padding: 11px 10px !important;
+}
+
+.budget-table td:nth-child(n+2) {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.budget-badge {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 86px;
+}
+
+/* System Owner. */
+.so-topbar,
+.so-nav,
+.so-actions,
+.so-form-actions {
+    flex-wrap: wrap;
+}
+
+.so-kpis {
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(min(100%, 220px), 1fr)
+    ) !important;
+}
+
+/* Staff portal. */
+.staff-mobile-nav {
+    display: none;
+}
+
+/* Security portal. */
+.cpms-security-page .nav {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.cpms-security-page .nav a {
+    flex: 0 0 auto;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* HQ Inspector. */
+.cpms-hq-page header {
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cpms-hq-page nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.cpms-hq-page nav a {
+    margin-left: 0 !important;
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+    .admin-main {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    .admin-content {
+        width: 100%;
+        padding: 16px !important;
+    }
+
+    .admin-topbar {
+        gap: 10px;
+        min-height: 64px;
+        padding: 10px 14px !important;
+    }
+
+    .topbar-search {
+        display: none !important;
+    }
+
+    .topbar-user-chip div {
+        display: none;
+    }
+
+    .topbar-property-id {
+        white-space: nowrap;
+    }
+
+    .budget-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .budget-head {
+        align-items: stretch !important;
+        flex-direction: column;
+    }
+
+    .so-dashboard {
+        padding: 16px !important;
+    }
+
+    .so-topbar {
+        align-items: flex-start;
+    }
+
+    .cpms-security-page .header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .staff-mobile-nav {
+        display: block;
+    }
+}
+
+@media (max-width: 680px) {
+    input,
+    select,
+    textarea {
+        font-size: 16px;
+    }
+
+    h1 {
+        overflow-wrap: anywhere;
+        font-size: clamp(24px, 8vw, 34px);
+    }
+
+    .admin-content,
+    .budget-wrap,
+    .so-dashboard,
+    .cpms-hq-page .wrap,
+    .cpms-security-page .wrap {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .budget-kpis {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .budget-card,
+    .so-card,
+    .card,
+    .panel {
+        padding: 15px;
+    }
+
+    .form-actions,
+    .page-actions,
+    .panel-actions,
+    .toolbar-actions,
+    .so-form-actions {
+        width: 100%;
+        align-items: stretch !important;
+        flex-direction: column;
+    }
+
+    .form-actions > *,
+    .page-actions > *,
+    .panel-actions > *,
+    .toolbar-actions > *,
+    .so-form-actions > * {
+        width: 100%;
+    }
+
+    .so-shell {
+        display: block !important;
+    }
+
+    .so-brand-panel {
+        min-height: auto !important;
+        padding: 24px !important;
+    }
+
+    .so-intro,
+    .so-brand-footer {
+        display: none;
+    }
+
+    .so-form-panel {
+        min-height: auto !important;
+        padding: 16px !important;
+    }
+
+    .cpms-hq-page header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .cpms-hq-page nav {
+        width: 100%;
+    }
+}
+
+@media print {
+    .admin-sidebar,
+    .admin-topbar,
+    .sidebar-overlay,
+    .admin-footer,
+    .staff-mobile-nav,
+    .pms-sidebar,
+    .cpms-security-page .nav,
+    .cpms-hq-page header {
+        display: none !important;
+    }
+
+    body,
+    .admin-main,
+    .admin-content,
+    .pms-main {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+}

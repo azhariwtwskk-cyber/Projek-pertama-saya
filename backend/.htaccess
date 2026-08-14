@@ -1,0 +1,27 @@
+Options -Indexes
+
+<IfModule mod_authz_core.c>
+    <FilesMatch "(^login_backup\.php$|^config_(error|wrong_system_owner)\.php$|backup_before.*\.php$|^README.*\.txt$)">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    <FilesMatch "(^login_backup\.php$|^config_(error|wrong_system_owner)\.php$|backup_before.*\.php$|^README.*\.txt$)">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php82” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php82 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

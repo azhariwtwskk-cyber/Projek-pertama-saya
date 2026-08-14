@@ -1,0 +1,334 @@
+/* CPMS Premium Compact Dashboard — visual-only enhancement, no SQL required. */
+
+:root {
+    --dash-surface: #ffffff;
+    --dash-soft: #f7f9fc;
+    --dash-border: #e7ebf2;
+    --dash-text: #182235;
+    --dash-muted: #758198;
+    --dash-shadow: 0 10px 28px rgba(15, 23, 42, .06);
+}
+
+.executive-hero {
+    min-height: 188px !important;
+    padding: 26px 30px !important;
+    border-radius: 22px !important;
+    box-shadow: 0 18px 48px rgba(15, 23, 42, .12) !important;
+}
+
+.executive-hero-copy h1 {
+    margin: 8px 0 7px !important;
+    font-size: clamp(24px, 2.7vw, 38px) !important;
+    line-height: 1.12 !important;
+    letter-spacing: -.035em;
+}
+
+.executive-hero-copy p {
+    max-width: 640px;
+    margin: 0 0 14px !important;
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+}
+
+.section-label {
+    font-size: 9px !important;
+    letter-spacing: .13em !important;
+}
+
+.hero-meta {
+    gap: 12px !important;
+    font-size: 11px !important;
+}
+
+.executive-score {
+    min-width: 300px !important;
+    padding: 17px 19px !important;
+    border-radius: 18px !important;
+}
+
+.executive-score span,
+.executive-score small {
+    font-size: 10px !important;
+}
+
+.executive-score strong {
+    font-size: 25px !important;
+}
+
+.dashboard-view-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin: 14px 0 8px;
+    color: var(--dash-muted);
+    font-size: 11px;
+}
+
+.dashboard-view-switch {
+    display: inline-flex;
+    padding: 3px;
+    border: 1px solid var(--dash-border);
+    border-radius: 11px;
+    background: var(--dash-surface);
+    box-shadow: 0 5px 16px rgba(15, 23, 42, .04);
+}
+
+.dashboard-view-switch button {
+    appearance: none;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--dash-muted);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    padding: 6px 10px;
+    transition: .18s ease;
+}
+
+.dashboard-view-switch button:hover,
+.dashboard-view-switch button.is-active {
+    background: var(--property-primary, #2563eb);
+    color: #fff;
+}
+
+.executive-command-strip {
+    gap: 10px !important;
+    margin: 10px 0 14px !important;
+}
+
+.executive-command-strip article {
+    min-height: 106px;
+    padding: 14px 16px !important;
+    border-radius: 15px !important;
+    box-shadow: var(--dash-shadow) !important;
+}
+
+.executive-command-strip span {
+    font-size: 9px !important;
+}
+
+.executive-command-strip strong {
+    margin: 5px 0 3px !important;
+    font-size: clamp(20px, 1.8vw, 28px) !important;
+}
+
+.executive-command-strip small {
+    font-size: 10px !important;
+}
+
+.premium-kpi-grid {
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+}
+
+.premium-kpi-card {
+    min-height: 112px !important;
+    padding: 15px 16px !important;
+    border-radius: 16px !important;
+    box-shadow: var(--dash-shadow) !important;
+}
+
+.premium-kpi-icon {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+}
+
+.premium-kpi-content span {
+    font-size: 10px !important;
+}
+
+.premium-kpi-content strong {
+    margin: 3px 0 !important;
+    font-size: 26px !important;
+    line-height: 1 !important;
+}
+
+.premium-kpi-content small,
+.kpi-static {
+    font-size: 10px !important;
+}
+
+.executive-grid,
+.executive-lower-grid {
+    gap: 14px !important;
+}
+
+.panel {
+    border-radius: 18px !important;
+    box-shadow: var(--dash-shadow) !important;
+}
+
+.panel-heading {
+    padding: 17px 18px 12px !important;
+}
+
+.panel-heading h2,
+.property-card h2 {
+    margin-top: 4px !important;
+    font-size: 16px !important;
+    letter-spacing: -.015em;
+}
+
+.panel-heading p {
+    margin-top: 4px !important;
+    font-size: 11px !important;
+}
+
+.chart-stage {
+    padding: 0 14px 12px !important;
+}
+
+.chart-stage canvas {
+    max-height: 245px;
+}
+
+.donut-layout {
+    padding: 12px 18px 18px !important;
+}
+
+.status-donut {
+    width: 152px !important;
+    height: 152px !important;
+}
+
+.status-donut strong {
+    font-size: 25px !important;
+}
+
+.status-legend div {
+    padding: 9px 0 !important;
+    font-size: 11px !important;
+}
+
+.executive-insight-panel {
+    margin-top: 14px !important;
+}
+
+.executive-insight-grid {
+    gap: 10px !important;
+    padding: 0 18px 18px;
+}
+
+.executive-insight {
+    padding: 12px !important;
+    border-radius: 13px !important;
+}
+
+.executive-insight strong {
+    font-size: 12px !important;
+}
+
+.executive-insight p {
+    font-size: 10px !important;
+}
+
+.premium-table th {
+    padding: 9px 12px !important;
+    font-size: 9px !important;
+}
+
+.premium-table td {
+    padding: 10px 12px !important;
+    font-size: 11px !important;
+}
+
+.premium-table td strong {
+    font-size: 11px !important;
+}
+
+.premium-table td small,
+.badge {
+    font-size: 9px !important;
+}
+
+.quick-action-grid {
+    gap: 8px !important;
+    padding: 0 16px 16px !important;
+}
+
+.quick-action-grid a {
+    min-height: 82px !important;
+    padding: 12px !important;
+    border-radius: 13px !important;
+}
+
+.quick-action-grid strong {
+    font-size: 11px !important;
+}
+
+.quick-action-grid small,
+.dashboard-alert small,
+.property-card dt,
+.property-card dd {
+    font-size: 10px !important;
+}
+
+.dashboard-alert-list {
+    padding: 0 16px 16px !important;
+}
+
+.dashboard-alert {
+    padding: 11px !important;
+    border-radius: 13px !important;
+}
+
+.dashboard-alert strong {
+    font-size: 11px !important;
+}
+
+.property-card {
+    padding: 17px !important;
+}
+
+body.dashboard-comfortable .executive-hero {
+    min-height: 225px !important;
+    padding: 34px 36px !important;
+}
+
+body.dashboard-comfortable .executive-command-strip article,
+body.dashboard-comfortable .premium-kpi-card {
+    padding: 20px !important;
+}
+
+body.dashboard-comfortable .panel-heading {
+    padding: 22px 22px 16px !important;
+}
+
+@media (max-width: 900px) {
+    .executive-hero {
+        min-height: auto !important;
+        padding: 22px !important;
+    }
+
+    .executive-score {
+        min-width: 0 !important;
+        width: 100%;
+    }
+
+    .dashboard-view-toolbar {
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 620px) {
+    .executive-hero-copy h1 {
+        font-size: 23px !important;
+    }
+
+    .dashboard-view-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-view-switch {
+        width: 100%;
+    }
+
+    .dashboard-view-switch button {
+        flex: 1;
+    }
+}

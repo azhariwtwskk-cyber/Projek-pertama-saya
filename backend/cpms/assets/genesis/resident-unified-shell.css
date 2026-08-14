@@ -1,0 +1,21 @@
+/* Resident Unified Shell 4.1 — visual bridge to premium dashboard */
+body{background:#f6f8fc!important;color:#0b1730!important}
+.rp-head{background:#fff!important;color:#0b1730!important;border-bottom:1px solid #e6eaf0!important;padding:18px 0!important}
+.rp-head .rp-wrap,.facility-hero-row,.visitor-hero-row{max-width:1160px!important}
+.rp-head small{color:#64748b!important;letter-spacing:.1em!important}
+.rp-head h1{font-size:24px!important;line-height:1.15!important;margin:4px 0!important;color:#0b1730!important}
+.rp-head p{color:#64748b!important;margin:3px 0!important}
+.rp-nav{position:sticky!important;top:0!important;z-index:30!important;background:rgba(255,255,255,.96)!important;backdrop-filter:blur(14px)!important;border-bottom:1px solid #e6eaf0!important;box-shadow:none!important;display:flex!important;justify-content:center!important;gap:8px!important;padding:8px 18px!important}
+.rp-nav a{color:#34425a!important;border-radius:8px!important;padding:10px 16px!important;font-weight:600!important;text-decoration:none!important;transition:background 180ms ease,color 180ms ease!important}
+.rp-nav a:hover{background:#f1f5f9!important;color:#0b1730!important}
+.rp-nav a[href*="resident_dashboard"]{order:1}.rp-nav a[href*="resident_request"]{order:2}.rp-nav a[href*="facility"]{order:3}.rp-nav a[href*="visitor"]{order:4}.rp-nav a[href*="announcement"]{order:5}.rp-nav a[href*="notification"]{order:6}.rp-nav a[href*="profile"]{order:7}
+.rp-main,.rp-wrap{max-width:1160px!important}
+.rp-main{padding-top:22px!important}
+.rp-card,.rp-list>*,.facility-card,.facility-panel,.visitor-card,.visitor-panel{background:#fff!important;border:1px solid #e6eaf0!important;border-radius:14px!important;box-shadow:none!important}
+.rp-btn,.facility-btn,.visitor-btn,button,input[type=submit]{border-radius:8px!important;transition:transform 180ms ease,box-shadow 180ms ease!important}
+.rp-btn:hover,.facility-btn:hover,.visitor-btn:hover,button:hover,input[type=submit]:hover{transform:translateY(-1px)}
+.facility-hero,.visitor-hero{background:#fff!important;color:#0b1730!important}
+.facility-language,.visitor-language{border:1px solid #dbe2ea!important;background:#f8fafc!important}
+.facility-language a.active,.visitor-language a.active{background:#111c33!important;color:#fff!important}
+@media(max-width:760px){.rp-head{padding:14px 0!important}.rp-head h1{font-size:20px!important}.rp-nav{justify-content:flex-start!important;overflow-x:auto!important;white-space:nowrap!important}.rp-nav a{padding:9px 12px!important}.rp-main{padding:14px!important}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important}}

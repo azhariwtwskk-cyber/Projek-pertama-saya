@@ -1,0 +1,17 @@
+/* CPMSPro Genesis Rollout 5 — Unified Login
+Presentation only. Authentication, sessions, redirects, roles and property scoping are untouched. */
+:root{--ul-primary:#6366F1;--ul-hover:#4F46E5;--ul-bg:#F7F8FB;--ul-surface:#fff;--ul-text:#0A0A0A;--ul-text2:#6B6B6B;--ul-border:#E8E8EC;--ul-error:#EF4444}
+html{background:var(--ul-bg)}body{background:var(--ul-bg)!important;color:var(--ul-text)!important}
+.login-shell,.auth-shell,.login-container,.auth-container{border-radius:16px!important}
+.login-card,.auth-card,.login-panel,.form-card{background:rgba(255,255,255,.97)!important;border:1px solid var(--ul-border)!important;border-radius:14px!important;box-shadow:0 18px 50px rgba(0,0,0,.08)!important}
+.login-card h1,.auth-card h1,.login-panel h1{letter-spacing:-.035em!important}
+.login-card p,.auth-card p,.login-panel p,.muted{color:var(--ul-text2)!important}
+input:not([type=checkbox]):not([type=radio]),select{min-height:46px!important;border:1px solid var(--ul-border)!important;border-radius:8px!important;background:#fff!important;transition:border-color 180ms ease,box-shadow 180ms ease!important}
+input:focus,select:focus{outline:none!important;border-color:var(--ul-primary)!important;box-shadow:0 0 0 3px rgba(99,102,241,.12)!important}
+button,.btn,.login-button,input[type=submit]{min-height:46px!important;border-radius:8px!important;transition:transform 180ms ease,box-shadow 180ms ease,background 180ms ease!important}
+button:hover,.btn:hover,.login-button:hover,input[type=submit]:hover{transform:translateY(-1px)}
+button[type=submit],.btn-primary,.login-button,input[type=submit]{background:var(--ul-primary)!important;border-color:var(--ul-primary)!important;color:#fff!important}
+button[type=submit]:hover,.btn-primary:hover,.login-button:hover,input[type=submit]:hover{background:var(--ul-hover)!important;box-shadow:0 6px 18px rgba(99,102,241,.22)!important}
+.alert,.error,.login-error{border-radius:8px!important}
+@media(max-width:720px){.login-card,.auth-card,.login-panel,.form-card{border-radius:12px!important}.login-shell,.auth-shell,.login-container,.auth-container{padding:14px!important}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}

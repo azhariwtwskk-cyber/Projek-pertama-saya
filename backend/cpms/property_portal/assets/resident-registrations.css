@@ -1,0 +1,317 @@
+.registration-admin-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 25px;
+    margin-bottom: 22px;
+}
+
+.registration-admin-heading h1 {
+    margin: 5px 0 5px;
+    font-size: clamp(28px, 4vw, 39px);
+    letter-spacing: -.035em;
+}
+
+.registration-admin-heading p {
+    margin: 0;
+    color: #64748b;
+}
+
+.registration-public-link {
+    flex: 0 0 auto;
+    padding: 11px 14px;
+    border-radius: 9px;
+    color: var(--property-on-primary, #fff);
+    background: var(--property-primary);
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.registration-admin-alert {
+    margin-bottom: 18px;
+    padding: 13px 15px;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    color: #166534;
+    background: #f0fdf4;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.registration-admin-alert--danger {
+    color: #991b1b;
+    border-color: #fecaca;
+    background: #fff1f2;
+}
+
+.registration-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.registration-stat-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 17px;
+    border: 1px solid #dfe7f0;
+    border-radius: 14px;
+    color: #334155;
+    background: #fff;
+    text-decoration: none;
+}
+
+.registration-stat-card span {
+    font-size: 11px;
+    font-weight: 850;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.registration-stat-card strong {
+    font-size: 24px;
+}
+
+.registration-stat-card.is-active {
+    color: var(--property-primary);
+    border-color: var(--property-primary);
+    box-shadow: 0 8px 22px rgba(15, 35, 65, .08);
+}
+
+.registration-admin-panel {
+    padding: 22px;
+    border: 1px solid #dfe7f0;
+    border-radius: 17px;
+    background: #fff;
+}
+
+.registration-admin-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 17px;
+}
+
+.registration-admin-panel-head h2 {
+    margin: 3px 0 0;
+}
+
+.registration-admin-panel-head > span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.registration-application-list {
+    display: grid;
+    gap: 14px;
+}
+
+.registration-application-card {
+    padding: 20px;
+    border: 1px solid #dfe7f0;
+    border-left: 4px solid #d19a18;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.registration-application-card.status-approved {
+    border-left-color: #16a34a;
+}
+
+.registration-application-card.status-rejected {
+    border-left-color: #dc2626;
+}
+
+.registration-application-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.registration-reference {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: .07em;
+}
+
+.registration-application-top h3 {
+    margin: 4px 0 0;
+    font-size: 20px;
+}
+
+.registration-status {
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: #684b06;
+    background: #fff2c7;
+    font-size: 10px;
+    font-weight: 850;
+}
+
+.status-approved .registration-status {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.status-rejected .registration-status {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+.registration-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 18px 0;
+}
+
+.registration-detail-grid > div {
+    min-width: 0;
+    padding: 11px;
+    border-radius: 9px;
+    background: #f6f8fb;
+}
+
+.registration-detail-grid dt {
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.registration-detail-grid dd {
+    margin: 4px 0 0;
+    overflow-wrap: anywhere;
+    color: #1e293b;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.registration-review-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+    padding-top: 16px;
+    border-top: 1px solid #e5ebf3;
+}
+
+.registration-review-form {
+    display: grid;
+    gap: 10px;
+    padding: 13px;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.registration-review-form label {
+    display: grid;
+    gap: 6px;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.registration-review-form textarea {
+    width: 100%;
+    min-height: 70px;
+    resize: vertical;
+    padding: 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+}
+
+.registration-review-form button {
+    min-height: 40px;
+    border: 0;
+    border-radius: 8px;
+    color: #fff;
+    background: #15803d;
+    font-size: 11px;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.registration-review-form--reject button {
+    background: #b91c1c;
+}
+
+.registration-review-history {
+    padding: 13px;
+    border-radius: 10px;
+    color: #475569;
+    background: #f8fafc;
+    font-size: 11px;
+}
+
+.registration-review-history strong,
+.registration-review-history span {
+    display: block;
+}
+
+.registration-review-history p {
+    margin-bottom: 0;
+}
+
+.registration-admin-empty {
+    min-height: 220px;
+    display: grid;
+    place-content: center;
+    gap: 10px;
+    color: #64748b;
+    text-align: center;
+}
+
+.registration-admin-empty > span {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    margin: auto;
+    border-radius: 50%;
+    color: #166534;
+    background: #dcfce7;
+    font-size: 21px;
+}
+
+@media (max-width: 850px) {
+    .registration-stat-grid,
+    .registration-detail-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .registration-admin-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .registration-public-link {
+        width: 100%;
+        text-align: center;
+    }
+
+    .registration-stat-grid,
+    .registration-review-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .registration-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .registration-admin-panel,
+    .registration-application-card {
+        padding: 16px;
+    }
+}

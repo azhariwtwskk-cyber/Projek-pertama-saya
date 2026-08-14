@@ -1,0 +1,20 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__ . '/auth.php';
+require_once dirname(__DIR__) . '/includes/compliance_service.php';
+cpmsRequire('compliance.create', $conn);
+if (!isset($propertyPortalUser) || !is_array($propertyPortalUser)) { $propertyPortalUser=[]; }
+$propertyId=cpmsCompliancePropertyId($propertyPortalUser);
+if ($propertyId<1) { http_response_code(403); exit('Property context is unavailable.'); }
+if (!cpmsComplianceTablesReady($conn)) { exit('Import compliance_sprint_2_6.sql first.'); }
+$errors=[];
+if ($_SERVER['REQUEST_METHOD']==='POST') {
+ if (!cpmsComplianceVerifyCsrf($_POST['csrf_token']??null)) { $errors[]='Invalid security token. Refresh and try again.'; }
+ $title=trim((string)($_POST['title']??'')); $category=trim((string)($_POST['category']??'General')); $location=trim((string)($_POST['location']??'')); $frequency=trim((string)($_POST['frequency_type']??'yearly')); $due=trim((string)($_POST['next_due_date']??'')); $responsible=trim((string)($_POST['responsible_person']??'')); $notes=trim((string)($_POST['notes']??''));
+ if ($title===''||$due==='') { $errors[]='Title and next due date are required.'; }
+ if (!in_array($frequency,['one_time','monthly','quarterly','half_yearly','yearly'],true)) { $frequency='yearly'; }
+ if (!$errors) { $uid=cpmsComplianceUserId($propertyPortalUser); $uname=cpmsComplianceUserName($propertyPortalUser); $stmt=$conn->prepare('INSERT INTO compliance_schedules(property_id,title,category,location,frequency_type,next_due_date,responsible_person,status,notes,created_by_id,created_by_name) VALUES(?,?,?,?,?,?,?,"active",?,NULLIF(?,0),?)'); if(!$stmt){$errors[]='Unable to prepare compliance record.';}else{$stmt->bind_param('isssssssiss',$propertyId,$title,$category,$location,$frequency,$due,$responsible,$notes,$uid,$uname);if($stmt->execute()){header('Location: compliance_view.php?id='.(int)$stmt->insert_id);exit;} $errors[]='Unable to save compliance item: '.$stmt->error;$stmt->close();}}
+}
+$pageTitle='New Compliance Item';$activeMenu='compliance';require __DIR__.'/includes/layout_header.php';require __DIR__.'/includes/layout_sidebar.php';require __DIR__.'/includes/layout_topbar.php';
+?>
+<link rel="stylesheet" href="assets/compliance-module.css"><div class="compliance-wrap"><div class="compliance-head"><div><span class="compliance-eyebrow">COMPLIANCE MANAGEMENT</span><h1>New Compliance Item</h1></div><a class="compliance-btn compliance-btn-secondary" href="compliance.php">Back</a></div><?php foreach($errors as $e):?><div class="compliance-alert compliance-alert-error"><?php echo cpmsComplianceEscape($e);?></div><?php endforeach;?><form method="post" class="compliance-form"><input type="hidden" name="csrf_token" value="<?php echo cpmsComplianceEscape(cpmsComplianceCsrfToken());?>"><div class="compliance-field"><label>Title *</label><input name="title" required placeholder="Example: Fire Extinguisher Inspection"></div><div class="compliance-row"><div class="compliance-field"><label>Category</label><input name="category" value="General"></div><div class="compliance-field"><label>Location</label><input name="location" placeholder="Example: Block A common area"></div></div><div class="compliance-row"><div class="compliance-field"><label>Frequency</label><select name="frequency_type"><option value="one_time">One time</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="half_yearly">Half yearly</option><option value="yearly" selected>Yearly</option></select></div><div class="compliance-field"><label>Next Due Date *</label><input type="date" name="next_due_date" required></div></div><div class="compliance-field"><label>Responsible Person</label><input name="responsible_person" placeholder="Manager, supervisor or contractor"></div><div class="compliance-field"><label>Notes</label><textarea name="notes" rows="4"></textarea></div><button class="compliance-btn compliance-btn-primary">Save Compliance Item</button></form></div><?php require __DIR__.'/includes/layout_footer.php';?>

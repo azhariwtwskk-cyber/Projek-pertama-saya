@@ -1,0 +1,112 @@
+/* CPMS Executive Dashboard v2 — additive and safe to remove. */
+
+.executive-score-v2 {
+    min-width: 310px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 18px;
+    align-items: center;
+}
+
+.executive-score-v2 > div:not(.score-divider) {
+    display: flex;
+    flex-direction: column;
+}
+
+.executive-score-v2 strong {
+    line-height: 1;
+}
+
+.score-divider {
+    width: 1px;
+    height: 64px;
+    background: rgba(255, 255, 255, .24);
+}
+
+.notification-panel {
+    overflow: hidden;
+}
+
+.dashboard-alert-list {
+    display: grid;
+    gap: 10px;
+}
+
+.dashboard-alert {
+    display: grid;
+    grid-template-columns: 12px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px;
+    border: 1px solid #e6ebf2;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #172033;
+    background: #fff;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.dashboard-alert:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, .08);
+}
+
+.dashboard-alert span:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dashboard-alert strong {
+    font-size: 13px;
+}
+
+.dashboard-alert small {
+    color: #748097;
+    line-height: 1.45;
+}
+
+.dashboard-alert b {
+    font-size: 18px;
+    color: #94a0b4;
+}
+
+.dashboard-alert-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #94a3b8;
+}
+
+.dashboard-alert-warning .dashboard-alert-dot {
+    background: #f59e0b;
+}
+
+.dashboard-alert-info .dashboard-alert-dot {
+    background: #3b82f6;
+}
+
+.dashboard-alert-success .dashboard-alert-dot {
+    background: #10b981;
+}
+
+.dashboard-alert-neutral .dashboard-alert-dot {
+    background: #64748b;
+}
+
+@media (max-width: 900px) {
+    .executive-score-v2 {
+        min-width: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    .executive-score-v2 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .score-divider {
+        display: none;
+    }
+}

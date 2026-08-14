@@ -1,0 +1,14 @@
+/* CPMSPro Resident Master Shell 4.2 */
+:root{--rms-navy:#0b1b34;--rms-text:#0b1730;--rms-muted:#64748b;--rms-border:#e6eaf0;--rms-bg:#f6f8fc;--rms-primary:#6366f1}
+body{background:var(--rms-bg)!important;color:var(--rms-text)!important}
+.rms-nav{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:6px 18px;background:rgba(255,255,255,.97);border-top:1px solid var(--rms-border);border-bottom:1px solid var(--rms-border);position:sticky;top:0;z-index:80;backdrop-filter:blur(14px)}
+.rms-nav a{display:flex;align-items:center;min-height:36px;padding:0 13px;border-radius:8px;color:#41506a;text-decoration:none;font-size:13px;font-weight:600;transition:background 180ms ease,color 180ms ease}
+.rms-nav a:hover{background:#f1f5f9;color:var(--rms-text)}
+.rms-nav a.active{background:var(--rms-navy);color:#fff}
+.rp-nav{display:none!important}
+.rp-head,.facility-hero,.visitor-hero{background:#fff!important;color:var(--rms-text)!important;border-bottom:0!important;box-shadow:none!important}
+.rp-head h1,.facility-hero h1,.visitor-hero h1{color:var(--rms-text)!important}
+.rp-head p,.facility-hero p,.visitor-hero p{color:var(--rms-muted)!important}
+.rp-main,.rp-wrap,.facility-wrap,.visitor-wrap{max-width:1160px!important;margin-left:auto!important;margin-right:auto!important}
+.rp-card,.facility-card,.facility-panel,.visitor-card,.visitor-panel{background:#fff!important;border:1px solid var(--rms-border)!important;border-radius:14px!important;box-shadow:none!important}
+@media(max-width:800px){.rms-nav{justify-content:flex-start;overflow-x:auto;white-space:nowrap}.rms-nav a{flex:0 0 auto}.rp-main,.rp-wrap,.facility-wrap,.visitor-wrap{padding-left:14px!important;padding-right:14px!important}}

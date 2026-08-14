@@ -1,0 +1,22 @@
+/* CPMSPro Genesis Rollout 4 — Resident Portal
+Presentation only. Resident auth, unit/property scoping, requests and data logic remain unchanged. */
+:root{--rp-primary:#6366F1;--rp-hover:#4F46E5;--rp-bg:#F7F8FB;--rp-surface:#fff;--rp-text:#0A0A0A;--rp-text2:#6B6B6B;--rp-border:#E8E8EC;--rp-success:#10B981;--rp-warning:#F59E0B;--rp-error:#EF4444}
+html{background:var(--rp-bg)}body{background:var(--rp-bg)!important;color:var(--rp-text)!important}
+.sidebar,.resident-sidebar{background:#111827!important;border-right:1px solid #20293A!important;box-shadow:none!important}
+.sidebar a,.resident-sidebar a,.nav-link{border-radius:7px!important;transition:background 180ms ease,color 180ms ease,transform 180ms ease!important}
+.sidebar a:hover,.resident-sidebar a:hover,.nav-link:hover{transform:translateX(1px)}
+.sidebar a.active,.resident-sidebar a.active,.nav-link.active{background:var(--rp-primary)!important;color:#fff!important}
+.topbar,.header,.resident-header,.page-header{background:rgba(255,255,255,.94)!important;backdrop-filter:blur(14px);border-bottom:1px solid var(--rp-border)!important;box-shadow:none!important}
+.card,.panel,.resident-card,.request-card,.announcement-card,.notification-card,.profile-card,.stat-card,.quick-action{
+background:var(--rp-surface)!important;border:1px solid var(--rp-border)!important;border-radius:12px!important;box-shadow:none!important;transition:transform 180ms ease,box-shadow 180ms ease!important}
+.card:hover,.request-card:hover,.announcement-card:hover,.quick-action:hover{box-shadow:0 8px 28px rgba(0,0,0,.05)!important}
+button,.btn,.button,a.btn,input[type=submit]{border-radius:7px!important;transition:transform 180ms ease,box-shadow 180ms ease,background 180ms ease!important}
+button:hover,.btn:hover,.button:hover,a.btn:hover{transform:translateY(-1px)}
+.btn-primary,.primary-btn,button.primary{background:var(--rp-primary)!important;border-color:var(--rp-primary)!important;color:#fff!important}
+.btn-primary:hover,.primary-btn:hover{background:var(--rp-hover)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea{border:1px solid var(--rp-border)!important;border-radius:7px!important;background:#fff!important;min-height:42px}
+textarea{min-height:100px}input:focus,select:focus,textarea:focus{outline:none!important;border-color:var(--rp-primary)!important;box-shadow:0 0 0 3px rgba(99,102,241,.12)!important}
+.badge,.status,.status-badge,.chip,.pill{border-radius:9999px!important}
+table{border-collapse:separate!important;border-spacing:0!important}table th{background:#FAFAFA!important;color:var(--rp-text2)!important;font-size:11px!important}table td{border-color:#F0F0F2!important}
+@media(max-width:760px){.main,.content,.main-content,.page-content{padding-left:14px!important;padding-right:14px!important}.card,.panel,.resident-card,.request-card,.announcement-card,.notification-card,.profile-card,.stat-card,.quick-action{border-radius:10px!important}button,.btn,.button,a.btn,input[type=submit],input:not([type=checkbox]):not([type=radio]),select{min-height:46px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1630">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; connect-src https:; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline'; script-src 'self';">
+  <title>CPMS Workforce</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div id="splash" class="splash" aria-hidden="true">
+    <div class="brand-mark brand-mark--large">C</div>
+    <strong>CPMS <span>Workforce</span></strong>
+    <small>Android v4.1.1</small>
+  </div>
+
+  <div id="offlineBanner" class="offline-banner" hidden>
+    <span>●</span>
+    <span data-i18n="offline">Offline — tindakan akan disimpan sementara</span>
+  </div>
+
+  <main id="loginView" class="login-view">
+    <section class="login-hero">
+      <div class="brand-lockup">
+        <div class="brand-mark">C</div>
+        <div>
+          <strong>CPMS</strong>
+          <span>Workforce</span>
+        </div>
+      </div>
+      <button id="languageButton" class="language-button" type="button" aria-label="Change language">BM <span>|</span> EN</button>
+      <div class="login-copy">
+        <span class="eyebrow">COMMERCIAL PROPERTY MANAGEMENT SYSTEM</span>
+        <h1 data-i18n="welcome">Selamat datang</h1>
+        <p data-i18n="loginSubtitle">Log masuk menggunakan akaun Staff atau Security yang diberikan oleh pihak pengurusan.</p>
+      </div>
+    </section>
+
+    <section class="login-card">
+      <div class="login-card__header">
+        <h2 data-i18n="signIn">Log masuk</h2>
+        <span id="modeBadge" class="mode-badge">DEMO</span>
+      </div>
+      <form id="loginForm" novalidate>
+        <label>
+          <span data-i18n="username">Nama pengguna</span>
+          <span class="input-wrap"><span class="input-icon">●</span><input id="username" name="username" autocomplete="username" required></span>
+        </label>
+        <label>
+          <span data-i18n="password">Kata laluan</span>
+          <span class="input-wrap"><span class="input-icon">◆</span><input id="password" name="password" type="password" autocomplete="current-password" required><button id="togglePassword" class="input-action" type="button" aria-label="Show password">◉</button></span>
+        </label>
+        <p id="loginError" class="form-error" role="alert" hidden></p>
+        <button id="loginButton" class="primary-button" type="submit"><span data-i18n="loginButton">Log masuk ke CPMS</span><span>→</span></button>
+      </form>
+      <div id="demoPanel" class="demo-panel">
+        <div class="divider"><span data-i18n="demoAccount">Akaun demonstrasi</span></div>
+        <div class="demo-actions">
+          <button type="button" data-demo-role="staff"><span class="demo-icon demo-icon--staff">S</span><span><strong>Staff</strong><small data-i18n="openStaffDemo">Buka demo Staff</small></span></button>
+          <button type="button" data-demo-role="security"><span class="demo-icon demo-icon--security">G</span><span><strong>Security</strong><small data-i18n="openSecurityDemo">Buka demo Security</small></span></button>
+        </div>
+      </div>
+      <p class="secure-note">◆ <span data-i18n="secureNote">Data diasingkan mengikut property dan peranan pengguna.</span></p>
+    </section>
+  </main>
+
+  <main id="appView" class="app-view" hidden>
+    <header class="app-header">
+      <div class="app-header__row">
+        <div class="brand-lockup brand-lockup--small"><div class="brand-mark">C</div><div><strong>CPMS</strong><span>Workforce</span></div></div>
+        <div class="header-actions"><button id="appLanguageButton" type="button">BM/EN</button><button id="notificationButton" class="notification-button" type="button" aria-label="Notifications">♢<span>3</span></button></div>
+      </div>
+      <div class="welcome-row">
+        <div><small id="roleLabel">STAFF</small><h1 id="welcomeName">Selamat datang</h1></div>
+        <button id="profileButton" class="avatar" type="button" aria-label="Profile">AR</button>
+      </div>
+      <div class="property-card"><div class="property-icon">▥</div><div><strong id="propertyName">Property</strong><span id="shiftLabel">Shift</span></div><span class="property-badge" id="propertyCode">V23</span></div>
+    </header>
+
+    <section id="dashboardContent" class="dashboard-content" aria-live="polite"></section>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button type="button" class="is-active" data-tab="home"><span>⌂</span><small data-i18n="home">Utama</small></button>
+      <button type="button" data-tab="tasks"><span>▤</span><small data-i18n="tasks">Tugasan</small></button>
+      <button type="button" data-tab="attendance"><span>▦</span><small data-i18n="attendance">Kehadiran</small></button>
+      <button type="button" data-tab="profile"><span>●</span><small data-i18n="profile">Profil</small></button>
+    </nav>
+  </main>
+
+  <dialog id="actionDialog" class="action-dialog">
+    <form method="dialog" id="actionForm">
+      <div class="dialog-header"><div><small id="dialogEyebrow">CPMS WORKFORCE</small><h2 id="dialogTitle">Action</h2></div><button value="cancel" aria-label="Close">×</button></div>
+      <div id="dialogBody"></div>
+      <div class="dialog-actions"><button value="cancel" class="secondary-button" data-i18n="cancel">Batal</button><button id="dialogSubmit" value="default" class="primary-button" data-i18n="submit">Hantar</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+  <script src="js/vendor/jsQR.js?v=4110"></script>
+  <script type="module" src="js/app.js?v=4110"></script>
+</body>
+</html>

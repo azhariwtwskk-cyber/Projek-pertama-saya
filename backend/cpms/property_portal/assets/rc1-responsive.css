@@ -1,0 +1,276 @@
+/* CPMS V24 RC1.3 — responsive and UI stability patch */
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+img,
+svg,
+video,
+canvas {
+    max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+    max-width: 100%;
+}
+
+.admin-main,
+.admin-content,
+.admin-content > *,
+.page-shell,
+.panel,
+.card {
+    min-width: 0;
+}
+
+/* Prevent long values, names and references from breaking layouts. */
+.admin-content,
+.topbar-title,
+.topbar-property,
+.sidebar-brand-text,
+.account-copy,
+.table-wrap,
+.smart-table-wrap {
+    overflow-wrap: anywhere;
+}
+
+/* Reliable horizontal scrolling for wide legacy tables. */
+.table-wrap,
+.smart-table-wrap,
+.responsive-table,
+.admin-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-wrap table,
+.responsive-table table,
+.admin-table-wrap table {
+    min-width: 680px;
+}
+
+/* Better touch targets. */
+.sidebar-link,
+.sidebar-toggle,
+.btn,
+button,
+input[type="submit"],
+input[type="button"],
+input[type="reset"] {
+    min-height: 44px;
+}
+
+.sidebar-toggle {
+    touch-action: manipulation;
+}
+
+/* Keyboard accessibility. */
+:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--property-primary) 45%, white);
+    outline-offset: 2px;
+}
+
+.sidebar-link:focus-visible,
+.btn:focus-visible,
+button:focus-visible,
+a:focus-visible {
+    border-radius: 8px;
+}
+
+/* Lock page scrolling when the mobile menu is open. */
+body.sidebar-open {
+    overflow: hidden;
+    touch-action: none;
+}
+
+/* Reduce accidental animation discomfort. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .admin-sidebar {
+        width: min(86vw, 320px);
+        max-width: 320px;
+        height: 100dvh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    }
+
+    .admin-main {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+
+    .admin-topbar {
+        min-height: 68px;
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+    }
+
+    .admin-content {
+        width: 100%;
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    .topbar-meta {
+        min-width: 0;
+    }
+
+    .topbar-property {
+        max-width: 220px;
+    }
+}
+
+@media (max-width: 680px) {
+    .admin-topbar {
+        gap: 10px;
+    }
+
+    .topbar-left {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .topbar-title {
+        min-width: 0;
+    }
+
+    .topbar-title strong,
+    .topbar-title span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .topbar-meta {
+        flex: 0 0 auto;
+    }
+
+    .topbar-property {
+        display: none;
+    }
+
+    .topbar-id {
+        white-space: nowrap;
+    }
+
+    .admin-content {
+        padding-top: 18px;
+        padding-bottom: 24px;
+    }
+
+    .admin-footer {
+        gap: 6px;
+        align-items: flex-start;
+        flex-direction: column;
+        padding-left: max(16px, env(safe-area-inset-left));
+        padding-right: max(16px, env(safe-area-inset-right));
+        padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+
+    .form-grid,
+    .filter-grid,
+    .action-grid,
+    .stats-grid,
+    .kpi-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .form-actions,
+    .page-actions,
+    .panel-actions,
+    .toolbar-actions {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .form-actions .btn,
+    .page-actions .btn,
+    .panel-actions .btn,
+    .toolbar-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    input,
+    select,
+    textarea {
+        font-size: 16px; /* Prevent iOS form zoom. */
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-topbar,
+    .admin-content,
+    .admin-footer {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .topbar-eyebrow {
+        display: none !important;
+    }
+
+    .topbar-id {
+        font-size: 11px;
+        padding-inline: 8px;
+    }
+
+    .sidebar-brand {
+        padding-inline: 14px;
+    }
+
+    .sidebar-menu {
+        padding-inline: 10px;
+    }
+}
+
+@media print {
+    .admin-sidebar,
+    .admin-topbar,
+    .sidebar-overlay,
+    .admin-footer,
+    .no-print {
+        display: none !important;
+    }
+
+    .admin-main,
+    .admin-content {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body {
+        overflow: visible !important;
+        background: white !important;
+    }
+}

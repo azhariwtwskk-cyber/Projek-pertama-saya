@@ -1,0 +1,409 @@
+.facility-admin-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.facility-admin-heading h1 {
+    margin: 5px 0 6px;
+    color: #10213d;
+    font-size: clamp(30px, 4vw, 46px);
+    letter-spacing: -1.4px;
+}
+
+.facility-admin-heading p {
+    max-width: 720px;
+    margin: 0;
+    color: #66758a;
+}
+
+.facility-admin-label {
+    color: var(--property-primary, #2563eb);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1.45px;
+}
+
+.facility-public-link,
+.facility-admin-panel-head a {
+    display: inline-flex;
+    padding: 11px 15px;
+    border: 1px solid #ccd8e6;
+    border-radius: 10px;
+    color: #173f70;
+    background: #fff;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.facility-admin-alert {
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.facility-admin-alert--success {
+    color: #166534;
+    border-color: #a7e3b9;
+    background: #eaf9ef;
+}
+
+.facility-admin-alert--danger {
+    color: #991b1b;
+    border-color: #fecaca;
+    background: #fff1f2;
+}
+
+.facility-admin-stats {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.facility-admin-stat {
+    display: grid;
+    gap: 7px;
+    min-height: 100px;
+    padding: 16px;
+    border: 1px solid #d7e1ec;
+    border-radius: 14px;
+    color: #53667d;
+    background: #fff;
+    box-shadow: 0 7px 22px rgba(19, 49, 84, .045);
+    text-decoration: none;
+}
+
+.facility-admin-stat span {
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.facility-admin-stat strong {
+    color: #112b4d;
+    font-size: 28px;
+}
+
+.facility-admin-stat.is-active {
+    border-color: var(--property-primary, #2563eb);
+    box-shadow: inset 0 3px 0 var(--property-primary, #2563eb);
+}
+
+.facility-admin-stat--cancel strong { color: #a16207; }
+
+.facility-admin-panel {
+    padding: 22px;
+    margin-bottom: 20px;
+    scroll-margin-top: 85px;
+    border: 1px solid #d8e1ec;
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 8px 26px rgba(16, 43, 76, .05);
+}
+
+.facility-admin-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.facility-admin-panel-head h2 {
+    margin: 4px 0 0;
+    color: #142b4b;
+    font-size: 23px;
+}
+
+.facility-admin-panel-head > span {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.facility-admin-empty {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: 42px 20px;
+    color: #53667d;
+    text-align: center;
+}
+
+.facility-admin-empty span {
+    display: grid;
+    width: 50px;
+    height: 50px;
+    place-items: center;
+    border-radius: 14px;
+    color: #15703a;
+    background: #e3f7ea;
+    font-size: 22px;
+}
+
+.facility-admin-booking-list,
+.facility-admin-cancellation-list {
+    display: grid;
+    gap: 14px;
+}
+
+.facility-admin-booking,
+.facility-admin-cancellation {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    border: 1px solid #dce5ef;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.facility-admin-booking::before {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 5px;
+    background: #94a3b8;
+    content: '';
+}
+
+.facility-admin-booking.status-pending::before { background: #d97706; }
+.facility-admin-booking.status-approved::before { background: #15803d; }
+.facility-admin-booking.status-rejected::before,
+.facility-admin-booking.status-cancelled::before { background: #b42318; }
+
+.facility-admin-booking-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.facility-admin-booking-top h3,
+.facility-admin-booking-top p {
+    margin: 4px 0;
+}
+
+.facility-admin-booking-top p {
+    color: #64748b;
+}
+
+.facility-admin-reference {
+    color: var(--property-primary, #2563eb);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.facility-admin-status {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: #475569;
+    background: #edf2f7;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.facility-admin-status.status-pending { color: #8a4b05; background: #fff1cf; }
+.facility-admin-status.status-approved { color: #12652f; background: #dcf7e5; }
+.facility-admin-status.status-rejected,
+.facility-admin-status.status-cancelled { color: #991b1b; background: #fee2e2; }
+
+.facility-admin-details {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.facility-admin-details div {
+    padding: 11px;
+    border-radius: 10px;
+    background: #f5f8fc;
+}
+
+.facility-admin-details dt {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.facility-admin-details dd {
+    margin: 5px 0 0;
+    color: #1d3555;
+    font-weight: 800;
+}
+
+.facility-admin-purpose {
+    padding: 12px 14px;
+    border-left: 3px solid #9dc4eb;
+    color: #314862;
+    background: #f6f9fd;
+}
+
+.facility-admin-review-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.facility-admin-review {
+    display: grid;
+    gap: 10px;
+    padding: 13px;
+    border: 1px solid #dce5ef;
+    border-radius: 11px;
+    background: #fbfdff;
+}
+
+.facility-admin-review label {
+    display: grid;
+    gap: 6px;
+    color: #314862;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.facility-admin-review textarea,
+.facility-admin-form input,
+.facility-admin-form textarea {
+    width: 100%;
+    padding: 10px 11px;
+    border: 1px solid #cbd7e5;
+    border-radius: 9px;
+    color: #10213d;
+    background: #fff;
+    font: inherit;
+}
+
+.facility-admin-review button,
+.facility-admin-save {
+    min-height: 40px;
+    border: 0;
+    border-radius: 9px;
+    color: #fff !important;
+    background: #19703d !important;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.facility-admin-review--reject button {
+    background: #b42318 !important;
+}
+
+.facility-admin-history {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: #40556f;
+    background: #eef4fb;
+}
+
+.facility-admin-history p {
+    margin: 5px 0 0;
+}
+
+.facility-admin-form {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 13px;
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 13px;
+    background: #f5f8fc;
+}
+
+.facility-admin-form > label {
+    display: grid;
+    gap: 6px;
+    color: #314862;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.facility-admin-form-wide,
+.facility-admin-checks,
+.facility-admin-save {
+    grid-column: 1 / -1;
+}
+
+.facility-admin-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.facility-admin-checks label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #314862;
+    font-weight: 800;
+}
+
+.facility-admin-checks input {
+    width: 17px;
+    height: 17px;
+}
+
+.facility-admin-save {
+    min-height: 46px;
+    background: var(--property-primary, #2563eb) !important;
+}
+
+.facility-admin-directory {
+    display: grid;
+    gap: 9px;
+}
+
+.facility-admin-directory article {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 13px 15px;
+    border: 1px solid #dce5ef;
+    border-radius: 11px;
+}
+
+.facility-admin-directory h3,
+.facility-admin-directory p {
+    margin: 5px 0 0;
+}
+
+.facility-admin-directory p {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.facility-admin-directory a {
+    color: var(--property-primary, #2563eb);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+@media (max-width: 1100px) {
+    .facility-admin-stats { grid-template-columns: repeat(3, 1fr); }
+    .facility-admin-form { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 720px) {
+    .facility-admin-heading,
+    .facility-admin-booking-top { align-items: flex-start; flex-direction: column; }
+    .facility-admin-stats { grid-template-columns: repeat(2, 1fr); }
+    .facility-admin-details,
+    .facility-admin-review-grid,
+    .facility-admin-form { grid-template-columns: 1fr; }
+    .facility-admin-form-wide,
+    .facility-admin-checks,
+    .facility-admin-save { grid-column: auto; }
+    .facility-admin-panel { padding: 16px; }
+}

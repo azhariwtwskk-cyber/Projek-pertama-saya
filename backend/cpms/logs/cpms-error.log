@@ -1,0 +1,20 @@
+[20-Jul-2026 10:53:04 Asia/Kuala_Lumpur] RuntimeException: Fail db.php tidak ditemui pada root sistem CPMS. in /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core/database.php:14
+Stack trace:
+#0 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core/bootstrap.php(30): require_once()
+#1 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/example_dashboard.php(4): require_once('/home/vol5_2/in...')
+#2 {main}
+[20-Jul-2026 10:53:31 Asia/Kuala_Lumpur] RuntimeException: Fail db.php tidak ditemui pada root sistem CPMS. in /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core/database.php:14
+Stack trace:
+#0 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core/bootstrap.php(30): require_once()
+#1 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/example_dashboard.php(4): require_once('/home/vol5_2/in...')
+#2 {main}
+[20-Jul-2026 10:57:16 Asia/Kuala_Lumpur] RuntimeException: Fail db.php tidak ditemui pada root sistem CPMS. in /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core/database.php:14
+Stack trace:
+#0 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core/bootstrap.php(30): require_once()
+#1 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/example_dashboard.php(4): require_once('/home/vol5_2/in...')
+#2 {main}
+[20-Jul-2026 10:57:17 Asia/Kuala_Lumpur] RuntimeException: Fail db.php tidak ditemui pada root sistem CPMS. in /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core/database.php:14
+Stack trace:
+#0 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core/bootstrap.php(30): require_once()
+#1 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/example_dashboard.php(4): require_once('/home/vol5_2/in...')
+#2 {main}

@@ -1,0 +1,16 @@
+[2026-07-27 14:20:40] mysqli_sql_exception: Column 'constraint_name' in SELECT is ambiguous in /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/install/foreign_key_health_v2.php:35
+Stack trace:
+#0 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/install/foreign_key_health_v2.php(35): mysqli->prepare('SELECT\n        ...')
+#1 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/install/foreign_key_health_v2.php(90): cpmsFkFind(Object(mysqli), 'if0_42377880_ho...', 'complaints', 'property_id', 'cpms_properties', 'id')
+#2 {main}
+[2026-07-27 14:21:00] mysqli_sql_exception: Column 'constraint_name' in SELECT is ambiguous in /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/install/foreign_key_health_v2.php:35
+Stack trace:
+#0 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/install/foreign_key_health_v2.php(35): mysqli->prepare('SELECT\n        ...')
+#1 /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/install/foreign_key_health_v2.php(90): cpmsFkFind(Object(mysqli), 'if0_42377880_ho...', 'complaints', 'property_id', 'cpms_properties', 'id')
+#2 {main}
+[2026-07-28 07:43:56] Error: Failed opening required '/home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core_v2/migration_engine.php' (include_path='.:/usr/share/pear/') in /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/install/migration_manager_v2.php:5
+Stack trace:
+#0 {main}
+[2026-07-28 07:45:49] Error: Failed opening required '/home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/core_v2/migration_engine.php' (include_path='.:/usr/share/pear/') in /home/vol5_2/infinityfree.com/if0_42377880/htdocs/cpms/install/migration_manager_v2.php:5
+Stack trace:
+#0 {main}
