@@ -6,7 +6,13 @@ if (defined('CPMS_WORKFORCE_API_BOOTSTRAPPED')) {
 }
 
 define('CPMS_WORKFORCE_API_BOOTSTRAPPED', true);
-define('CPMS_WORKFORCE_API_VERSION', '4.0.1');
+define('CPMS_WORKFORCE_API_VERSION', '4.1.0');
+
+// Stage 1 auth (see mobile/docs/BACKEND_INTEGRATION_AUDIT.md): access
+// tokens stay short-lived, the refresh token is what keeps staff signed
+// in across a shift without repeated logins.
+define('CPMS_API_ACCESS_TOKEN_TTL_SECONDS', 3600);
+define('CPMS_API_REFRESH_TOKEN_TTL_DAYS', 30);
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
@@ -159,6 +165,14 @@ function cpmsApiTableExists(mysqli $db, string $table): bool
     return $result instanceof mysqli_result && $result->num_rows > 0;
 }
 
+function cpmsApiColumnExists(mysqli $db, string $table, string $column): bool
+{
+    $safeTable = $db->real_escape_string($table);
+    $safeColumn = $db->real_escape_string($column);
+    $result = $db->query("SHOW COLUMNS FROM `{$safeTable}` LIKE '{$safeColumn}'");
+    return $result instanceof mysqli_result && $result->num_rows > 0;
+}
+
 function cpmsApiTablesReady(mysqli $db): bool
 {
     foreach (['cpms_api_tokens', 'cpms_api_login_attempts',
@@ -167,6 +181,14 @@ function cpmsApiTablesReady(mysqli $db): bool
         if (!cpmsApiTableExists($db, $table)) {
             return false;
         }
+    }
+    // Stage 1 (refresh tokens): migration 20260814_0060 adds this column
+    // to the already-live cpms_api_tokens table. Treat it the same as a
+    // missing table so an un-migrated server fails with a clear
+    // API_NOT_INSTALLED error instead of a raw SQL error from login.php
+    // or refresh.php trying to write a column that doesn't exist yet.
+    if (!cpmsApiColumnExists($db, 'cpms_api_tokens', 'refresh_token_hash')) {
+        return false;
     }
     return true;
 }
@@ -255,7 +277,7 @@ function cpmsApiAuth(): array
     if (!cpmsApiTablesReady($db)) {
         cpmsApiError(
             'API_NOT_INSTALLED',
-            'Jalankan migration CPMS Workforce v4.0.1 terlebih dahulu.',
+            'Jalankan migration CPMS Workforce v4.1.0 terlebih dahulu.',
             503
         );
     }
@@ -266,6 +288,7 @@ function cpmsApiAuth(): array
         "SELECT t.id AS token_id,t.system_user_id,t.property_id,t.role_name,
                 t.expires_at,su.username,su.full_name,su.status AS user_status,
                 su.source_table,su.source_id,p.property_code,p.property_name,
+                p.company_name,p.logo_path,p.primary_color,p.secondary_color,
                 p.timezone_name,p.is_active AS property_active
          FROM cpms_api_tokens t
          JOIN system_users su ON su.id=t.system_user_id
@@ -343,6 +366,10 @@ function cpmsApiAuth(): array
             'id' => $propertyId,
             'code' => (string) $row['property_code'],
             'name' => (string) $row['property_name'],
+            'company_name' => (string) ($row['company_name'] ?? ''),
+            'logo_url' => cpmsApiBrandingAssetUrl((string) ($row['logo_path'] ?? '')),
+            'primary_color' => (string) ($row['primary_color'] ?? ''),
+            'secondary_color' => (string) ($row['secondary_color'] ?? ''),
         ],
     ];
     return $identity;

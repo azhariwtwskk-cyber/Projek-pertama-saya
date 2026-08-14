@@ -1,6 +1,28 @@
 <?php
 declare(strict_types=1);
 
+/**
+ * Turns a cpms_properties.logo_path value (stored relative, e.g.
+ * "images/logo.png" or "uploads/branding/xyz.png") into a root-relative
+ * URL the mobile app can load directly, using the same "/cpms/<path>"
+ * convention this API already uses for evidence photo URLs
+ * (see cpmsApiSaveImage() callers). Deliberately self-contained rather
+ * than reusing cpms/core/branding.php's cpmsBrandingAssetUrl() helper,
+ * since that module isn't guaranteed to be loaded on every request path
+ * (see mobile/docs/BACKEND_INTEGRATION_AUDIT.md, S-M3-adjacent note).
+ */
+function cpmsApiBrandingAssetUrl(?string $path): string
+{
+    $path = trim((string) $path);
+    if ($path === '') {
+        return '';
+    }
+    if (preg_match('#^https?://#i', $path)) {
+        return $path;
+    }
+    return '/cpms/' . ltrim($path, '/');
+}
+
 function cpmsApiLocation(array $input): array
 {
     $location = isset($input['location']) && is_array($input['location'])

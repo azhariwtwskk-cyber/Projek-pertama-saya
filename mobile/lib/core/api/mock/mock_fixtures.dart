@@ -31,12 +31,17 @@ class MockFixtures {
     secondaryColor: Color(0xFF12B76A),
   );
 
-  final StaffUser staffUser = StaffUser(
+  // `late`: these read the `instance` static field via `instance.branding`,
+  // so they must not be evaluated as part of building `instance` itself
+  // (eager initializers run before the `static final instance = ...`
+  // assignment completes, which previously caused unbounded recursion).
+  late final StaffUser staffUser = StaffUser(
     userId: 'usr_1029',
     staffId: 'STF-2031',
     propertyId: 'PROP-V23',
     name: 'Ahmad Rozahari',
     role: 'Maintenance Technician',
+    username: 'ahmad.rozahari',
     employeeId: 'EMP-04471',
     phone: '+60 12-345 6789',
     email: 'rozahari88@gmail.com',
@@ -69,7 +74,7 @@ class MockFixtures {
     ),
   ];
 
-  AttendanceStatus attendanceStatus = AttendanceStatus(
+  late AttendanceStatus attendanceStatus = AttendanceStatus(
     status: ClockStatus.clockedOut,
     propertyName: instance.branding.propertyName,
   );

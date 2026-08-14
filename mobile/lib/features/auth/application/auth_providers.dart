@@ -21,6 +21,10 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 
 enum AuthStatus { unknown, authenticating, authenticated, unauthenticated }
 
+/// Sentinel distinguishing "no value passed" from "explicitly passed null"
+/// for [AuthState.copyWith]'s `user` parameter.
+const _unset = Object();
+
 class AuthState {
   const AuthState({required this.status, this.user, this.errorMessage});
 
@@ -30,9 +34,13 @@ class AuthState {
 
   static const initial = AuthState(status: AuthStatus.unknown);
 
-  AuthState copyWith({AuthStatus? status, StaffUser? user, String? errorMessage}) => AuthState(
+  AuthState copyWith({AuthStatus? status, Object? user = _unset, String? errorMessage}) => AuthState(
         status: status ?? this.status,
-        user: user ?? this.user,
+        // `user ?? this.user` would silently keep the old user whenever a
+        // caller passes `user: null` to clear it (e.g. forceLogout,
+        // logout) -- an `identical(_unset)` check is needed so an explicit
+        // null is honored instead of being treated as "not provided".
+        user: identical(user, _unset) ? this.user : user as StaffUser?,
         errorMessage: errorMessage,
       );
 }
@@ -44,6 +52,14 @@ class AuthController extends StateNotifier<AuthState> {
 
   final AuthRepository _repository;
   final SecureStorageService _secureStorage;
+
+  /// Guards against concurrent refresh calls: if several requests 401 at
+  /// once (e.g. right after the app resumes with an expired access
+  /// token), they all await this one in-flight refresh instead of each
+  /// firing their own `POST /auth/refresh.php` — the backend rotates the
+  /// refresh token on every call, so a second concurrent call using the
+  /// now-stale stored token would otherwise fail needlessly.
+  Future<String?>? _refreshInFlight;
 
   Future<void> _restoreSession() async {
     // Deliberately catches everything, including failures reading secure
@@ -57,12 +73,20 @@ class AuthController extends StateNotifier<AuthState> {
         state = state.copyWith(status: AuthStatus.unauthenticated);
         return;
       }
+      // No separate "is the access token expired?" check here on purpose:
+      // fetchProfile() below goes through ApiClient, whose interceptor
+      // already does the full 401 -> refresh -> retry dance (see
+      // onTokenRefreshNeeded below) — restoring an expired-but-refreshable
+      // session and restoring a still-valid one are the same code path.
       final user = await _repository.fetchProfile();
       state = state.copyWith(status: AuthStatus.authenticated, user: user);
     } catch (_) {
-      // Report unauthenticated first — clearing the (possibly already
-      // broken) secure storage is best-effort cleanup and must never be
-      // able to block the state transition that unblocks the UI.
+      if (state.status == AuthStatus.unauthenticated) {
+        // ApiClient's onSessionExpired (forceLogout, below) already ran
+        // as part of that failed refresh attempt and already set a
+        // user-facing message — don't overwrite it.
+        return;
+      }
       state = state.copyWith(status: AuthStatus.unauthenticated);
       try {
         await _secureStorage.clearSession();
@@ -83,8 +107,8 @@ class AuthController extends StateNotifier<AuthState> {
       await _secureStorage.saveSession(
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
-        expiresAt: result.expiresAt,
-        deviceSessionId: result.deviceSessionId,
+        accessExpiresAt: result.accessExpiresAt,
+        refreshExpiresAt: result.refreshExpiresAt,
       );
       await _secureStorage.saveRememberedUsername(rememberMe ? usernameOrEmail : null);
       state = state.copyWith(status: AuthStatus.authenticated, user: result.user);
@@ -110,7 +134,42 @@ class AuthController extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.unauthenticated, user: null);
   }
 
-  /// Invoked by [ApiClient] when a 401 survives a refresh attempt.
+  /// Assigned to [ApiClient.onTokenRefreshNeeded]. Returns the new access
+  /// token on success, or null if the session genuinely can't be
+  /// refreshed (no stored refresh token, or the server rejected it as
+  /// expired/revoked/already-used) — ApiClient treats null as "give up
+  /// and call onSessionExpired," never retries on its own.
+  Future<String?> refreshAccessToken() {
+    return _refreshInFlight ??= _performRefresh().whenComplete(() {
+      _refreshInFlight = null;
+    });
+  }
+
+  Future<String?> _performRefresh() async {
+    final storedRefreshToken = await _secureStorage.refreshToken;
+    if (storedRefreshToken == null) return null;
+    try {
+      final result = await _repository.refresh(refreshToken: storedRefreshToken);
+      await _secureStorage.saveRefreshedSession(
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+        accessExpiresAt: result.accessExpiresAt,
+        refreshExpiresAt: result.refreshExpiresAt,
+      );
+      return result.accessToken;
+    } catch (_) {
+      // RefreshTokenInvalid or any other failure (offline, server error):
+      // either way this refresh attempt didn't produce a usable token, so
+      // report failure and let the caller (ApiClient) fall back to
+      // onSessionExpired. We don't distinguish "definitely invalid" from
+      // "network hiccup" here — both correctly result in the request that
+      // triggered this failing too, which is the safe default.
+      return null;
+    }
+  }
+
+  /// Invoked by [ApiClient] when a 401 survives a refresh attempt (or the
+  /// refresh attempt itself couldn't produce a token).
   void forceLogout() {
     _secureStorage.clearSession();
     state = state.copyWith(status: AuthStatus.unauthenticated, user: null, errorMessage: 'Session expired. Please login again.');
@@ -123,7 +182,9 @@ final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
   // providers don't form a dependency cycle: ApiClient reports session
   // expiry up to whoever owns the session, and AuthController is that
   // owner.
-  ref.watch(apiClientProvider).onSessionExpired = () async => controller.forceLogout();
+  final client = ref.watch(apiClientProvider);
+  client.onTokenRefreshNeeded = controller.refreshAccessToken;
+  client.onSessionExpired = () async => controller.forceLogout();
   return controller;
 });
 

@@ -19,8 +19,8 @@ class MockAuthRepository implements AuthRepository {
       user: MockFixtures.instance.staffUser,
       accessToken: 'mock_access_${const Uuid().v4()}',
       refreshToken: 'mock_refresh_${const Uuid().v4()}',
-      expiresAt: DateTime.now().add(const Duration(hours: 8)),
-      deviceSessionId: const Uuid().v4(),
+      accessExpiresAt: DateTime.now().add(const Duration(hours: 1)),
+      refreshExpiresAt: DateTime.now().add(const Duration(days: 30)),
     );
   }
 
@@ -33,5 +33,24 @@ class MockAuthRepository implements AuthRepository {
   Future<StaffUser> fetchProfile() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return MockFixtures.instance.staffUser;
+  }
+
+  @override
+  Future<RefreshResult> refresh({required String refreshToken}) async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    // Mirrors the real backend's rotation-invalidates-the-old-token
+    // behaviour closely enough to exercise the same Flutter-side flow in
+    // mock/demo mode: any token that doesn't look like one this mock
+    // itself issued is rejected, exactly like an unknown/already-rotated
+    // refresh token is on the real server.
+    if (!refreshToken.startsWith('mock_refresh_')) {
+      throw const RefreshTokenInvalid('Refresh token is invalid or expired.');
+    }
+    return RefreshResult(
+      accessToken: 'mock_access_${const Uuid().v4()}',
+      refreshToken: 'mock_refresh_${const Uuid().v4()}',
+      accessExpiresAt: DateTime.now().add(const Duration(hours: 1)),
+      refreshExpiresAt: DateTime.now().add(const Duration(days: 30)),
+    );
   }
 }

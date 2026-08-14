@@ -4,16 +4,24 @@ import '../config/app_config.dart';
 /// 32). Keeping every path in one place means a backend change is a
 /// one-line diff, and it documents exactly what the mobile app expects
 /// from the existing CPMSPro platform.
+///
+/// Stage 1 (see mobile/docs/BACKEND_INTEGRATION_AUDIT.md): the auth/profile
+/// paths below have been corrected to match the real backend, which is
+/// deployed at `<host>/cpms/api/v1/...php` — not the `/api/v1/...`
+/// (no `cpms/` prefix, no `.php`) paths this file originally assumed.
+/// Every other endpoint below is still the pre-Stage-1 placeholder path
+/// and has NOT been verified or corrected yet; that happens stage by
+/// stage as each feature is migrated (see the audit's staged plan).
 class ApiEndpoints {
   const ApiEndpoints._();
 
   static const String _v = AppConfig.apiVersion;
 
-  static const String login = '/api/$_v/auth/login';
-  static const String logout = '/api/$_v/auth/logout';
-  static const String refreshToken = '/api/$_v/auth/refresh';
+  static const String login = '/cpms/api/$_v/auth/login.php';
+  static const String logout = '/cpms/api/$_v/auth/logout.php';
+  static const String refreshToken = '/cpms/api/$_v/auth/refresh.php';
 
-  static const String staffProfile = '/api/$_v/staff/profile';
+  static const String staffProfile = '/cpms/api/$_v/me.php';
   static const String staffDashboard = '/api/$_v/staff/dashboard';
   static const String staffTasks = '/api/$_v/staff/tasks';
   static String staffTask(String id) => '/api/$_v/staff/tasks/$id';

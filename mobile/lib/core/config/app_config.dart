@@ -4,10 +4,13 @@
 class AppConfig {
   const AppConfig._();
 
-  /// Base URL of the CPMSPro REST API, e.g. https://api.cpmspro.com
+  /// Site root the CPMSPro backend is deployed under — the real API lives
+  /// at `<apiBaseUrl>/cpms/api/v1/...php` (see [ApiEndpoints]), so this is
+  /// the plain domain (e.g. https://yourdomain.com), not an "api."
+  /// subdomain or anything with `/cpms` already appended.
   static const String apiBaseUrl = String.fromEnvironment(
     'CPMSPRO_API_BASE_URL',
-    defaultValue: 'https://api.cpmspro.example.com',
+    defaultValue: 'https://cpmspro.example.com',
   );
 
   static const String apiVersion = 'v1';

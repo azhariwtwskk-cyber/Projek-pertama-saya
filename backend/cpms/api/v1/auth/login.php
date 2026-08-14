@@ -8,7 +8,7 @@ $db = cpmsApiDatabase();
 if (!cpmsApiTablesReady($db)) {
     cpmsApiError(
         'API_NOT_INSTALLED',
-        'Jalankan migration CPMS Workforce v4.0.1 terlebih dahulu.',
+        'Jalankan migration CPMS Workforce v4.1.0 terlebih dahulu.',
         503
     );
 }
@@ -100,7 +100,8 @@ if (($role === 'staff' && $sourceTable !== 'staff')
 }
 
 $propertyStmt = $db->prepare(
-    'SELECT id,property_code,property_name,timezone_name
+    'SELECT id,property_code,property_name,company_name,logo_path,
+            primary_color,secondary_color,timezone_name
      FROM cpms_properties WHERE id=? AND is_active=1 LIMIT 1'
 );
 if (!$propertyStmt) {
@@ -116,6 +117,8 @@ if (!is_array($property)) {
 
 $token = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
 $tokenHash = hash('sha256', $token);
+$refreshToken = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+$refreshTokenHash = hash('sha256', $refreshToken);
 $systemUserId = (int) $user['id'];
 $platform = substr(trim((string) ($device['platform'] ?? 'android')), 0, 40);
 $appVersion = substr(trim((string) ($device['app_version'] ?? '')), 0, 30);
@@ -130,19 +133,24 @@ $db->query(
 
 $tokenStmt = $db->prepare(
     "INSERT INTO cpms_api_tokens
-     (system_user_id,property_id,role_name,token_hash,device_name,
-      app_version,ip_address,user_agent,expires_at,last_used_at)
-     VALUES (?,?,?,?,?,?,?,?,DATE_ADD(NOW(),INTERVAL 8 HOUR),NOW())"
+     (system_user_id,property_id,role_name,token_hash,refresh_token_hash,
+      device_name,app_version,ip_address,user_agent,expires_at,
+      refresh_expires_at,last_used_at)
+     VALUES (?,?,?,?,?,?,?,?,?,
+             DATE_ADD(NOW(),INTERVAL " . CPMS_API_ACCESS_TOKEN_TTL_SECONDS . " SECOND),
+             DATE_ADD(NOW(),INTERVAL " . CPMS_API_REFRESH_TOKEN_TTL_DAYS . " DAY),
+             NOW())"
 );
 if (!$tokenStmt) {
     throw new RuntimeException('Unable to prepare access token.');
 }
 $tokenStmt->bind_param(
-    'iissssss',
+    'iisssssss',
     $systemUserId,
     $propertyId,
     $role,
     $tokenHash,
+    $refreshTokenHash,
     $deviceName,
     $appVersion,
     $ip,
@@ -171,7 +179,9 @@ cpmsApiAudit($db, $identity, 'workforce.login', 'success', 'api_token', $tokenId
 
 cpmsApiRespond([
     'access_token' => $token,
-    'expires_in' => 28800,
+    'expires_in' => CPMS_API_ACCESS_TOKEN_TTL_SECONDS,
+    'refresh_token' => $refreshToken,
+    'refresh_expires_in' => CPMS_API_REFRESH_TOKEN_TTL_DAYS * 86400,
     'user' => [
         'id' => $systemUserId,
         'name' => (string) $user['full_name'],
@@ -181,6 +191,10 @@ cpmsApiRespond([
         'id' => (int) $property['id'],
         'code' => (string) $property['property_code'],
         'name' => (string) $property['property_name'],
+        'company_name' => (string) ($property['company_name'] ?? ''),
+        'logo_url' => cpmsApiBrandingAssetUrl((string) ($property['logo_path'] ?? '')),
+        'primary_color' => (string) ($property['primary_color'] ?? ''),
+        'secondary_color' => (string) ($property['secondary_color'] ?? ''),
     ],
 ]);
 

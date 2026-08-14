@@ -1,13 +1,20 @@
 Options -Indexes
 
+# make_password.php and generate_password.php are one-off, unauthenticated
+# CLI utilities for generating a password_hash() value during local setup
+# (see mobile/docs/BACKEND_INTEGRATION_AUDIT.md, finding S-H1) — they must
+# never be reachable over HTTP in a deployed environment. They still work
+# for their intended purpose from a terminal/SSH session on the server
+# (`php make_password.php`), since .htaccess only governs requests that go
+# through the web server, not direct CLI execution.
 <IfModule mod_authz_core.c>
-    <FilesMatch "(^login_backup\.php$|^config_(error|wrong_system_owner)\.php$|backup_before.*\.php$|^README.*\.txt$)">
+    <FilesMatch "(^login_backup\.php$|^config_(error|wrong_system_owner)\.php$|backup_before.*\.php$|^README.*\.txt$|^make_password\.php$|^generate_password\.php$)">
         Require all denied
     </FilesMatch>
 </IfModule>
 
 <IfModule !mod_authz_core.c>
-    <FilesMatch "(^login_backup\.php$|^config_(error|wrong_system_owner)\.php$|backup_before.*\.php$|^README.*\.txt$)">
+    <FilesMatch "(^login_backup\.php$|^config_(error|wrong_system_owner)\.php$|backup_before.*\.php$|^README.*\.txt$|^make_password\.php$|^generate_password\.php$)">
         Order allow,deny
         Deny from all
     </FilesMatch>
