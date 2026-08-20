@@ -10,11 +10,16 @@ class MockDailyWorkRepository implements DailyWorkRepository {
   final List<DailyWorkEntry> _entries = MockFixtures.instance.dailyWork;
 
   @override
-  Future<List<DailyWorkEntry>> fetchEntries({DateTime? from, DateTime? to}) async {
+  Future<List<DailyWorkEntry>> fetchEntries(
+      {DateTime? from, DateTime? to}) async {
     await Future.delayed(const Duration(milliseconds: 400));
     var results = List<DailyWorkEntry>.from(_entries);
-    if (from != null) results = results.where((e) => !e.startTime.isBefore(from)).toList();
-    if (to != null) results = results.where((e) => !e.startTime.isAfter(to)).toList();
+    if (from != null) {
+      results = results.where((e) => !e.startTime.isBefore(from)).toList();
+    }
+    if (to != null) {
+      results = results.where((e) => !e.startTime.isAfter(to)).toList();
+    }
     results.sort((a, b) => b.startTime.compareTo(a.startTime));
     return results;
   }

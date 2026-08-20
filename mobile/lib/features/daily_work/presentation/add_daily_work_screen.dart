@@ -23,7 +23,7 @@ class _AddDailyWorkScreenState extends ConsumerState<AddDailyWorkScreen> {
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _remarksController = TextEditingController();
-  DailyWorkCategory _category = DailyWorkCategory.generalWork;
+  DailyWorkCategory _category = DailyWorkCategory.maintenance;
   TimeOfDay _startTime = TimeOfDay.now();
   TimeOfDay? _completionTime;
   final List<File> _photos = [];
@@ -39,7 +39,10 @@ class _AddDailyWorkScreenState extends ConsumerState<AddDailyWorkScreen> {
   }
 
   Future<void> _pickTime({required bool isStart}) async {
-    final picked = await showTimePicker(context: context, initialTime: isStart ? _startTime : (_completionTime ?? TimeOfDay.now()));
+    final picked = await showTimePicker(
+        context: context,
+        initialTime:
+            isStart ? _startTime : (_completionTime ?? TimeOfDay.now()));
     if (picked == null) return;
     setState(() => isStart ? _startTime = picked : _completionTime = picked);
   }
@@ -64,16 +67,22 @@ class _AddDailyWorkScreenState extends ConsumerState<AddDailyWorkScreen> {
             location: _locationController.text.trim(),
             description: _descriptionController.text.trim(),
             startTime: _combine(_startTime),
-            completionTime: _completionTime == null ? null : _combine(_completionTime!),
+            completionTime:
+                _completionTime == null ? null : _combine(_completionTime!),
             photos: _photos,
-            remarks: _remarksController.text.trim().isEmpty ? null : _remarksController.text.trim(),
+            remarks: _remarksController.text.trim().isEmpty
+                ? null
+                : _remarksController.text.trim(),
           );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Daily work recorded.')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Daily work recorded.')));
       Navigator.of(context).pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to save. Please try again.'), backgroundColor: AppColors.danger));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Failed to save. Please try again.'),
+            backgroundColor: AppColors.danger));
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -92,8 +101,10 @@ class _AddDailyWorkScreenState extends ConsumerState<AddDailyWorkScreen> {
             const _Label('Work Title'),
             TextFormField(
               controller: _titleController,
-              decoration: const InputDecoration(hintText: 'e.g. Cleaned Block A lobby'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter a work title' : null,
+              decoration:
+                  const InputDecoration(hintText: 'e.g. Cleaned Block A lobby'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Enter a work title' : null,
             ),
             const SizedBox(height: 16),
             const _Label('Work Category'),
@@ -108,26 +119,37 @@ class _AddDailyWorkScreenState extends ConsumerState<AddDailyWorkScreen> {
             const _Label('Location'),
             TextFormField(
               controller: _locationController,
-              decoration: const InputDecoration(hintText: 'e.g. Block A — Lobby'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter a location' : null,
+              decoration:
+                  const InputDecoration(hintText: 'e.g. Block A — Lobby'),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Enter a location' : null,
             ),
             const SizedBox(height: 16),
             const _Label('Description'),
             TextFormField(
               controller: _descriptionController,
               maxLines: 3,
-              decoration: const InputDecoration(hintText: 'Describe the work performed'),
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter a description' : null,
+              decoration: const InputDecoration(
+                  hintText: 'Describe the work performed'),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Enter a description'
+                  : null,
             ),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
-                  child: _TimePickerField(label: 'Start Time', time: _startTime, onTap: () => _pickTime(isStart: true)),
+                  child: _TimePickerField(
+                      label: 'Start Time',
+                      time: _startTime,
+                      onTap: () => _pickTime(isStart: true)),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: _TimePickerField(label: 'Completion Time', time: _completionTime, onTap: () => _pickTime(isStart: false)),
+                  child: _TimePickerField(
+                      label: 'Completion Time',
+                      time: _completionTime,
+                      onTap: () => _pickTime(isStart: false)),
                 ),
               ],
             ),
@@ -138,9 +160,31 @@ class _AddDailyWorkScreenState extends ConsumerState<AddDailyWorkScreen> {
               runSpacing: 10,
               children: [
                 for (final photo in _photos)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: Image.file(photo, width: 84, height: 84, fit: BoxFit.cover),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.file(photo,
+                            width: 84, height: 84, fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        top: -6,
+                        right: -6,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _photos.remove(photo)),
+                          child: Container(
+                            width: 22,
+                            height: 22,
+                            decoration: const BoxDecoration(
+                                color: AppColors.danger,
+                                shape: BoxShape.circle),
+                            child: const Icon(Icons.close_rounded,
+                                size: 14, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 GestureDetector(
                   onTap: _addPhoto,
@@ -149,10 +193,15 @@ class _AddDailyWorkScreenState extends ConsumerState<AddDailyWorkScreen> {
                     height: 84,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Theme.of(context).colorScheme.primary),
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.primary),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.05),
                     ),
-                    child: Icon(Icons.add_a_photo_outlined, color: Theme.of(context).colorScheme.primary),
+                    child: Icon(Icons.add_a_photo_outlined,
+                        color: Theme.of(context).colorScheme.primary),
                   ),
                 ),
               ],
@@ -164,7 +213,11 @@ class _AddDailyWorkScreenState extends ConsumerState<AddDailyWorkScreen> {
             ElevatedButton(
               onPressed: _submitting ? null : _submit,
               child: _submitting
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white))
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2.4, color: Colors.white))
                   : const Text('Save Daily Work'),
             ),
           ],
@@ -185,7 +238,8 @@ class _Label extends StatelessWidget {
 }
 
 class _TimePickerField extends StatelessWidget {
-  const _TimePickerField({required this.label, required this.time, required this.onTap});
+  const _TimePickerField(
+      {required this.label, required this.time, required this.onTap});
   final String label;
   final TimeOfDay? time;
   final VoidCallback onTap;
@@ -204,8 +258,12 @@ class _TimePickerField extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(time == null ? '—' : DateFormat('h:mm a').format(DateTime(0, 0, 0, time!.hour, time!.minute))),
-                const Icon(Icons.access_time_rounded, size: 18, color: AppColors.textSecondary),
+                Text(time == null
+                    ? '—'
+                    : DateFormat('h:mm a')
+                        .format(DateTime(0, 0, 0, time!.hour, time!.minute))),
+                const Icon(Icons.access_time_rounded,
+                    size: 18, color: AppColors.textSecondary),
               ],
             ),
           ),

@@ -16,8 +16,10 @@ final dailyWorkRepositoryProvider = Provider<DailyWorkRepository>((ref) {
 
 enum DailyWorkFilter { today, thisWeek, thisMonth, custom }
 
-final dailyWorkFilterProvider = StateProvider<DailyWorkFilter>((ref) => DailyWorkFilter.today);
-final dailyWorkCustomRangeProvider = StateProvider<DailyWorkDateRange?>((ref) => null);
+final dailyWorkFilterProvider =
+    StateProvider<DailyWorkFilter>((ref) => DailyWorkFilter.today);
+final dailyWorkCustomRangeProvider =
+    StateProvider<DailyWorkDateRange?>((ref) => null);
 
 /// Deliberately not Flutter's `DateTimeRange` — keeps this file
 /// material-free so it stays cheaply testable, and avoids a name clash for
@@ -28,7 +30,8 @@ class DailyWorkDateRange {
   final DateTime end;
 }
 
-final dailyWorkEntriesProvider = FutureProvider.autoDispose<List<DailyWorkEntry>>((ref) {
+final dailyWorkEntriesProvider =
+    FutureProvider.autoDispose<List<DailyWorkEntry>>((ref) {
   final filter = ref.watch(dailyWorkFilterProvider);
   final now = DateTime.now();
   DateTime from;
@@ -39,7 +42,8 @@ final dailyWorkEntriesProvider = FutureProvider.autoDispose<List<DailyWorkEntry>
       from = DateTime(now.year, now.month, now.day);
       break;
     case DailyWorkFilter.thisWeek:
-      from = DateTime(now.year, now.month, now.day).subtract(Duration(days: now.weekday - 1));
+      from = DateTime(now.year, now.month, now.day)
+          .subtract(Duration(days: now.weekday - 1));
       break;
     case DailyWorkFilter.thisMonth:
       from = DateTime(now.year, now.month, 1);
@@ -49,9 +53,13 @@ final dailyWorkEntriesProvider = FutureProvider.autoDispose<List<DailyWorkEntry>
       from = range?.start ?? DateTime(now.year, now.month, now.day);
       break;
   }
-  final effectiveTo = filter == DailyWorkFilter.custom ? (ref.watch(dailyWorkCustomRangeProvider)?.end ?? to) : to;
+  final effectiveTo = filter == DailyWorkFilter.custom
+      ? (ref.watch(dailyWorkCustomRangeProvider)?.end ?? to)
+      : to;
 
-  return ref.watch(dailyWorkRepositoryProvider).fetchEntries(from: from, to: effectiveTo);
+  return ref
+      .watch(dailyWorkRepositoryProvider)
+      .fetchEntries(from: from, to: effectiveTo);
 });
 
 class DailyWorkController {
