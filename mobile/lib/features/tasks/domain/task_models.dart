@@ -1,3 +1,5 @@
+import '../../../core/config/app_config.dart';
+
 enum TaskPriority { low, normal, high, urgent }
 
 enum TaskStatus {
@@ -11,7 +13,13 @@ enum TaskStatus {
   overdue,
 }
 
-enum TaskCategory { workOrder, inspectionCorrectiveAction, preventiveMaintenance, dailyAssignment, supervisorTask }
+enum TaskCategory {
+  workOrder,
+  inspectionCorrectiveAction,
+  preventiveMaintenance,
+  dailyAssignment,
+  supervisorTask
+}
 
 TaskPriority taskPriorityFromString(String value) {
   switch (value.toLowerCase()) {
@@ -26,9 +34,19 @@ TaskPriority taskPriorityFromString(String value) {
   }
 }
 
+/// The real backend (`cpms/api/v1/staff/tasks.php`) only ever returns one
+/// of three collapsed buckets — `pending`, `in_progress`, `completed`
+/// (see `cpmsApiTaskStatus()` server-side) — there is no accept/start/
+/// work-completed/pending-verification/rejected state for work orders.
+/// `completed` covers both `Completed` and `Verified` work orders, so it
+/// maps to the terminal [TaskStatus.verified] here (nothing more for
+/// staff to do either way). The other enum values remain for demo/mock
+/// data and other task categories, they just never come from a real
+/// work-order response today.
 TaskStatus taskStatusFromString(String value) {
   switch (value.toLowerCase()) {
     case 'new':
+    case 'pending':
       return TaskStatus.newTask;
     case 'accepted':
       return TaskStatus.accepted;
@@ -38,6 +56,7 @@ TaskStatus taskStatusFromString(String value) {
       return TaskStatus.workCompleted;
     case 'pending_verification':
       return TaskStatus.pendingVerification;
+    case 'completed':
     case 'verified':
       return TaskStatus.verified;
     case 'rejected':
@@ -105,12 +124,26 @@ class EvidencePhoto {
   String get displaySource => isLocalPending ? (localPath ?? url) : url;
 
   factory EvidencePhoto.fromJson(Map<String, dynamic> json) => EvidencePhoto(
-        id: json['id'] as String,
-        url: json['url'] as String,
-        uploadedAt: DateTime.parse(json['uploaded_at'] as String),
+        id: (json['id'] ?? '').toString(),
+        url: AppConfig.resolveUrl((json['url'] ?? '').toString()),
+        uploadedAt: DateTime.tryParse((json['uploaded_at'] ?? '').toString()) ??
+            DateTime.now(),
         uploadedByRole: json['uploaded_by_role'] as String?,
         gpsLat: (json['gps_lat'] as num?)?.toDouble(),
         gpsLng: (json['gps_lng'] as num?)?.toDouble(),
+      );
+
+  /// The real `staff/task-photo.php` upload response is
+  /// `{"uploaded":true,"image_id":123,"work_order_reference":"...",
+  /// "image_url":"/cpms/uploads/..."}` — a different shape from
+  /// [fromJson] above (no `uploaded_at`, `id` is `image_id`, `url` is
+  /// `image_url`), so it gets its own factory rather than forcing that
+  /// parser to guess between two contracts.
+  factory EvidencePhoto.fromUploadResponse(Map<String, dynamic> json) =>
+      EvidencePhoto(
+        id: (json['image_id'] ?? '').toString(),
+        url: AppConfig.resolveUrl((json['image_url'] ?? '').toString()),
+        uploadedAt: DateTime.now(),
       );
 }
 
@@ -133,6 +166,7 @@ class InspectionIssue {
 class StaffTask {
   const StaffTask({
     required this.id,
+    this.databaseId,
     required this.taskNumber,
     required this.title,
     required this.description,
@@ -146,6 +180,7 @@ class StaffTask {
     required this.dueDate,
     this.inspectionIssue,
     this.afterPhotos = const [],
+    this.existingImageUrl,
     this.completionRemarks,
     this.materialsUsed,
     this.timeSpentMinutes,
@@ -153,7 +188,16 @@ class StaffTask {
     this.requiresEvidence = true,
   });
 
+  /// The work order *reference* (e.g. `WO-2026-0082`) — this is what the
+  /// real backend calls `id` in list responses and is also what
+  /// `staff/task-photo.php` expects as `work_order_reference`.
   final String id;
+
+  /// The real numeric `work_orders.id` (`database_id` in the list
+  /// response) — only this value, never [id], is accepted by
+  /// `staff/daily-work/submit.php`'s `work_order_id` field. Null for
+  /// demo/mock tasks that were never round-tripped through the API.
+  final int? databaseId;
   final String taskNumber;
   final String title;
   final String description;
@@ -167,31 +211,67 @@ class StaffTask {
   final DateTime dueDate;
   final InspectionIssue? inspectionIssue;
   final List<EvidencePhoto> afterPhotos;
+
+  /// The single latest work-order photo thumbnail the list endpoint
+  /// already includes (`image_url`) — the backend has no endpoint that
+  /// returns the *full* evidence gallery for a work order, so this is
+  /// the only pre-existing evidence reference the app can show before
+  /// any new photos are captured this session.
+  final String? existingImageUrl;
   final String? completionRemarks;
   final String? materialsUsed;
   final int? timeSpentMinutes;
   final String? rejectionReason;
   final bool requiresEvidence;
 
-  bool get isOverdue => status != TaskStatus.verified && DateTime.now().isAfter(dueDate);
+  bool get isOverdue =>
+      status != TaskStatus.verified && DateTime.now().isAfter(dueDate);
 
   /// Shared parser for every endpoint that returns this task shape (list,
   /// detail, accept, start, complete, and the dashboard's priority/recent
   /// tasks) so the mapping lives in exactly one place.
   factory StaffTask.fromJson(Map<String, dynamic> json) {
+    String str(dynamic v, [String fallback = '']) =>
+        v == null ? fallback : v.toString();
+    DateTime date(dynamic v, {DateTime? fallback}) {
+      final raw = str(v).trim();
+      if (raw.isEmpty || raw == '-') return fallback ?? DateTime.now();
+      final iso = DateTime.tryParse(raw);
+      if (iso != null) return iso;
+      final parts = raw.split('/');
+      if (parts.length == 3) {
+        final d = int.tryParse(parts[0]);
+        final m = int.tryParse(parts[1]);
+        final y = int.tryParse(parts[2]);
+        if (d != null && m != null && y != null) return DateTime(y, m, d);
+      }
+      return fallback ?? DateTime.now();
+    }
+
+    final id = str(json['id'] ?? json['database_id']);
+    final taskNo =
+        str(json['task_number'] ?? json['id'] ?? json['reference'], id);
+    final assigned = date(json['assigned_date'] ?? json['created_at']);
+    final due = date(json['due_date'] ?? json['due'],
+        fallback: assigned.add(const Duration(days: 7)));
+    final rawImageUrl = str(json['image_url']).trim();
     return StaffTask(
-      id: json['id'] as String,
-      taskNumber: json['task_number'] as String,
-      title: json['title'] as String,
-      description: json['description'] as String? ?? '',
-      category: taskCategoryFromString(json['category'] as String? ?? 'work_order'),
+      id: id,
+      databaseId: json['database_id'] is int
+          ? json['database_id'] as int
+          : int.tryParse(str(json['database_id'])),
+      taskNumber: taskNo,
+      title: str(json['title'], 'Task'),
+      description: str(json['description']),
+      category:
+          taskCategoryFromString(json['category'] as String? ?? 'work_order'),
       priority: taskPriorityFromString(json['priority'] as String? ?? 'normal'),
       status: taskStatusFromString(json['status'] as String? ?? 'new'),
       propertyName: json['property_name'] as String? ?? '',
       location: json['location'] as String? ?? '',
       assignedBy: json['assigned_by'] as String? ?? '',
-      assignedDate: DateTime.parse(json['assigned_date'] as String),
-      dueDate: DateTime.parse(json['due_date'] as String),
+      assignedDate: assigned,
+      dueDate: due,
       completionRemarks: json['completion_remarks'] as String?,
       materialsUsed: json['materials_used'] as String?,
       timeSpentMinutes: json['time_spent_minutes'] as int?,
@@ -200,14 +280,19 @@ class StaffTask {
       afterPhotos: ((json['after_photos'] as List<dynamic>?) ?? [])
           .map((e) => EvidencePhoto.fromJson(e as Map<String, dynamic>))
           .toList(),
+      existingImageUrl:
+          rawImageUrl.isEmpty ? null : AppConfig.resolveUrl(rawImageUrl),
       inspectionIssue: json['inspection_issue'] == null
           ? null
           : InspectionIssue(
               issue: json['inspection_issue']['issue'] as String? ?? '',
               location: json['inspection_issue']['location'] as String? ?? '',
               severity: json['inspection_issue']['severity'] as String? ?? '',
-              inspectorRemark: json['inspection_issue']['inspector_remark'] as String? ?? '',
-              beforePhotos: ((json['inspection_issue']['before_photos'] as List<dynamic>?) ?? [])
+              inspectorRemark:
+                  json['inspection_issue']['inspector_remark'] as String? ?? '',
+              beforePhotos: ((json['inspection_issue']['before_photos']
+                          as List<dynamic>?) ??
+                      [])
                   .map((e) => EvidencePhoto.fromJson(e as Map<String, dynamic>))
                   .toList(),
             ),
@@ -224,6 +309,7 @@ class StaffTask {
   }) {
     return StaffTask(
       id: id,
+      databaseId: databaseId,
       taskNumber: taskNumber,
       title: title,
       description: description,
@@ -237,6 +323,7 @@ class StaffTask {
       dueDate: dueDate,
       inspectionIssue: inspectionIssue,
       afterPhotos: afterPhotos ?? this.afterPhotos,
+      existingImageUrl: existingImageUrl,
       completionRemarks: completionRemarks ?? this.completionRemarks,
       materialsUsed: materialsUsed ?? this.materialsUsed,
       timeSpentMinutes: timeSpentMinutes ?? this.timeSpentMinutes,

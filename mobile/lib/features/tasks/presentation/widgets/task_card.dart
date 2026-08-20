@@ -29,21 +29,31 @@ class TaskCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   task.taskNumber,
-                  style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.textSecondary, fontSize: 12.5),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textSecondary,
+                      fontSize: 12.5),
                 ),
               ),
               StatusBadge(status: task.status),
             ],
           ),
           const SizedBox(height: 6),
-          Text(task.title, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+          Text(task.title,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleSmall
+                  ?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
           Row(
             children: [
-              const Icon(Icons.place_outlined, size: 14, color: AppColors.textSecondary),
+              const Icon(Icons.place_outlined,
+                  size: 14, color: AppColors.textSecondary),
               const SizedBox(width: 4),
               Expanded(
-                child: Text(task.location, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5)),
+                child: Text(task.location,
+                    style: const TextStyle(
+                        color: AppColors.textSecondary, fontSize: 12.5)),
               ),
             ],
           ),

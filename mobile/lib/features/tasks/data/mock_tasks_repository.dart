@@ -25,7 +25,9 @@ class MockTasksRepository implements TasksRepository {
 
   int _indexOf(String id) {
     final i = _tasks.indexWhere((t) => t.id == id);
-    if (i == -1) throw const ApiException(ApiFailureType.notFound, 'Task not found.');
+    if (i == -1) {
+      throw const ApiException(ApiFailureType.notFound, 'Task not found.');
+    }
     return i;
   }
 
@@ -42,28 +44,10 @@ class MockTasksRepository implements TasksRepository {
   }
 
   @override
-  Future<StaffTask> acceptTask(String id) async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    final i = _indexOf(id);
-    _tasks[i] = _tasks[i].copyWith(status: TaskStatus.accepted);
-    return _tasks[i];
-  }
-
-  @override
-  Future<StaffTask> startTask(String id) async {
-    await Future.delayed(const Duration(milliseconds: 400));
-    final i = _indexOf(id);
-    _tasks[i] = _tasks[i].copyWith(status: TaskStatus.inProgress);
-    return _tasks[i];
-  }
-
-  @override
   Future<EvidencePhoto> uploadEvidence({
     required String taskId,
     required File file,
-    String? beforePhotoId,
-    double? gpsLat,
-    double? gpsLng,
+    required String imageType,
   }) async {
     final compressed = await ImageUtils.compressForUpload(file);
     final online = await _connectivity.isOnline;
@@ -74,7 +58,8 @@ class MockTasksRepository implements TasksRepository {
       // dir) so it survives even if the app is killed before connectivity
       // returns, then queue the upload — never lose the staff photo.
       final docsDir = await getApplicationDocumentsDirectory();
-      final permanentPath = p.join(docsDir.path, 'pending_evidence', p.basename(compressed.path));
+      final permanentPath =
+          p.join(docsDir.path, 'pending_evidence', p.basename(compressed.path));
       await Directory(p.dirname(permanentPath)).create(recursive: true);
       final permanentFile = await compressed.copy(permanentPath);
 
@@ -82,25 +67,24 @@ class MockTasksRepository implements TasksRepository {
         id: 'local_${const Uuid().v4()}',
         url: permanentFile.path,
         uploadedAt: DateTime.now(),
-        gpsLat: gpsLat,
-        gpsLng: gpsLng,
         isLocalPending: true,
         localPath: permanentFile.path,
       );
-      _tasks[i] = _tasks[i].copyWith(afterPhotos: [..._tasks[i].afterPhotos, photo]);
+      _tasks[i] =
+          _tasks[i].copyWith(afterPhotos: [..._tasks[i].afterPhotos, photo]);
 
       await _enqueue(PendingSyncItem(
         id: photo.id,
         type: PendingSyncType.photoEvidence,
-        summary: '${_tasks[i].taskNumber} — after photo',
-        endpoint: '/api/v1/staff/tasks/$taskId/evidence',
+        summary: '${_tasks[i].taskNumber} — $imageType photo',
+        endpoint: '/cpms/api/v1/staff/task-photo.php',
         method: 'POST',
         payload: {
-          'task_id': taskId,
-          'before_photo_id': beforePhotoId,
-          'gps_lat': gpsLat,
-          'gps_lng': gpsLng,
-          'device_timestamp': DateTime.now().toIso8601String(),
+          'work_order_reference': taskId,
+          'image_type': imageType,
+          // Read by SyncHandlers to pick the correct multipart field
+          // name for this endpoint (`photo`, not the generic `files[0]`).
+          '_file_field': 'photo',
         },
         filePaths: [permanentFile.path],
         createdAt: DateTime.now(),
@@ -113,35 +97,40 @@ class MockTasksRepository implements TasksRepository {
       id: 'evd_${const Uuid().v4()}',
       url: compressed.path,
       uploadedAt: DateTime.now(),
-      gpsLat: gpsLat,
-      gpsLng: gpsLng,
     );
-    _tasks[i] = _tasks[i].copyWith(afterPhotos: [..._tasks[i].afterPhotos, photo]);
+    _tasks[i] =
+        _tasks[i].copyWith(afterPhotos: [..._tasks[i].afterPhotos, photo]);
     return photo;
   }
 
   @override
-  Future<StaffTask> completeTask({
-    required String taskId,
-    required String remarks,
+  Future<void> completeTask({
+    required StaffTask task,
+    required String workDescription,
+    required String workStatus,
     String? materialsUsed,
-    int? timeSpentMinutes,
+    String? issueNotes,
+    required List<File> afterPhotos,
+    List<File> beforePhotos = const [],
+    List<File> duringPhotos = const [],
   }) async {
     await Future.delayed(const Duration(milliseconds: 700));
-    final i = _indexOf(taskId);
-    if (_tasks[i].requiresEvidence && _tasks[i].afterPhotos.isEmpty) {
+    final i = _indexOf(task.id);
+    if (workStatus == 'Completed' &&
+        afterPhotos.isEmpty &&
+        _tasks[i].afterPhotos.isEmpty) {
       throw const ApiException(
         ApiFailureType.validation,
-        'Please upload completion evidence before completing this task.',
+        'Please attach at least one AFTER photo before marking this task Completed.',
       );
     }
     _tasks[i] = _tasks[i].copyWith(
-      status: TaskStatus.pendingVerification,
-      completionRemarks: remarks,
+      status: workStatus == 'Completed'
+          ? TaskStatus.verified
+          : TaskStatus.inProgress,
+      completionRemarks: workDescription,
       materialsUsed: materialsUsed,
-      timeSpentMinutes: timeSpentMinutes,
       rejectionReason: '',
     );
-    return _tasks[i];
   }
 }

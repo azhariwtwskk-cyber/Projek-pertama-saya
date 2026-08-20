@@ -23,14 +23,17 @@ final tasksRepositoryProvider = Provider<TasksRepository>((ref) {
 
 enum TaskInboxTab { all, newTasks, inProgress, completed, overdue }
 
-final taskInboxTabProvider = StateProvider<TaskInboxTab>((ref) => TaskInboxTab.all);
+final taskInboxTabProvider =
+    StateProvider<TaskInboxTab>((ref) => TaskInboxTab.all);
 final taskSearchQueryProvider = StateProvider<String>((ref) => '');
 
-final tasksListProvider = FutureProvider.autoDispose<List<StaffTask>>((ref) async {
+final tasksListProvider =
+    FutureProvider.autoDispose<List<StaffTask>>((ref) async {
   return ref.watch(tasksRepositoryProvider).fetchTasks();
 });
 
-final filteredTasksProvider = Provider.autoDispose<AsyncValue<List<StaffTask>>>((ref) {
+final filteredTasksProvider =
+    Provider.autoDispose<AsyncValue<List<StaffTask>>>((ref) {
   final tab = ref.watch(taskInboxTabProvider);
   final query = ref.watch(taskSearchQueryProvider).toLowerCase();
   final tasksAsync = ref.watch(tasksListProvider);
@@ -43,8 +46,14 @@ final filteredTasksProvider = Provider.autoDispose<AsyncValue<List<StaffTask>>>(
         case TaskInboxTab.newTasks:
           return t.status == TaskStatus.newTask;
         case TaskInboxTab.inProgress:
-          return t.status == TaskStatus.accepted || t.status == TaskStatus.inProgress;
+          return t.status == TaskStatus.accepted ||
+              t.status == TaskStatus.inProgress;
         case TaskInboxTab.completed:
+          // The real backend collapses "Completed" and "Verified" work
+          // orders into one `completed` bucket (taskStatusFromString maps
+          // it to TaskStatus.verified) — workCompleted/pendingVerification
+          // never occur for a real work order but are matched too so mock
+          // demo data still filters correctly.
           return t.status == TaskStatus.workCompleted ||
               t.status == TaskStatus.pendingVerification ||
               t.status == TaskStatus.verified;
@@ -66,7 +75,8 @@ final filteredTasksProvider = Provider.autoDispose<AsyncValue<List<StaffTask>>>(
   });
 });
 
-final taskDetailProvider = FutureProvider.autoDispose.family<StaffTask, String>((ref, id) async {
+final taskDetailProvider =
+    FutureProvider.autoDispose.family<StaffTask, String>((ref, id) async {
   return ref.watch(tasksRepositoryProvider).fetchTask(id);
 });
 
@@ -76,40 +86,38 @@ class TaskActionsController {
 
   TasksRepository get _repo => _ref.read(tasksRepositoryProvider);
 
-  Future<void> accept(String id) async {
-    await _repo.acceptTask(id);
-    _invalidate(id);
-  }
-
-  Future<void> start(String id) async {
-    await _repo.startTask(id);
-    _invalidate(id);
-  }
-
-  Future<void> uploadEvidence({
+  Future<EvidencePhoto> uploadEvidence({
     required String taskId,
     required File file,
-    String? beforePhotoId,
-    double? gpsLat,
-    double? gpsLng,
+    required String imageType,
   }) async {
-    await _repo.uploadEvidence(taskId: taskId, file: file, beforePhotoId: beforePhotoId, gpsLat: gpsLat, gpsLng: gpsLng);
+    final photo = await _repo.uploadEvidence(
+        taskId: taskId, file: file, imageType: imageType);
     _invalidate(taskId);
+    return photo;
   }
 
   Future<void> complete({
-    required String taskId,
-    required String remarks,
+    required StaffTask task,
+    required String workDescription,
+    required String workStatus,
     String? materialsUsed,
-    int? timeSpentMinutes,
+    String? issueNotes,
+    required List<File> afterPhotos,
+    List<File> beforePhotos = const [],
+    List<File> duringPhotos = const [],
   }) async {
     await _repo.completeTask(
-      taskId: taskId,
-      remarks: remarks,
+      task: task,
+      workDescription: workDescription,
+      workStatus: workStatus,
       materialsUsed: materialsUsed,
-      timeSpentMinutes: timeSpentMinutes,
+      issueNotes: issueNotes,
+      afterPhotos: afterPhotos,
+      beforePhotos: beforePhotos,
+      duringPhotos: duringPhotos,
     );
-    _invalidate(taskId);
+    _invalidate(task.id);
   }
 
   void _invalidate(String id) {
@@ -118,4 +126,5 @@ class TaskActionsController {
   }
 }
 
-final taskActionsControllerProvider = Provider((ref) => TaskActionsController(ref));
+final taskActionsControllerProvider =
+    Provider((ref) => TaskActionsController(ref));

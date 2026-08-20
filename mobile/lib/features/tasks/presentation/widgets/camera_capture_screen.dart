@@ -40,7 +40,8 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
         });
         return;
       }
-      final controller = CameraController(_cameras.first, ResolutionPreset.high, enableAudio: false);
+      final controller = CameraController(_cameras.first, ResolutionPreset.high,
+          enableAudio: false);
       await controller.initialize();
       if (!mounted) return;
       setState(() {
@@ -97,7 +98,8 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
 
   Widget _buildBody() {
     if (_initializing) {
-      return const Center(child: CircularProgressIndicator(color: Colors.white));
+      return const Center(
+          child: CircularProgressIndicator(color: Colors.white));
     }
     if (_error != null) {
       return Center(
@@ -106,12 +108,17 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.no_photography_outlined, color: Colors.white70, size: 42),
+              const Icon(Icons.no_photography_outlined,
+                  color: Colors.white70, size: 42),
               const SizedBox(height: 12),
-              Text(_error!, style: const TextStyle(color: Colors.white70), textAlign: TextAlign.center),
+              Text(_error!,
+                  style: const TextStyle(color: Colors.white70),
+                  textAlign: TextAlign.center),
               const SizedBox(height: 16),
               OutlinedButton(
-                style: OutlinedButton.styleFrom(foregroundColor: Colors.white, side: const BorderSide(color: Colors.white38)),
+                style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white38)),
                 onPressed: _pickFromGallery,
                 child: const Text('Choose from Gallery instead'),
               ),
@@ -124,14 +131,18 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
     if (_captured != null) {
       return Column(
         children: [
-          Expanded(child: Image.file(File(_captured!.path), fit: BoxFit.contain, width: double.infinity)),
+          Expanded(
+              child: Image.file(File(_captured!.path),
+                  fit: BoxFit.contain, width: double.infinity)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             child: Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(foregroundColor: Colors.white, side: const BorderSide(color: Colors.white38)),
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white38)),
                     onPressed: _retake,
                     icon: const Icon(Icons.replay_rounded),
                     label: const Text('Retake'),
@@ -168,7 +179,9 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
                 onPressed: () => Navigator.of(context).pop(),
               ),
               IconButton(
-                icon: Icon(_flashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded, color: Colors.white),
+                icon: Icon(
+                    _flashOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                    color: Colors.white),
                 onPressed: _toggleFlash,
               ),
             ],
@@ -183,7 +196,8 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
             children: [
               IconButton(
                 iconSize: 32,
-                icon: const Icon(Icons.photo_library_outlined, color: Colors.white),
+                icon: const Icon(Icons.photo_library_outlined,
+                    color: Colors.white),
                 onPressed: _pickFromGallery,
               ),
               GestureDetector(
@@ -197,7 +211,8 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
                   ),
                   child: Container(
                     margin: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                    decoration: const BoxDecoration(
+                        shape: BoxShape.circle, color: Colors.white),
                   ),
                 ),
               ),

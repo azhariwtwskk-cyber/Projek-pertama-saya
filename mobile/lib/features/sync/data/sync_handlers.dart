@@ -25,14 +25,27 @@ class SyncHandlers {
     final client = ref.read(apiClientProvider);
     await client.request((dio) async {
       if (item.filePaths.isNotEmpty) {
+        // Every real multipart endpoint expects a specific field name
+        // (`photo`, `evidence`, `after_images[]`, ...) — never the
+        // generic `files[0]` a naive replayer would guess. Callers stash
+        // the real field name under `_file_field` at enqueue time; fall
+        // back to `file` (harmless — most single-file endpoints reject
+        // unknown fields silently rather than matching by position) if
+        // an older queued item doesn't have it.
+        final payload = Map<String, dynamic>.from(item.payload);
+        final fileField = (payload.remove('_file_field') as String?) ?? 'file';
+        final files = [
+          for (final path in item.filePaths) await MultipartFile.fromFile(path)
+        ];
         final formData = FormData.fromMap({
-          ...item.payload,
-          for (var i = 0; i < item.filePaths.length; i++)
-            'files[$i]': await MultipartFile.fromFile(item.filePaths[i]),
+          ...payload,
+          fileField: files.length == 1 ? files.first : files,
         });
-        return dio.request(item.endpoint, data: formData, options: Options(method: item.method));
+        return dio.request(item.endpoint,
+            data: formData, options: Options(method: item.method));
       }
-      return dio.request(item.endpoint, data: item.payload, options: Options(method: item.method));
+      return dio.request(item.endpoint,
+          data: item.payload, options: Options(method: item.method));
     }, (_) => null);
   }
 }
