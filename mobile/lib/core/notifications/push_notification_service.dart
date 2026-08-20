@@ -3,22 +3,25 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-/// Wraps Firebase Cloud Messaging + local notifications for deep-linked
-/// push (section 25). Firebase itself only activates once a real
-/// `google-services.json` / `GoogleService-Info.plist` is added to the
-/// platform projects and `Firebase.initializeApp()` is called in
-/// `main.dart`; until then this degrades gracefully to a no-op so the rest
-/// of the app (including the in-app Notification Centre, which is driven
-/// by the REST API, not FCM) works standalone.
+/// Local, on-device notification display only — there is NO Firebase
+/// Cloud Messaging wiring in this app. No `Firebase.initializeApp()` is
+/// ever called, no `google-services.json`/`GoogleService-Info.plist`
+/// ships with the platform projects, and no backend device-registration
+/// endpoint exists (see mobile/docs/INTEGRATION_REPAIR_REPORT.md). The
+/// real, working notification list is the in-app Notification Centre,
+/// driven entirely by `GET notifications.php` — that's what staff should
+/// rely on. [showLocalNotification] only fires when *this app itself*
+/// calls it (e.g. a foreground reminder), never from a server-pushed
+/// message, and should not be presented to staff as "push notifications."
 ///
-/// Deep link contract: every push payload carries a `route` data field
-/// (e.g. `/tasks/WO-2026-0082`) that [onDeepLink] forwards straight to
-/// GoRouter, so tapping "New Work Order WO-2026-0082" opens Task Detail
-/// directly.
+/// Deep link contract: [showLocalNotification]'s `route` payload (e.g.
+/// `/tasks/WO-2026-0082`) is forwarded straight to GoRouter via
+/// [onDeepLink] when the user taps the resulting local notification.
 class PushNotificationService {
   PushNotificationService();
 
-  final FlutterLocalNotificationsPlugin _local = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _local =
+      FlutterLocalNotificationsPlugin();
   final _deepLinkController = StreamController<String>.broadcast();
 
   Stream<String> get onDeepLink => _deepLinkController.stream;
@@ -54,7 +57,8 @@ class PushNotificationService {
       importance: Importance.high,
       priority: Priority.high,
     );
-    const details = NotificationDetails(android: androidDetails, iOS: DarwinNotificationDetails());
+    const details = NotificationDetails(
+        android: androidDetails, iOS: DarwinNotificationDetails());
     try {
       await _local.show(id, title, body, details, payload: route);
     } catch (e) {

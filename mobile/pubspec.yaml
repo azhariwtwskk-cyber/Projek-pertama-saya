@@ -38,9 +38,12 @@ dependencies:
   geolocator: ^12.0.0
   permission_handler: ^11.3.1
 
-  # Push notifications (wired for FCM; requires firebase project config to activate)
-  firebase_core: ^2.32.0
-  firebase_messaging: ^14.9.4
+  # In-app push: local-notification display only (see
+  # core/notifications/push_notification_service.dart). No FCM/Firebase
+  # wiring exists — firebase_core/firebase_messaging were declared but
+  # never actually initialized or called anywhere, and no
+  # google-services.json/GoogleService-Info.plist ships with the app, so
+  # they were removed rather than left as a misleading "push works" claim.
   flutter_local_notifications: ^17.2.1
 
   # UI / UX
