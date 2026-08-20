@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/network/connectivity_service.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../dashboard/application/dashboard_providers.dart';
 import '../../sync/application/sync_providers.dart';
+import '../../work_history/application/work_history_providers.dart';
 import '../data/api_tasks_repository.dart';
 import '../data/mock_tasks_repository.dart';
 import '../data/tasks_repository.dart';
@@ -120,9 +122,18 @@ class TaskActionsController {
     _invalidate(task.id);
   }
 
+  /// A successful submit must never leave stale cached UI behind — this
+  /// work order's own status can change (the active task queue), its
+  /// verification record now exists or has changed (Work Order History),
+  /// and Home's KPI counts/priority card read from the same backend rows
+  /// (dashboard.php's `tasks[]` is the same query as `staff/tasks.php`).
+  /// Missing any one of these three is exactly what made a just-submitted
+  /// task look like it had vanished on a real device.
   void _invalidate(String id) {
     _ref.invalidate(taskDetailProvider(id));
     _ref.invalidate(tasksListProvider);
+    _ref.invalidate(workHistoryProvider);
+    _ref.invalidate(dashboardDataProvider);
   }
 }
 

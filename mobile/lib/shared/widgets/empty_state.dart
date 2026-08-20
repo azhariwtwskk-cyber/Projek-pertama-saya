@@ -30,6 +30,20 @@ class AppStateView extends StatelessWidget {
             "You're all caught up. New assignments will appear here automatically.",
       );
 
+  /// Shown wherever an "active work" list can legitimately hit zero
+  /// because everything assigned has already been submitted — a
+  /// just-completed task moves out of the active queue by design, but
+  /// staff must never be left looking at a plain "No tasks" screen with
+  /// no way to find what they just did. Always pass [onViewHistory] here.
+  factory AppStateView.noActiveTasks({required VoidCallback onViewHistory}) =>
+      AppStateView(
+        icon: Icons.task_alt_rounded,
+        title: 'No Active Tasks',
+        message: 'Completed work is available in Work Order History.',
+        actionLabel: 'View Work Order History',
+        onAction: onViewHistory,
+      );
+
   factory AppStateView.offline({VoidCallback? onRetry}) => AppStateView(
         icon: Icons.cloud_off_rounded,
         title: 'No Internet Connection',

@@ -117,9 +117,19 @@ class ApiDashboardRepository implements DashboardRepository {
           }
         }
 
-        // If backend does not provide priority_task,
-        // use first valid task.
-        priorityTask ??= tasks.isNotEmpty ? tasks.first : null;
+        // If backend does not provide priority_task, use the first task
+        // that still needs action. `tasks` includes Completed work orders
+        // (staff/tasks.php only drops Verified/Cancelled ones — see
+        // API_CONTRACT.md), so picking `tasks.first` unconditionally could
+        // surface an already-completed order under a "Start Task" button.
+        if (priorityTask == null) {
+          for (final candidate in tasks) {
+            if (candidate.status != TaskStatus.verified) {
+              priorityTask = candidate;
+              break;
+            }
+          }
+        }
 
         /*
          * ============================================================

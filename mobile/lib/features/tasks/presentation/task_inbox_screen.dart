@@ -45,11 +45,12 @@ class _TaskInboxScreenState extends ConsumerState<TaskInboxScreen> {
       appBar: AppBar(
         title: const Text('My Tasks'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.fact_check_outlined),
-            tooltip: 'Work Order History',
+          TextButton.icon(
             onPressed: () => context.push('/work-history'),
+            icon: const Icon(Icons.fact_check_outlined, size: 18),
+            label: const Text('History'),
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
@@ -115,7 +116,11 @@ class _TaskInboxScreenState extends ConsumerState<TaskInboxScreen> {
               data: (tasks) {
                 if (tasks.isEmpty) {
                   return SliverFillRemaining(
-                    child: Center(child: AppStateView.noTasksToday()),
+                    child: Center(
+                      child: AppStateView.noActiveTasks(
+                        onViewHistory: () => context.push('/work-history'),
+                      ),
+                    ),
                   );
                 }
                 return SliverPadding(

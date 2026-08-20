@@ -290,7 +290,9 @@ class _DashboardContent extends StatelessWidget {
             actionLabel: 'View All',
             onAction: () => context.push('/tasks')),
         if (data.recentTasks.isEmpty)
-          AppStateView.noTasksToday()
+          AppStateView.noActiveTasks(
+            onViewHistory: () => context.push('/work-history'),
+          )
         else
           ...data.recentTasks.map((t) => _RecentTaskTile(task: t)),
         if (data.announcements.isNotEmpty) ...[

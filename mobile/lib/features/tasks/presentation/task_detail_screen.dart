@@ -236,6 +236,48 @@ class _TaskDetailScreenState extends ConsumerState<TaskDetailScreen> {
                 ],
               ),
             ),
+            if (task.rejectionReason != null &&
+                task.rejectionReason!.isNotEmpty) ...[
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                      color: AppColors.danger.withValues(alpha: 0.25)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.error_rounded,
+                        size: 20, color: AppColors.danger),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Rejected – Action Required',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.danger)),
+                          const SizedBox(height: 4),
+                          Text(task.rejectionReason!,
+                              style: const TextStyle(
+                                  fontSize: 12.5, color: AppColors.danger)),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'This work order was sent back by Property Admin. Submit corrective work below.',
+                            style: TextStyle(
+                                fontSize: 11.5, color: AppColors.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 20),
             AppSectionCard(
               child: Column(
