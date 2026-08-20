@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-/// Section 23: Asset QR Scanner. CPMSPro asset QR codes encode the asset
-/// ID directly (`CPMSPRO:ASSET:<id>` or a bare asset id) — on a
-/// successful scan we navigate straight to Asset Detail.
+/// Section 23: Asset QR Scanner. The real backend
+/// (`staff/asset-inspection/lookup.php?token=`) looks assets up by an
+/// opaque `public_token`, and the physical QR code printed by CPMSPro
+/// encodes a full portal URL with that token as a query parameter — not
+/// a `CPMSPRO:ASSET:<id>` prefix (see
+/// mobile/docs/INTEGRATION_REPAIR_REPORT.md).
 class QrScannerScreen extends StatefulWidget {
   const QrScannerScreen({super.key});
 
@@ -23,10 +26,14 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
   }
 
   String _extractAssetId(String raw) {
-    if (raw.toUpperCase().startsWith('CPMSPRO:ASSET:')) {
-      return raw.substring('CPMSPRO:ASSET:'.length);
+    final trimmed = raw.trim();
+    final uri = Uri.tryParse(trimmed);
+    if (uri != null && uri.queryParameters.containsKey('token')) {
+      return uri.queryParameters['token']!;
     }
-    return raw;
+    // Fall back to the raw scanned value in case a label was printed as
+    // a bare token rather than a full portal URL.
+    return trimmed;
   }
 
   void _onDetect(BarcodeCapture capture) {
@@ -50,7 +57,10 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           IconButton(
             icon: ValueListenableBuilder(
               valueListenable: _controller,
-              builder: (context, state, __) => Icon(state.torchState == TorchState.on ? Icons.flash_on_rounded : Icons.flash_off_rounded),
+              builder: (context, state, __) => Icon(
+                  state.torchState == TorchState.on
+                      ? Icons.flash_on_rounded
+                      : Icons.flash_off_rounded),
             ),
             onPressed: () => _controller.toggleTorch(),
           ),
