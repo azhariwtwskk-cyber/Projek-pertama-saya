@@ -10,10 +10,15 @@ class AppConfig {
   /// subdomain or anything with `/cpms` already appended.
   static const String apiBaseUrl = String.fromEnvironment(
     'CPMSPRO_API_BASE_URL',
-    defaultValue: 'https://cpmspro.example.com',
+    defaultValue: 'https://cpmspro.my',
   );
 
   static const String apiVersion = 'v1';
+
+  /// Kept in sync with `pubspec.yaml`'s `version:` field by hand — shown
+  /// on the Profile screen's About dialog. Not read from a package-info
+  /// plugin to avoid adding a new dependency for one label.
+  static const String appVersion = '1.0.0+1';
 
   /// When true, the app runs entirely against in-memory fixture data
   /// (see core/api/mock) instead of the live Dio-backed API client. This
@@ -23,7 +28,7 @@ class AppConfig {
   /// backend team has published the endpoints in section 32.
   static const bool useMockApi = bool.fromEnvironment(
     'USE_MOCK_API',
-    defaultValue: true,
+    defaultValue: false,
   );
 
   static const Duration apiConnectTimeout = Duration(seconds: 15);
@@ -34,4 +39,22 @@ class AppConfig {
   static const int evidenceImageQuality = 78;
 
   static const int sessionRefreshLeewaySeconds = 60;
+
+  /// Every real CPMSPro endpoint that returns an uploaded-file URL
+  /// (`work_order_images`, `daily_work_images`, PM evidence, asset
+  /// inspection photos, property branding logos) returns it *root-relative*
+  /// (e.g. `/cpms/uploads/daily_work/xxx.jpg`), not as a full URL — the
+  /// same convention `cpmsApiSaveImage()`/`task-photo.php` use server-side.
+  /// [FullScreenImageViewer] and any `CachedNetworkImage` needs an
+  /// absolute URL to tell a *local* file path from a *remote* one, so
+  /// every such path must be resolved through this before display.
+  static String resolveUrl(String path) {
+    final trimmed = path.trim();
+    if (trimmed.isEmpty) return trimmed;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    final base = apiBaseUrl.endsWith('/') ? apiBaseUrl.substring(0, apiBaseUrl.length - 1) : apiBaseUrl;
+    return base + (trimmed.startsWith('/') ? trimmed : '/$trimmed');
+  }
 }

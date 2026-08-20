@@ -27,7 +27,22 @@ class StaffPermissions {
   factory StaffPermissions.fromList(List<dynamic> raw) =>
       StaffPermissions(raw.map((e) => e.toString()).toSet());
 
-  bool can(String permission) => _granted.contains(permission);
+  /// CRITICAL: the real `auth/login.php`/`me.php` never return a
+  /// `permissions[]` array at all (see
+  /// mobile/docs/INTEGRATION_REPAIR_REPORT.md) — [StaffUser.fromJson]
+  /// always constructs this with an empty list for every real login.
+  /// Treating "empty" as "deny everything" (the original behaviour) hid
+  /// every permission-gated quick action — Add Daily Work, PM Tasks, Scan
+  /// QR — behind a permission the backend can never grant, making those
+  /// features completely unreachable from Home for every real staff
+  /// account even though the endpoints themselves work fine and are
+  /// already independently authorized server-side per the class doc
+  /// above. An empty list therefore means "the server hasn't told us
+  /// anything," which defaults to allow, not deny; a genuinely non-empty
+  /// list (mock data today, real data if the backend adds this later)
+  /// still restricts normally.
+  bool can(String permission) =>
+      _granted.isEmpty || _granted.contains(permission);
 
   List<String> get all => _granted.toList(growable: false);
 }

@@ -58,7 +58,7 @@ class AppBranding {
     final fallback = AppBranding.fallback();
     return AppBranding(
       cpmsproLogoUrl: '',
-      propertyLogoUrl: _resolveAssetUrl(json['logo_url'] as String?),
+      propertyLogoUrl: AppConfig.resolveUrl(json['logo_url'] as String? ?? ''),
       propertyName: json['name'] as String? ?? fallback.propertyName,
       managementCompanyName:
           json['company_name'] as String? ?? fallback.managementCompanyName,
@@ -71,21 +71,5 @@ class AppBranding {
         fallback.secondaryColor,
       ),
     );
-  }
-
-  /// The backend returns logo URLs root-relative (e.g. `/cpms/uploads/...`)
-  /// rather than fully qualified, so this resolves them against
-  /// [AppConfig.apiBaseUrl] — the same origin the API itself is called on.
-  static String _resolveAssetUrl(String? path) {
-    final trimmed = (path ?? '').trim();
-    if (trimmed.isEmpty) return '';
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
-      return trimmed;
-    }
-    final base = AppConfig.apiBaseUrl.endsWith('/')
-        ? AppConfig.apiBaseUrl.substring(0, AppConfig.apiBaseUrl.length - 1)
-        : AppConfig.apiBaseUrl;
-    final path0 = trimmed.startsWith('/') ? trimmed : '/$trimmed';
-    return '$base$path0';
   }
 }
