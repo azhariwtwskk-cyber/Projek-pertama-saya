@@ -1,0 +1,143 @@
+# CPMSPro Full-System Audit — Changelog
+
+Branch: `claude/cpmspro-full-system-audit`. All fixes described in `AUDIT_REPORT.md`; full
+request/response contract in `API_CONTRACT.md`; validation results in `TEST_REPORT.md`.
+
+## New files
+
+| File | Purpose |
+|---|---|
+| `backend/cpms/api/v1/staff/work-history.php` | New, additive, read-only endpoint reconciling `work_orders` + `daily_work_logs` verification (AUDIT_REPORT H-3) |
+| `mobile/lib/features/work_history/domain/work_history_models.dart` | Work Order History domain models |
+| `mobile/lib/features/work_history/data/work_history_repository.dart` | Repository interface |
+| `mobile/lib/features/work_history/data/api_work_history_repository.dart` | Real API implementation |
+| `mobile/lib/features/work_history/data/mock_work_history_repository.dart` | Demo/mock implementation |
+| `mobile/lib/features/work_history/application/work_history_providers.dart` | Riverpod providers |
+| `mobile/lib/features/work_history/presentation/work_history_screen.dart` | `/work-history` screen — grouped Before/During/After photos, verification banners, rejection reason |
+| `AUDIT_REPORT.md`, `API_CONTRACT.md`, `TEST_REPORT.md`, `CHANGELOG_CPMSPRO_AUDIT.md` | This audit's deliverables |
+
+## Modified files with functional changes
+
+Backend:
+- `backend/cpms/api/v1/staff/daily-work/list.php` — added `images[]` (joined from
+  `daily_work_images`, real resolved URLs), `supervisor_remarks`, `work_order_reference`,
+  `verified_by`/`verified_at` passthrough. Additive only; existing fields unchanged.
+
+Mobile — core:
+- `lib/core/api/api_endpoints.dart` — removed dead `staffTaskAccept/Start/Complete` constants
+  (pointed at a GET-only endpoint, never actually reachable); added `staffWorkHistory`.
+- `lib/core/api/api_client.dart` — extract `error.code` from the backend's error envelope into
+  `ApiException.code`; map HTTP 409 to a new `ApiFailureType.conflict`.
+- `lib/core/api/api_exception.dart` — added `code` field and `conflict` failure type.
+- `lib/core/config/app_config.dart` — added `AppConfig.resolveUrl()` (root-relative → absolute
+  URL, consolidating logic duplicated in `AppBranding`) and `appVersion`.
+- `lib/core/config/app_branding.dart` — now uses `AppConfig.resolveUrl()` instead of a private
+  duplicate `_resolveAssetUrl`.
+- `lib/core/permissions/staff_permissions.dart` — **critical fix**: `can()` no longer denies
+  everything when the server sends an empty permissions list (AUDIT_REPORT C-1).
+- `lib/core/notifications/push_notification_service.dart` — corrected doc comment (no FCM wiring
+  exists; local notifications only — AUDIT_REPORT M-6).
+- `lib/core/location/location_service.dart` — reformatted only (no functional change).
+- `lib/core/router/app_router.dart` — added `/work-history` route (parallel to, not merged with,
+  `/daily-work/history`).
+
+Mobile — tasks feature (work order workflow rebuild, AUDIT_REPORT H-1/H-2):
+- `lib/features/tasks/domain/task_models.dart` — added `databaseId`, `existingImageUrl`;
+  `taskStatusFromString` now maps the real backend's `pending`/`completed` values;
+  `EvidencePhoto.fromJson` hardened against missing fields; added
+  `EvidencePhoto.fromUploadResponse` for `task-photo.php`'s real response shape; URLs resolved via
+  `AppConfig.resolveUrl`.
+- `lib/features/tasks/data/tasks_repository.dart` — interface: removed `acceptTask`/`startTask`;
+  `uploadEvidence` now takes `imageType` instead of the invented `beforePhotoId`; `completeTask`
+  rebuilt around submitting a linked Daily Work log.
+- `lib/features/tasks/data/api_tasks_repository.dart` — rewritten against the real
+  `staff/tasks.php` (list + client-side find-by-id, no detail endpoint), `staff/task-photo.php`
+  (correct field names), and `staff/daily-work/submit.php` (real completion path).
+- `lib/features/tasks/data/mock_tasks_repository.dart` — updated to match the new interface,
+  offline-queue payload now carries the correct multipart field name.
+- `lib/features/tasks/application/tasks_providers.dart` — controller: removed accept/start;
+  `uploadEvidence` returns the uploaded `EvidencePhoto`; `complete` takes the full Daily Work form.
+- `lib/features/tasks/presentation/task_detail_screen.dart` — removed Accept/Start actions; added
+  Before/During/After/Supporting evidence capture at the correct workflow stage; session-scoped
+  evidence gallery (backend has no full-gallery endpoint, see API_CONTRACT.md); wired the new
+  Complete Task flow.
+- `lib/features/tasks/presentation/widgets/complete_task_sheet.dart` — rebuilt: work status
+  dropdown, Before/During/After photo capture (camera or gallery) with preview + removal, After
+  required when marking Completed (client-side mirror of the backend's own rule).
+- `lib/features/tasks/presentation/widgets/task_workflow_stepper.dart` — simplified to the three
+  states the real backend can report (New → In Progress → Completed).
+- `lib/features/tasks/presentation/task_inbox_screen.dart` — added a Work Order History entry
+  point in the app bar.
+
+Mobile — attendance (AUDIT_REPORT M-1/M-2):
+- `lib/features/attendance/data/api_attendance_repository.dart` — real device GPS accuracy sent
+  (was hard-coded 25.0); branches on the backend's real error codes for a specific message per
+  failure mode; reports the resulting clock state back to the caller.
+- `lib/features/attendance/domain/attendance_models.dart` — `GeofenceResult.resultingStatus`.
+- `lib/features/attendance/application/attendance_providers.dart` — session-scoped
+  last-confirmed-clock-state tracking (no backend status endpoint exists).
+- `lib/features/attendance/data/attendance_repository.dart`,
+  `lib/features/attendance/data/mock_attendance_repository.dart` — interface/signature updates.
+
+Mobile — daily work (AUDIT_REPORT H-4/L-4/L-5/M-5):
+- `lib/features/daily_work/domain/daily_work_models.dart` — added `rejected` status,
+  `photoUrls`, `supervisor_remarks`; category enum values corrected to match the real backend list.
+- `lib/features/daily_work/data/api_daily_work_repository.dart` — parses the newly-returned
+  `images[]`/`supervisor_remarks`/real `status` string.
+- `lib/features/daily_work/presentation/daily_work_history_screen.dart` — relabelled "Daily Work
+  History" (was ambiguously "Work History"); shows real photo thumbnails (tap to enlarge),
+  verified/rejected badges, and the supervisor's rejection remarks.
+- `lib/features/daily_work/presentation/add_daily_work_screen.dart` — photo picker now supports
+  removing a picked photo before submit; default category fixed after enum rename.
+
+Mobile — assets/QR (AUDIT_REPORT M-3):
+- `lib/features/assets/presentation/qr_scanner_screen.dart` — parses the real `token` query
+  parameter from a scanned portal URL instead of an invented `CPMSPRO:ASSET:` prefix.
+
+Mobile — PM (AUDIT_REPORT M-8):
+- `lib/features/preventive_maintenance/presentation/pm_detail_screen.dart` — checklist card only
+  renders when the backend actually supplies items; photo picker supports removal.
+
+Mobile — notifications (AUDIT_REPORT M-7):
+- `lib/features/notifications/data/api_notifications_repository.dart` — no longer treats
+  `action_url` (a web-portal URL) as a Flutter route; per-row parsing hardened against malformed
+  rows; added `markAllRead`.
+- `lib/features/notifications/data/notifications_repository.dart`,
+  `lib/features/notifications/data/mock_notifications_repository.dart`,
+  `lib/features/notifications/application/notifications_providers.dart` — `markAllRead` plumbed
+  through.
+- `lib/features/notifications/presentation/notifications_screen.dart` — "Mark all read" action;
+  removed the broken route-push on tap.
+
+Mobile — profile/settings (AUDIT_REPORT M-4):
+- `lib/features/profile/presentation/profile_screen.dart` — every settings item audited; dead
+  buttons now either wired (Sync Centre, About, Help & Support, Privacy) or visibly disabled with
+  a reason (Edit Profile, Change Password, Language, Notification Settings); "Employee ID"
+  relabelled "Staff ID".
+
+Mobile — dashboard:
+- `lib/features/dashboard/data/api_dashboard_repository.dart` — defensive fallback mapping for
+  the real `stats.workOrders`/`pmTasks` field names so the KPI row degrades gracefully instead of
+  always showing 0.
+- `lib/features/dashboard/presentation/home_screen.dart` — "Work Order History" vs. "Daily Work
+  History" quick actions clearly separated (was one ambiguous "Work History" action); removed a
+  dead "Camera Evidence" quick action that only routed to `/tasks` under a misleading label.
+
+Mobile — dependencies:
+- `mobile/pubspec.yaml` — removed unused `firebase_core`/`firebase_messaging` (AUDIT_REPORT M-6);
+  `pubspec.lock` updated.
+
+## Removed
+
+- `mobile/CPMSPRO_API_PATCH_README.txt` — stale notes from an earlier, superseded patch pass;
+  superseded by `AUDIT_REPORT.md`/`API_CONTRACT.md`.
+
+## Formatting-only changes (no functional difference)
+
+`dart format .` was run per the task's instructions. Many files outside the list above show a
+full-file diff in `git diff` — these are confirmed via `git diff --ignore-all-space
+--ignore-blank-lines` (zero output) to be **whitespace/line-ending normalization only** (a bulk
+source-tree sync earlier in this session introduced inconsistent line endings across the `lib/`
+and `test/` trees; `dart format` and this pass's cleanup normalized them). This includes
+`mobile/test/*.dart`, `mobile/lib/l10n/*.arb`, and several files in `dashboard/`, `assets/`,
+`preventive_maintenance/`, `sync/` not otherwise mentioned above.
