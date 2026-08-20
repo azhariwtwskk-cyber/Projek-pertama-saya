@@ -187,6 +187,37 @@ class _WorkOrderHistoryCardState extends State<_WorkOrderHistoryCard> {
                 style: const TextStyle(
                     fontSize: 12, color: AppColors.textSecondary)),
           ],
+          // Evidence photos are the whole point of this screen — they must
+          // always be visible, not hidden behind an extra tap-to-expand
+          // (that's what made real-device testers report "images not
+          // showing" even after the backend URL fix).
+          if (item.photos.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            for (final type in const [
+              'Before',
+              'During',
+              'After',
+              'Supporting'
+            ])
+              if (item.photosOfType(type).isNotEmpty)
+                _PhotoRow(
+                    label: type.toUpperCase(),
+                    photos: item.photosOfType(type),
+                    onTap: _openPhotos),
+          ] else ...[
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Icon(Icons.image_not_supported_outlined,
+                    size: 14, color: AppColors.textSecondary),
+                const SizedBox(width: 6),
+                Text('No evidence photos found for this work order',
+                    style: TextStyle(
+                        fontSize: 11.5,
+                        color: AppColors.textSecondary.withValues(alpha: 0.8))),
+              ],
+            ),
+          ],
           if (_expanded) ...[
             const Divider(height: 24),
             if (item.completionNotes != null) ...[
@@ -199,17 +230,6 @@ class _WorkOrderHistoryCardState extends State<_WorkOrderHistoryCard> {
               Text(item.completionNotes!, style: const TextStyle(height: 1.4)),
               const SizedBox(height: 14),
             ],
-            for (final type in const [
-              'Before',
-              'During',
-              'After',
-              'Supporting'
-            ])
-              if (item.photosOfType(type).isNotEmpty)
-                _PhotoRow(
-                    label: type.toUpperCase(),
-                    photos: item.photosOfType(type),
-                    onTap: _openPhotos),
             if (item.dailyWorkEntries.isNotEmpty) ...[
               const SizedBox(height: 6),
               const Text('Daily Work Submissions',
@@ -226,10 +246,11 @@ class _WorkOrderHistoryCardState extends State<_WorkOrderHistoryCard> {
                       style: const TextStyle(fontSize: 12.5)),
                 ),
             ],
-          ] else
+          ] else if (item.completionNotes != null ||
+              item.dailyWorkEntries.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: Text('Tap to view evidence photos and remarks',
+              child: Text('Tap to view remarks and submission history',
                   style: TextStyle(
                       fontSize: 11.5,
                       color: AppColors.textSecondary.withValues(alpha: 0.8))),
