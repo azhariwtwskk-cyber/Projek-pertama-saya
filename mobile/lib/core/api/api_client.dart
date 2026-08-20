@@ -58,7 +58,8 @@ class ApiClient {
   Future<String?> Function()? onTokenRefreshNeeded;
   Future<void> Function()? onSessionExpired;
 
-  Future<void> _onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> _onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await _secureStorage.accessToken;
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -66,9 +67,12 @@ class ApiClient {
     handler.next(options);
   }
 
-  Future<void> _onError(DioException err, ErrorInterceptorHandler handler) async {
-    final alreadyRetried = err.requestOptions.extra['cpmspro_retried_after_refresh'] == true;
-    final isExcludedPath = _authPathsExcludedFromAutoRefresh.contains(err.requestOptions.path);
+  Future<void> _onError(
+      DioException err, ErrorInterceptorHandler handler) async {
+    final alreadyRetried =
+        err.requestOptions.extra['cpmspro_retried_after_refresh'] == true;
+    final isExcludedPath =
+        _authPathsExcludedFromAutoRefresh.contains(err.requestOptions.path);
 
     if (err.response?.statusCode == 401 && !alreadyRetried && !isExcludedPath) {
       if (onTokenRefreshNeeded != null) {
@@ -103,7 +107,8 @@ class ApiClient {
     } on DioException catch (e) {
       throw _mapDioException(e);
     } on SocketException {
-      throw const ApiException(ApiFailureType.noConnection, 'No internet connection.');
+      throw const ApiException(
+          ApiFailureType.noConnection, 'No internet connection.');
     }
   }
 
@@ -123,32 +128,54 @@ class ApiClient {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return const ApiException(ApiFailureType.timeout, 'The request timed out.');
+        return const ApiException(
+            ApiFailureType.timeout, 'The request timed out.');
       case DioExceptionType.connectionError:
-        return const ApiException(ApiFailureType.noConnection, 'No internet connection.');
+        return const ApiException(
+            ApiFailureType.noConnection, 'No internet connection.');
       case DioExceptionType.badResponse:
         final status = e.response?.statusCode ?? 0;
         final serverMessage = _extractMessage(e.response?.data);
+        final serverCode = _extractCode(e.response?.data);
         if (status == 401) {
-          return ApiException(ApiFailureType.sessionExpired, serverMessage ?? 'Session expired.', statusCode: status);
+          return ApiException(ApiFailureType.sessionExpired,
+              serverMessage ?? 'Session expired.',
+              statusCode: status, code: serverCode);
         }
         if (status == 403) {
-          return ApiException(ApiFailureType.forbidden, serverMessage ?? 'You do not have access to this resource.', statusCode: status);
+          return ApiException(ApiFailureType.forbidden,
+              serverMessage ?? 'You do not have access to this resource.',
+              statusCode: status, code: serverCode);
         }
         if (status == 404) {
-          return ApiException(ApiFailureType.notFound, serverMessage ?? 'Not found.', statusCode: status);
+          return ApiException(
+              ApiFailureType.notFound, serverMessage ?? 'Not found.',
+              statusCode: status, code: serverCode);
+        }
+        if (status == 409) {
+          // e.g. ALREADY_CLOCKED_IN / NOT_CLOCKED_IN / GEOFENCE_NOT_CONFIGURED —
+          // a real, expected state conflict, not a generic server failure.
+          return ApiException(ApiFailureType.conflict,
+              serverMessage ?? 'This action conflicts with the current state.',
+              statusCode: status, code: serverCode);
         }
         if (status == 422 || status == 400) {
-          return ApiException(ApiFailureType.validation, serverMessage ?? 'Please check the submitted information.', statusCode: status);
+          return ApiException(ApiFailureType.validation,
+              serverMessage ?? 'Please check the submitted information.',
+              statusCode: status, code: serverCode);
         }
-        return ApiException(ApiFailureType.server, serverMessage ?? 'CPMSPro server error.', statusCode: status);
+        return ApiException(
+            ApiFailureType.server, serverMessage ?? 'CPMSPro server error.',
+            statusCode: status, code: serverCode);
       case DioExceptionType.cancel:
         return const ApiException(ApiFailureType.unknown, 'Request cancelled.');
       case DioExceptionType.badCertificate:
-        return const ApiException(ApiFailureType.unknown, 'Secure connection could not be verified.');
+        return const ApiException(
+            ApiFailureType.unknown, 'Secure connection could not be verified.');
       case DioExceptionType.unknown:
       default:
-        return const ApiException(ApiFailureType.noConnection, 'Unable to connect to CPMSPro.');
+        return const ApiException(
+            ApiFailureType.noConnection, 'Unable to connect to CPMSPro.');
     }
   }
 
@@ -162,6 +189,16 @@ class ApiClient {
         return error['message'] as String?;
       }
       return data['message'] as String?;
+    }
+    return null;
+  }
+
+  String? _extractCode(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final error = data['error'];
+      if (error is Map<String, dynamic>) {
+        return error['code'] as String?;
+      }
     }
     return null;
   }

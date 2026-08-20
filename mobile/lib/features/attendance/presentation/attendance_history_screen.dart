@@ -14,19 +14,24 @@ class AttendanceHistoryScreen extends ConsumerStatefulWidget {
   const AttendanceHistoryScreen({super.key});
 
   @override
-  ConsumerState<AttendanceHistoryScreen> createState() => _AttendanceHistoryScreenState();
+  ConsumerState<AttendanceHistoryScreen> createState() =>
+      _AttendanceHistoryScreenState();
 }
 
-class _AttendanceHistoryScreenState extends ConsumerState<AttendanceHistoryScreen> {
-  late DateTime _selectedMonth = DateTime(DateTime.now().year, DateTime.now().month);
+class _AttendanceHistoryScreenState
+    extends ConsumerState<AttendanceHistoryScreen> {
+  late DateTime _selectedMonth =
+      DateTime(DateTime.now().year, DateTime.now().month);
 
   void _shiftMonth(int delta) {
-    setState(() => _selectedMonth = DateTime(_selectedMonth.year, _selectedMonth.month + delta));
+    setState(() => _selectedMonth =
+        DateTime(_selectedMonth.year, _selectedMonth.month + delta));
   }
 
   @override
   Widget build(BuildContext context) {
-    final summaryAsync = ref.watch(attendanceHistoryProvider((year: _selectedMonth.year, month: _selectedMonth.month)));
+    final summaryAsync = ref.watch(attendanceHistoryProvider(
+        (year: _selectedMonth.year, month: _selectedMonth.month)));
 
     return Scaffold(
       appBar: AppBar(title: const Text('Attendance History')),
@@ -37,26 +42,52 @@ class _AttendanceHistoryScreenState extends ConsumerState<AttendanceHistoryScree
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(icon: const Icon(Icons.chevron_left_rounded), onPressed: () => _shiftMonth(-1)),
-                Text(DateFormat('MMMM yyyy').format(_selectedMonth), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                IconButton(icon: const Icon(Icons.chevron_right_rounded), onPressed: () => _shiftMonth(1)),
+                IconButton(
+                    icon: const Icon(Icons.chevron_left_rounded),
+                    onPressed: () => _shiftMonth(-1)),
+                Text(DateFormat('MMMM yyyy').format(_selectedMonth),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 16)),
+                IconButton(
+                    icon: const Icon(Icons.chevron_right_rounded),
+                    onPressed: () => _shiftMonth(1)),
               ],
             ),
           ),
           Expanded(
             child: summaryAsync.when(
-              loading: () => const Padding(padding: EdgeInsets.all(16), child: SkeletonList(count: 6, itemHeight: 64)),
-              error: (e, _) => Center(child: AppStateView.error(onRetry: () => ref.invalidate(attendanceHistoryProvider((year: _selectedMonth.year, month: _selectedMonth.month))))),
+              loading: () => const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: SkeletonList(count: 6, itemHeight: 64)),
+              error: (e, _) => Center(
+                  child: AppStateView.error(
+                      onRetry: () => ref.invalidate(attendanceHistoryProvider((
+                            year: _selectedMonth.year,
+                            month: _selectedMonth.month
+                          ))))),
               data: (summary) => ListView(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                 children: [
                   AppSectionCard(
                     child: Row(
                       children: [
-                        Expanded(child: _SummaryStat(label: 'Days Worked', value: '${summary.daysWorked}')),
-                        Expanded(child: _SummaryStat(label: 'Total Hours', value: summary.totalHours.toStringAsFixed(1))),
-                        Expanded(child: _SummaryStat(label: 'Late', value: '${summary.lateArrivals}')),
-                        Expanded(child: _SummaryStat(label: 'OT Hours', value: summary.overtimeHours.toStringAsFixed(1))),
+                        Expanded(
+                            child: _SummaryStat(
+                                label: 'Days Worked',
+                                value: '${summary.daysWorked}')),
+                        Expanded(
+                            child: _SummaryStat(
+                                label: 'Total Hours',
+                                value: summary.totalHours.toStringAsFixed(1))),
+                        Expanded(
+                            child: _SummaryStat(
+                                label: 'Late',
+                                value: '${summary.lateArrivals}')),
+                        Expanded(
+                            child: _SummaryStat(
+                                label: 'OT Hours',
+                                value:
+                                    summary.overtimeHours.toStringAsFixed(1))),
                       ],
                     ),
                   ),
@@ -85,9 +116,12 @@ class _SummaryStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(value, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        Text(value,
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         const SizedBox(height: 2),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+        Text(label,
+            style:
+                const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
       ],
     );
   }
@@ -110,8 +144,12 @@ class _RecordTile extends StatelessWidget {
               width: 46,
               child: Column(
                 children: [
-                  Text(DateFormat('d').format(record.date), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-                  Text(DateFormat('EEE').format(record.date), style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                  Text(DateFormat('d').format(record.date),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 16)),
+                  Text(DateFormat('EEE').format(record.date),
+                      style: const TextStyle(
+                          fontSize: 11, color: AppColors.textSecondary)),
                 ],
               ),
             ),
@@ -124,23 +162,34 @@ class _RecordTile extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('In: ${DateFormat('h:mm a').format(record.clockIn!)}', style: const TextStyle(fontSize: 12.5)),
+                              Text(
+                                  'In: ${DateFormat('h:mm a').format(record.clockIn!)}',
+                                  style: const TextStyle(fontSize: 12.5)),
                               if (record.clockOut != null)
-                                Text('Out: ${DateFormat('h:mm a').format(record.clockOut!)}', style: const TextStyle(fontSize: 12.5)),
+                                Text(
+                                    'Out: ${DateFormat('h:mm a').format(record.clockOut!)}',
+                                    style: const TextStyle(fontSize: 12.5)),
                             ],
                           ),
                         ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text('${record.hoursWorked.toStringAsFixed(1)}h', style: const TextStyle(fontWeight: FontWeight.w700)),
+                            Text('${record.hoursWorked.toStringAsFixed(1)}h',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700)),
                             if (record.isLate)
-                              const Text('Late', style: TextStyle(color: AppColors.warning, fontSize: 11, fontWeight: FontWeight.w600)),
+                              const Text('Late',
+                                  style: TextStyle(
+                                      color: AppColors.warning,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ],
                     )
-                  : const Text('Off Day', style: TextStyle(color: AppColors.textSecondary)),
+                  : const Text('Off Day',
+                      style: TextStyle(color: AppColors.textSecondary)),
             ),
           ],
         ),

@@ -7,8 +7,11 @@ abstract class AttendanceRepository {
   /// coordinates fall inside the property's configured geofence and
   /// whether clock-in is therefore allowed (section 20) — the client never
   /// makes that call itself, it only reports [GeofenceResult] back.
-  Future<GeofenceResult> clockIn({required double lat, required double lng});
-  Future<GeofenceResult> clockOut({required double lat, required double lng});
+  Future<GeofenceResult> clockIn(
+      {required double lat, required double lng, double? accuracy});
+  Future<GeofenceResult> clockOut(
+      {required double lat, required double lng, double? accuracy});
 
-  Future<MonthlyAttendanceSummary> fetchHistory({required int year, required int month});
+  Future<MonthlyAttendanceSummary> fetchHistory(
+      {required int year, required int month});
 }

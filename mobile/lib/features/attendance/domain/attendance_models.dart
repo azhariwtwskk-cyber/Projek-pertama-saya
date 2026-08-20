@@ -27,10 +27,23 @@ class AttendanceStatus {
 }
 
 class GeofenceResult {
-  const GeofenceResult({required this.allowed, required this.message, this.distanceMeters});
+  const GeofenceResult({
+    required this.allowed,
+    required this.message,
+    this.distanceMeters,
+    this.resultingStatus,
+  });
   final bool allowed;
   final String message;
   final double? distanceMeters;
+
+  /// The clock status CPMSPro actually confirms after this call — set on
+  /// both success and on an `ALREADY_CLOCKED_IN`/`NOT_CLOCKED_IN`
+  /// conflict, since either way the server just told the app the real
+  /// current state. Null only when the request failed for an unrelated
+  /// reason (network error, GPS rejected, etc.) and the previous known
+  /// state should be left alone.
+  final ClockStatus? resultingStatus;
 }
 
 class AttendanceRecord {

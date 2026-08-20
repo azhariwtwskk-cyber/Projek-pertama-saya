@@ -23,7 +23,8 @@ class MockAttendanceRepository implements AttendanceRepository {
       Geolocator.distanceBetween(lat1, lng1, lat2, lng2);
 
   @override
-  Future<GeofenceResult> clockIn({required double lat, required double lng}) async {
+  Future<GeofenceResult> clockIn(
+      {required double lat, required double lng, double? accuracy}) async {
     await Future.delayed(const Duration(milliseconds: 900));
     final distance = _distanceMeters(lat, lng, _geofenceLat, _geofenceLng);
     final propertyName = MockFixtures.instance.branding.propertyName;
@@ -43,14 +44,19 @@ class MockAttendanceRepository implements AttendanceRepository {
       isLate: DateTime.now().hour >= 8 && DateTime.now().minute > 15,
       propertyName: propertyName,
     );
-    return GeofenceResult(allowed: true, message: 'You are within the $propertyName attendance area.', distanceMeters: distance);
+    return GeofenceResult(
+        allowed: true,
+        message: 'You are within the $propertyName attendance area.',
+        distanceMeters: distance);
   }
 
   @override
-  Future<GeofenceResult> clockOut({required double lat, required double lng}) async {
+  Future<GeofenceResult> clockOut(
+      {required double lat, required double lng, double? accuracy}) async {
     await Future.delayed(const Duration(milliseconds: 900));
     final current = MockFixtures.instance.attendanceStatus;
-    final overtime = current.clockInTime != null && DateTime.now().difference(current.clockInTime!).inHours >= 9
+    final overtime = current.clockInTime != null &&
+            DateTime.now().difference(current.clockInTime!).inHours >= 9
         ? DateTime.now().difference(current.clockInTime!).inMinutes - (9 * 60)
         : 0;
     MockFixtures.instance.attendanceStatus = AttendanceStatus(
@@ -62,11 +68,13 @@ class MockAttendanceRepository implements AttendanceRepository {
       overtimeMinutes: overtime > 0 ? overtime : 0,
       propertyName: current.propertyName,
     );
-    return const GeofenceResult(allowed: true, message: 'Clocked out successfully.');
+    return const GeofenceResult(
+        allowed: true, message: 'Clocked out successfully.');
   }
 
   @override
-  Future<MonthlyAttendanceSummary> fetchHistory({required int year, required int month}) async {
+  Future<MonthlyAttendanceSummary> fetchHistory(
+      {required int year, required int month}) async {
     await Future.delayed(const Duration(milliseconds: 400));
     final records = MockFixtures.instance.attendanceHistory
         .where((r) => r.date.year == year && r.date.month == month)
