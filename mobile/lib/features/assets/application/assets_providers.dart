@@ -12,6 +12,7 @@ final assetsRepositoryProvider = Provider<AssetsRepository>((ref) {
   return ApiAssetsRepository(ref.watch(apiClientProvider));
 });
 
-final assetDetailProvider = FutureProvider.autoDispose.family<PropertyAsset, String>((ref, id) {
+final assetDetailProvider =
+    FutureProvider.autoDispose.family<PropertyAsset, String>((ref, id) {
   return ref.watch(assetsRepositoryProvider).fetchAsset(id);
 });

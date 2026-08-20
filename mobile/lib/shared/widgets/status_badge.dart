@@ -39,11 +39,14 @@ class PriorityBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _color;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: dense ? 8 : 10, vertical: dense ? 3 : 5),
+      padding: EdgeInsets.symmetric(
+          horizontal: dense ? 8 : 10, vertical: dense ? 3 : 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(999),
-        border: priority == TaskPriority.urgent ? Border.all(color: color.withValues(alpha: 0.4)) : null,
+        border: priority == TaskPriority.urgent
+            ? Border.all(color: color.withValues(alpha: 0.4))
+            : null,
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -98,10 +101,16 @@ class StatusBadge extends StatelessWidget {
     final (color, label) = _spec;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
+      decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(999)),
       child: Text(
         label,
-        style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 11, letterSpacing: 0.2),
+        style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.w700,
+            fontSize: 11,
+            letterSpacing: 0.2),
       ),
     );
   }

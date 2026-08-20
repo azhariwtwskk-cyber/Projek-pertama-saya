@@ -34,7 +34,8 @@ class AppShell extends ConsumerWidget {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: navigationShell.currentIndex,
-        onTap: (index) => navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex),
+        onTap: (index) => navigationShell.goBranch(index,
+            initialLocation: index == navigationShell.currentIndex),
         items: [
           for (var i = 0; i < _tabs.length; i++)
             BottomNavigationBarItem(

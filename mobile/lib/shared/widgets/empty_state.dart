@@ -26,19 +26,22 @@ class AppStateView extends StatelessWidget {
   factory AppStateView.noTasksToday() => const AppStateView(
         icon: Icons.task_alt_rounded,
         title: 'No Tasks Today',
-        message: "You're all caught up. New assignments will appear here automatically.",
+        message:
+            "You're all caught up. New assignments will appear here automatically.",
       );
 
   factory AppStateView.offline({VoidCallback? onRetry}) => AppStateView(
         icon: Icons.cloud_off_rounded,
         title: 'No Internet Connection',
-        message: 'Unable to connect to CPMSPro. Your work has been saved and will sync automatically when connection returns.',
+        message:
+            'Unable to connect to CPMSPro. Your work has been saved and will sync automatically when connection returns.',
         actionLabel: onRetry != null ? 'Retry' : null,
         onAction: onRetry,
         iconColor: AppColors.warning,
       );
 
-  factory AppStateView.error({String? message, VoidCallback? onRetry}) => AppStateView(
+  factory AppStateView.error({String? message, VoidCallback? onRetry}) =>
+      AppStateView(
         icon: Icons.error_outline_rounded,
         title: 'Something Went Wrong',
         message: message ?? 'Please try again.',
@@ -59,18 +62,24 @@ class AppStateView extends StatelessWidget {
             width: 76,
             height: 76,
             decoration: BoxDecoration(
-              color: (iconColor ?? theme.colorScheme.primary).withValues(alpha: 0.1),
+              color: (iconColor ?? theme.colorScheme.primary)
+                  .withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 36, color: iconColor ?? theme.colorScheme.primary),
+            child: Icon(icon,
+                size: 36, color: iconColor ?? theme.colorScheme.primary),
           ),
           const SizedBox(height: 20),
-          Text(title, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700), textAlign: TextAlign.center),
+          Text(title,
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w700),
+              textAlign: TextAlign.center),
           const SizedBox(height: 8),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(color: AppColors.textSecondary),
           ),
           if (actionLabel != null) ...[
             const SizedBox(height: 20),

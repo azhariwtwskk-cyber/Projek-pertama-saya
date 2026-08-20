@@ -8,7 +8,8 @@ import '../data/auth_repository.dart';
 import '../data/mock_auth_repository.dart';
 import '../domain/staff_user.dart';
 
-final secureStorageProvider = Provider<SecureStorageService>((ref) => SecureStorageService());
+final secureStorageProvider =
+    Provider<SecureStorageService>((ref) => SecureStorageService());
 
 final apiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(secureStorage: ref.watch(secureStorageProvider));
@@ -34,7 +35,9 @@ class AuthState {
 
   static const initial = AuthState(status: AuthStatus.unknown);
 
-  AuthState copyWith({AuthStatus? status, Object? user = _unset, String? errorMessage}) => AuthState(
+  AuthState copyWith(
+          {AuthStatus? status, Object? user = _unset, String? errorMessage}) =>
+      AuthState(
         status: status ?? this.status,
         // `user ?? this.user` would silently keep the old user whenever a
         // caller passes `user: null` to clear it (e.g. forceLogout,
@@ -46,7 +49,8 @@ class AuthState {
 }
 
 class AuthController extends StateNotifier<AuthState> {
-  AuthController(this._repository, this._secureStorage) : super(AuthState.initial) {
+  AuthController(this._repository, this._secureStorage)
+      : super(AuthState.initial) {
     _restoreSession();
   }
 
@@ -101,20 +105,25 @@ class AuthController extends StateNotifier<AuthState> {
     required String password,
     required bool rememberMe,
   }) async {
-    state = state.copyWith(status: AuthStatus.authenticating, errorMessage: null);
+    state =
+        state.copyWith(status: AuthStatus.authenticating, errorMessage: null);
     try {
-      final result = await _repository.login(usernameOrEmail: usernameOrEmail, password: password);
+      final result = await _repository.login(
+          usernameOrEmail: usernameOrEmail, password: password);
       await _secureStorage.saveSession(
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
         accessExpiresAt: result.accessExpiresAt,
         refreshExpiresAt: result.refreshExpiresAt,
       );
-      await _secureStorage.saveRememberedUsername(rememberMe ? usernameOrEmail : null);
-      state = state.copyWith(status: AuthStatus.authenticated, user: result.user);
+      await _secureStorage
+          .saveRememberedUsername(rememberMe ? usernameOrEmail : null);
+      state =
+          state.copyWith(status: AuthStatus.authenticated, user: result.user);
       return true;
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.unauthenticated, errorMessage: e.toString());
+      state = state.copyWith(
+          status: AuthStatus.unauthenticated, errorMessage: e.toString());
       return false;
     }
   }
@@ -149,7 +158,8 @@ class AuthController extends StateNotifier<AuthState> {
     final storedRefreshToken = await _secureStorage.refreshToken;
     if (storedRefreshToken == null) return null;
     try {
-      final result = await _repository.refresh(refreshToken: storedRefreshToken);
+      final result =
+          await _repository.refresh(refreshToken: storedRefreshToken);
       await _secureStorage.saveRefreshedSession(
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
@@ -172,12 +182,17 @@ class AuthController extends StateNotifier<AuthState> {
   /// refresh attempt itself couldn't produce a token).
   void forceLogout() {
     _secureStorage.clearSession();
-    state = state.copyWith(status: AuthStatus.unauthenticated, user: null, errorMessage: 'Session expired. Please login again.');
+    state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        user: null,
+        errorMessage: 'Session expired. Please login again.');
   }
 }
 
-final authControllerProvider = StateNotifierProvider<AuthController, AuthState>((ref) {
-  final controller = AuthController(ref.watch(authRepositoryProvider), ref.watch(secureStorageProvider));
+final authControllerProvider =
+    StateNotifierProvider<AuthController, AuthState>((ref) {
+  final controller = AuthController(
+      ref.watch(authRepositoryProvider), ref.watch(secureStorageProvider));
   // Wired here (rather than inside apiClientProvider) so the two
   // providers don't form a dependency cycle: ApiClient reports session
   // expiry up to whoever owns the session, and AuthController is that
@@ -188,7 +203,8 @@ final authControllerProvider = StateNotifierProvider<AuthController, AuthState>(
   return controller;
 });
 
-final currentStaffUserProvider = Provider<StaffUser?>((ref) => ref.watch(authControllerProvider).user);
+final currentStaffUserProvider =
+    Provider<StaffUser?>((ref) => ref.watch(authControllerProvider).user);
 
 final rememberedUsernameProvider = FutureProvider<String?>((ref) {
   return ref.watch(secureStorageProvider).rememberedUsername;

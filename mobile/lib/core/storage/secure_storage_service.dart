@@ -8,7 +8,8 @@ class SecureStorageService {
       : _storage = storage ??
             const FlutterSecureStorage(
               aOptions: AndroidOptions(encryptedSharedPreferences: true),
-              iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+              iOptions:
+                  IOSOptions(accessibility: KeychainAccessibility.first_unlock),
             );
 
   final FlutterSecureStorage _storage;
@@ -28,8 +29,11 @@ class SecureStorageService {
     await Future.wait([
       _storage.write(key: _accessTokenKey, value: accessToken),
       _storage.write(key: _refreshTokenKey, value: refreshToken),
-      _storage.write(key: _accessTokenExpiryKey, value: accessExpiresAt.toIso8601String()),
-      _storage.write(key: _refreshTokenExpiryKey, value: refreshExpiresAt.toIso8601String()),
+      _storage.write(
+          key: _accessTokenExpiryKey, value: accessExpiresAt.toIso8601String()),
+      _storage.write(
+          key: _refreshTokenExpiryKey,
+          value: refreshExpiresAt.toIso8601String()),
     ]);
   }
 
@@ -81,5 +85,6 @@ class SecureStorageService {
     }
   }
 
-  Future<String?> get rememberedUsername => _storage.read(key: _rememberedUsernameKey);
+  Future<String?> get rememberedUsername =>
+      _storage.read(key: _rememberedUsernameKey);
 }

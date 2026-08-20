@@ -12,7 +12,9 @@ class ConnectivityService {
     _sub = Connectivity().onConnectivityChanged.listen((results) {
       _controller.add(_isOnline(results));
     });
-    Connectivity().checkConnectivity().then((r) => _controller.add(_isOnline(r)));
+    Connectivity()
+        .checkConnectivity()
+        .then((r) => _controller.add(_isOnline(r)));
   }
 
   final _controller = StreamController<bool>.broadcast();

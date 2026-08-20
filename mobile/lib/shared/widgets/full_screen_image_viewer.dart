@@ -10,15 +10,21 @@ import 'package:photo_view/photo_view_gallery.dart';
 /// works the same for a synced photo and one still sitting in the offline
 /// outbox.
 class FullScreenImageViewer extends StatefulWidget {
-  const FullScreenImageViewer({super.key, required this.imageUrls, this.initialIndex = 0, this.captions});
+  const FullScreenImageViewer(
+      {super.key,
+      required this.imageUrls,
+      this.initialIndex = 0,
+      this.captions});
 
   final List<String> imageUrls;
   final int initialIndex;
   final List<String>? captions;
 
-  static void open(BuildContext context, List<String> urls, {int initialIndex = 0, List<String>? captions}) {
+  static void open(BuildContext context, List<String> urls,
+      {int initialIndex = 0, List<String>? captions}) {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => FullScreenImageViewer(imageUrls: urls, initialIndex: initialIndex, captions: captions),
+      builder: (_) => FullScreenImageViewer(
+          imageUrls: urls, initialIndex: initialIndex, captions: captions),
       fullscreenDialog: true,
     ));
   }
@@ -65,7 +71,8 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 color: Colors.black54,
-                child: Text(widget.captions![_index], style: const TextStyle(color: Colors.white)),
+                child: Text(widget.captions![_index],
+                    style: const TextStyle(color: Colors.white)),
               ),
             ),
         ],

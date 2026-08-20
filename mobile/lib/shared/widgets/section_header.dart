@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 
 class SectionHeader extends StatelessWidget {
-  const SectionHeader({super.key, required this.title, this.actionLabel, this.onAction});
+  const SectionHeader(
+      {super.key, required this.title, this.actionLabel, this.onAction});
 
   final String title;
   final String? actionLabel;
@@ -18,14 +19,20 @@ class SectionHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(context)
+                .textTheme
+                .titleMedium
+                ?.copyWith(fontWeight: FontWeight.w700),
           ),
           if (actionLabel != null)
             GestureDetector(
               onTap: onAction,
               child: Text(
                 actionLabel!,
-                style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.w600, fontSize: 13),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13),
               ),
             ),
         ],
@@ -35,7 +42,11 @@ class SectionHeader extends StatelessWidget {
 }
 
 class AppSectionCard extends StatelessWidget {
-  const AppSectionCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.onTap});
+  const AppSectionCard(
+      {super.key,
+      required this.child,
+      this.padding = const EdgeInsets.all(16),
+      this.onTap});
 
   final Widget child;
   final EdgeInsets padding;
@@ -50,12 +61,14 @@ class AppSectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.border),
         boxShadow: const [
-          BoxShadow(color: Color(0x0A101828), blurRadius: 12, offset: Offset(0, 4)),
+          BoxShadow(
+              color: Color(0x0A101828), blurRadius: 12, offset: Offset(0, 4)),
         ],
       ),
       child: child,
     );
     if (onTap == null) return card;
-    return InkWell(borderRadius: BorderRadius.circular(20), onTap: onTap, child: card);
+    return InkWell(
+        borderRadius: BorderRadius.circular(20), onTap: onTap, child: card);
   }
 }

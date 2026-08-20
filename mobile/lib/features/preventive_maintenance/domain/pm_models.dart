@@ -1,15 +1,22 @@
 enum PmStatus { today, upcoming, overdue, completed }
 
 class PmChecklistItem {
-  const PmChecklistItem({required this.id, required this.label, this.isMandatory = true, this.isChecked = false});
+  const PmChecklistItem(
+      {required this.id,
+      required this.label,
+      this.isMandatory = true,
+      this.isChecked = false});
 
   final String id;
   final String label;
   final bool isMandatory;
   final bool isChecked;
 
-  PmChecklistItem copyWith({bool? isChecked}) =>
-      PmChecklistItem(id: id, label: label, isMandatory: isMandatory, isChecked: isChecked ?? this.isChecked);
+  PmChecklistItem copyWith({bool? isChecked}) => PmChecklistItem(
+      id: id,
+      label: label,
+      isMandatory: isMandatory,
+      isChecked: isChecked ?? this.isChecked);
 }
 
 class PmTask {
@@ -37,5 +44,6 @@ class PmTask {
   final List<PmChecklistItem> checklist;
   final bool requiresPhotoEvidence;
 
-  bool get allMandatoryChecked => checklist.where((c) => c.isMandatory).every((c) => c.isChecked);
+  bool get allMandatoryChecked =>
+      checklist.where((c) => c.isMandatory).every((c) => c.isChecked);
 }

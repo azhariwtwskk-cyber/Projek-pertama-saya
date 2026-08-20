@@ -7,13 +7,16 @@ import 'auth_repository.dart';
 
 class MockAuthRepository implements AuthRepository {
   @override
-  Future<LoginResult> login({required String usernameOrEmail, required String password}) async {
+  Future<LoginResult> login(
+      {required String usernameOrEmail, required String password}) async {
     await Future.delayed(const Duration(milliseconds: 900));
     if (usernameOrEmail.trim().isEmpty || password.isEmpty) {
-      throw const ApiException(ApiFailureType.validation, 'Please enter your username/email and password.');
+      throw const ApiException(ApiFailureType.validation,
+          'Please enter your username/email and password.');
     }
     if (password.length < 4) {
-      throw const ApiException(ApiFailureType.forbidden, 'Incorrect username or password.');
+      throw const ApiException(
+          ApiFailureType.forbidden, 'Incorrect username or password.');
     }
     return LoginResult(
       user: MockFixtures.instance.staffUser,

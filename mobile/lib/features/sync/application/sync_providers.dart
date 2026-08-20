@@ -12,7 +12,8 @@ import '../data/sync_handlers.dart';
 class SyncQueueController extends StateNotifier<List<PendingSyncItem>> {
   SyncQueueController(this._ref) : super(const []) {
     refresh();
-    _connectivitySub = _ref.read(connectivityServiceProvider).onStatusChange.listen((online) {
+    _connectivitySub =
+        _ref.read(connectivityServiceProvider).onStatusChange.listen((online) {
       if (online) retrySync();
     });
   }
@@ -60,8 +61,10 @@ class SyncQueueController extends StateNotifier<List<PendingSyncItem>> {
   }
 }
 
-final syncQueueControllerProvider = StateNotifierProvider<SyncQueueController, List<PendingSyncItem>>((ref) {
+final syncQueueControllerProvider =
+    StateNotifierProvider<SyncQueueController, List<PendingSyncItem>>((ref) {
   return SyncQueueController(ref);
 });
 
-final pendingSyncCountProvider = Provider<int>((ref) => ref.watch(syncQueueControllerProvider).length);
+final pendingSyncCountProvider =
+    Provider<int>((ref) => ref.watch(syncQueueControllerProvider).length);

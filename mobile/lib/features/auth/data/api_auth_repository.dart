@@ -25,12 +25,14 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   DateTime _expiryFromSeconds(dynamic seconds) {
-    final value = seconds is int ? seconds : int.tryParse(seconds?.toString() ?? '') ?? 0;
+    final value =
+        seconds is int ? seconds : int.tryParse(seconds?.toString() ?? '') ?? 0;
     return DateTime.now().add(Duration(seconds: value));
   }
 
   @override
-  Future<LoginResult> login({required String usernameOrEmail, required String password}) {
+  Future<LoginResult> login(
+      {required String usernameOrEmail, required String password}) {
     return _client.request(
       (dio) => dio.post(ApiEndpoints.login, data: {
         'username': usernameOrEmail,
@@ -67,7 +69,8 @@ class ApiAuthRepository implements AuthRepository {
   Future<RefreshResult> refresh({required String refreshToken}) async {
     try {
       return await _client.request(
-        (dio) => dio.post(ApiEndpoints.refreshToken, data: {'refresh_token': refreshToken}),
+        (dio) => dio.post(ApiEndpoints.refreshToken,
+            data: {'refresh_token': refreshToken}),
         (data) {
           final json = data as Map<String, dynamic>;
           return RefreshResult(
@@ -83,7 +86,8 @@ class ApiAuthRepository implements AuthRepository {
       // expired, revoked, already-rotated/reused token; access revoked)
       // as a 401/403 — all of them mean "this refresh token can't be
       // used again," never "try again."
-      if (e.type == ApiFailureType.sessionExpired || e.type == ApiFailureType.forbidden) {
+      if (e.type == ApiFailureType.sessionExpired ||
+          e.type == ApiFailureType.forbidden) {
         throw RefreshTokenInvalid(e.message);
       }
       rethrow;

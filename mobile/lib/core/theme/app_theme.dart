@@ -13,7 +13,8 @@ class AppPalette {
   final Color secondary;
 
   factory AppPalette.fromBranding(AppBranding branding) {
-    return AppPalette(primary: branding.primaryColor, secondary: branding.secondaryColor);
+    return AppPalette(
+        primary: branding.primaryColor, secondary: branding.secondaryColor);
   }
 }
 
@@ -43,7 +44,8 @@ class AppColors {
 }
 
 class AppTheme {
-  static ThemeData light(AppPalette palette) => _build(palette, Brightness.light);
+  static ThemeData light(AppPalette palette) =>
+      _build(palette, Brightness.light);
   static ThemeData dark(AppPalette palette) => _build(palette, Brightness.dark);
 
   static ThemeData _build(AppPalette palette, Brightness brightness) {
@@ -56,7 +58,8 @@ class AppTheme {
       error: AppColors.danger,
     );
 
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
+    final textColor =
+        isDark ? AppColors.textPrimaryDark : AppColors.textPrimary;
     final baseTextTheme = GoogleFonts.interTextTheme(
       isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
     );
@@ -65,14 +68,16 @@ class AppTheme {
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme,
-      scaffoldBackgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+      scaffoldBackgroundColor:
+          isDark ? AppColors.backgroundDark : AppColors.background,
       fontFamily: GoogleFonts.inter().fontFamily,
       textTheme: baseTextTheme.apply(
         bodyColor: textColor,
         displayColor: textColor,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: isDark ? AppColors.backgroundDark : AppColors.background,
+        backgroundColor:
+            isDark ? AppColors.backgroundDark : AppColors.background,
         foregroundColor: textColor,
         elevation: 0,
         centerTitle: false,
@@ -95,7 +100,8 @@ class AppTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: (isDark ? AppColors.surfaceDark : AppColors.background),
+        backgroundColor:
+            (isDark ? AppColors.surfaceDark : AppColors.background),
         labelStyle: baseTextTheme.labelMedium!,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
@@ -106,15 +112,18 @@ class AppTheme {
           foregroundColor: Colors.white,
           minimumSize: const Size.fromHeight(54),
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           minimumSize: const Size.fromHeight(54),
-          side: BorderSide(color: isDark ? AppColors.borderDark : AppColors.border),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          side: BorderSide(
+              color: isDark ? AppColors.borderDark : AppColors.border),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           foregroundColor: textColor,
         ),
       ),
@@ -124,14 +133,17 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isDark ? AppColors.surfaceDark : AppColors.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: isDark ? AppColors.borderDark : AppColors.border),
+          borderSide: BorderSide(
+              color: isDark ? AppColors.borderDark : AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: isDark ? AppColors.borderDark : AppColors.border),
+          borderSide: BorderSide(
+              color: isDark ? AppColors.borderDark : AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -145,7 +157,8 @@ class AppTheme {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
         selectedItemColor: palette.primary,
-        unselectedItemColor: isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
+        unselectedItemColor:
+            isDark ? AppColors.textSecondaryDark : AppColors.textSecondary,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         elevation: 0,

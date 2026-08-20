@@ -29,7 +29,8 @@ class OfflineBanner extends ConsumerWidget {
       color = AppColors.textSecondary;
       icon = Icons.cloud_off_rounded;
     } else {
-      text = '$pendingCount upload${pendingCount == 1 ? '' : 's'} waiting for connection';
+      text =
+          '$pendingCount upload${pendingCount == 1 ? '' : 's'} waiting for connection';
       color = AppColors.warning;
       icon = Icons.sync_rounded;
     }
@@ -45,7 +46,11 @@ class OfflineBanner extends ConsumerWidget {
               Icon(icon, size: 15, color: color),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(text, style: TextStyle(fontSize: 12.5, color: color, fontWeight: FontWeight.w600)),
+                child: Text(text,
+                    style: TextStyle(
+                        fontSize: 12.5,
+                        color: color,
+                        fontWeight: FontWeight.w600)),
               ),
             ],
           ),

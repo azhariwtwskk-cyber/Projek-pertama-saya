@@ -78,7 +78,8 @@ class StaffUser {
     );
   }
 
-  StaffUser copyWith({String? profileImageUrl, String? phone, String? email}) => StaffUser(
+  StaffUser copyWith({String? profileImageUrl, String? phone, String? email}) =>
+      StaffUser(
         userId: userId,
         staffId: staffId,
         propertyId: propertyId,

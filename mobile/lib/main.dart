@@ -9,7 +9,8 @@ import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/application/auth_providers.dart';
 
-final pushNotificationServiceProvider = Provider<PushNotificationService>((ref) {
+final pushNotificationServiceProvider =
+    Provider<PushNotificationService>((ref) {
   final service = PushNotificationService();
   service.initialize();
   ref.onDispose(service.dispose);
@@ -34,7 +35,8 @@ class CpmsproWorkforceApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     final user = ref.watch(currentStaffUserProvider);
-    final palette = AppPalette.fromBranding(user?.branding ?? AppBranding.fallback());
+    final palette =
+        AppPalette.fromBranding(user?.branding ?? AppBranding.fallback());
 
     // Deep link a tapped push notification straight to its route (section 25).
     ref.listen(pushDeepLinkProvider, (_, next) {

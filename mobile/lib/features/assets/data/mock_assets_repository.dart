@@ -9,7 +9,8 @@ class MockAssetsRepository implements AssetsRepository {
     await Future.delayed(const Duration(milliseconds: 400));
     return MockFixtures.instance.assets.firstWhere(
       (a) => a.id == id,
-      orElse: () => throw const ApiException(ApiFailureType.notFound, 'Asset not found for this property.'),
+      orElse: () => throw const ApiException(
+          ApiFailureType.notFound, 'Asset not found for this property.'),
     );
   }
 }

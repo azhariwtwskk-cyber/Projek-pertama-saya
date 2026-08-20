@@ -13,27 +13,31 @@ class EvidencePicker {
 
   static Future<File?> _pickFromGallery() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
+    final picked =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
     return picked == null ? null : File(picked.path);
   }
 
   static Future<File?> captureViaCamera(BuildContext context) {
     return Navigator.of(context).push<File?>(
       MaterialPageRoute(
-        builder: (_) => const CameraCaptureScreen(onPickFromGallery: _pickFromGallery),
+        builder: (_) =>
+            const CameraCaptureScreen(onPickFromGallery: _pickFromGallery),
         fullscreenDialog: true,
       ),
     );
   }
 
-  static Future<File?> pickFromGallery(BuildContext context) => _pickFromGallery();
+  static Future<File?> pickFromGallery(BuildContext context) =>
+      _pickFromGallery();
 
   /// Bottom sheet offering both options — used where a full-screen camera
   /// launch isn't warranted (e.g. profile photo).
   static Future<File?> showPickerSheet(BuildContext context) async {
     return showModalBottomSheet<File?>(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,

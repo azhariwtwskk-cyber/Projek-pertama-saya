@@ -57,8 +57,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
     setState(() => _submitting = false);
     if (!success) {
-      setState(() => _errorMessage = ref.read(authControllerProvider).errorMessage ??
-          'Incorrect username or password.');
+      setState(() => _errorMessage =
+          ref.read(authControllerProvider).errorMessage ??
+              'Incorrect username or password.');
     }
   }
 
@@ -72,7 +73,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           'Please contact your Property Admin or CPMSPro helpdesk to reset your password.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
+          TextButton(
+              onPressed: () => Navigator.pop(context), child: const Text('OK')),
         ],
       ),
     );
@@ -87,7 +89,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           builder: (context, constraints) => SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight - 64),
+              constraints:
+                  BoxConstraints(minHeight: constraints.maxHeight - 64),
               child: IntrinsicHeight(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -102,26 +105,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.25),
                               blurRadius: 24,
                               offset: const Offset(0, 10),
                             ),
                           ],
                         ),
-                        child: const Icon(Icons.apartment_rounded, color: Colors.white, size: 42),
+                        child: const Icon(Icons.apartment_rounded,
+                            color: Colors.white, size: 42),
                       ),
                     ),
                     const SizedBox(height: 24),
                     Text(
                       'CPMSPro Workforce',
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                      style: theme.textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w800),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'Property Operations. Simplified.',
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: 40),
                     Form(
@@ -129,7 +136,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text('Username / Email', style: theme.textTheme.labelLarge),
+                          Text('Username / Email',
+                              style: theme.textTheme.labelLarge),
                           const SizedBox(height: 8),
                           TextFormField(
                             controller: _usernameController,
@@ -139,8 +147,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               hintText: 'name@cpmspro.com',
                               prefixIcon: Icon(Icons.person_outline_rounded),
                             ),
-                            validator: (v) =>
-                                (v == null || v.trim().isEmpty) ? 'Enter your username or email' : null,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Enter your username or email'
+                                : null,
                           ),
                           const SizedBox(height: 18),
                           Text('Password', style: theme.textTheme.labelLarge),
@@ -152,15 +161,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             onFieldSubmitted: (_) => _submit(),
                             decoration: InputDecoration(
                               hintText: 'Enter your password',
-                              prefixIcon: const Icon(Icons.lock_outline_rounded),
+                              prefixIcon:
+                                  const Icon(Icons.lock_outline_rounded),
                               suffixIcon: IconButton(
                                 icon: Icon(_obscurePassword
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined),
-                                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                onPressed: () => setState(
+                                    () => _obscurePassword = !_obscurePassword),
                               ),
                             ),
-                            validator: (v) => (v == null || v.isEmpty) ? 'Enter your password' : null,
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? 'Enter your password'
+                                : null,
                           ),
                           if (_errorMessage != null) ...[
                             const SizedBox(height: 14),
@@ -172,11 +185,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.error_outline_rounded, color: AppColors.danger, size: 18),
+                                  const Icon(Icons.error_outline_rounded,
+                                      color: AppColors.danger, size: 18),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(_errorMessage!,
-                                        style: const TextStyle(color: AppColors.danger, fontSize: 13)),
+                                        style: const TextStyle(
+                                            color: AppColors.danger,
+                                            fontSize: 13)),
                                   ),
                                 ],
                               ),
@@ -187,21 +203,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               InkWell(
-                                onTap: () => setState(() => _rememberMe = !_rememberMe),
+                                onTap: () =>
+                                    setState(() => _rememberMe = !_rememberMe),
                                 borderRadius: BorderRadius.circular(8),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Checkbox(
                                       value: _rememberMe,
-                                      onChanged: (v) => setState(() => _rememberMe = v ?? false),
+                                      onChanged: (v) => setState(
+                                          () => _rememberMe = v ?? false),
                                       visualDensity: VisualDensity.compact,
                                     ),
                                     const Text('Remember Me'),
                                   ],
                                 ),
                               ),
-                              TextButton(onPressed: _showForgotPassword, child: const Text('Forgot Password?')),
+                              TextButton(
+                                  onPressed: _showForgotPassword,
+                                  child: const Text('Forgot Password?')),
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -211,12 +231,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ? const SizedBox(
                                     height: 22,
                                     width: 22,
-                                    child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.white),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2.4, color: Colors.white),
                                   )
                                 : const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.lock_rounded, size: 18, color: Colors.white),
+                                      Icon(Icons.lock_rounded,
+                                          size: 18, color: Colors.white),
                                       SizedBox(width: 8),
                                       Text('Secure Login'),
                                     ],
@@ -230,7 +252,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Center(
                       child: Text(
                         'Protected by CPMSPro secure authentication',
-                        style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                        style: theme.textTheme.bodySmall
+                            ?.copyWith(color: AppColors.textSecondary),
                       ),
                     ),
                   ],

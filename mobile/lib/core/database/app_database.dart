@@ -74,7 +74,8 @@ class AppDatabase {
 
   Future<Map<String, dynamic>?> getCache(String key) async {
     final db = await database;
-    final rows = await db.query('cache', where: 'cache_key = ?', whereArgs: [key], limit: 1);
+    final rows = await db.query('cache',
+        where: 'cache_key = ?', whereArgs: [key], limit: 1);
     if (rows.isEmpty) return null;
     return jsonDecode(rows.first['payload'] as String) as Map<String, dynamic>;
   }
@@ -88,7 +89,8 @@ class AppDatabase {
 
   Future<List<PendingSyncItem>> pendingItems() async {
     final db = await database;
-    final rows = await db.query('pending_sync_items', orderBy: 'created_at ASC');
+    final rows =
+        await db.query('pending_sync_items', orderBy: 'created_at ASC');
     return rows.map(PendingSyncItem.fromRow).toList();
   }
 
@@ -106,7 +108,13 @@ class AppDatabase {
   }
 }
 
-enum PendingSyncType { photoEvidence, dailyWork, taskUpdate, pmCompletion, attendance }
+enum PendingSyncType {
+  photoEvidence,
+  dailyWork,
+  taskUpdate,
+  pmCompletion,
+  attendance
+}
 
 class PendingSyncItem {
   const PendingSyncItem({
@@ -148,12 +156,16 @@ class PendingSyncItem {
 
   factory PendingSyncItem.fromRow(Map<String, dynamic> row) => PendingSyncItem(
         id: row['id'] as String,
-        type: PendingSyncType.values.firstWhere((t) => t.name == row['item_type']),
+        type: PendingSyncType.values
+            .firstWhere((t) => t.name == row['item_type']),
         summary: row['summary'] as String,
         endpoint: row['endpoint'] as String,
         method: row['method'] as String,
-        payload: jsonDecode(row['payload_json'] as String) as Map<String, dynamic>,
-        filePaths: (jsonDecode(row['file_paths_json'] as String? ?? '[]') as List).cast<String>(),
+        payload:
+            jsonDecode(row['payload_json'] as String) as Map<String, dynamic>,
+        filePaths:
+            (jsonDecode(row['file_paths_json'] as String? ?? '[]') as List)
+                .cast<String>(),
         createdAt: DateTime.parse(row['created_at'] as String),
         retryCount: row['retry_count'] as int? ?? 0,
         lastError: row['last_error'] as String?,

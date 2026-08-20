@@ -44,7 +44,8 @@ class _SyncCentreScreenState extends ConsumerState<SyncCentreScreen> {
   @override
   Widget build(BuildContext context) {
     final items = ref.watch(syncQueueControllerProvider);
-    final lastSynced = ref.watch(syncQueueControllerProvider.notifier).lastSyncedAt;
+    final lastSynced =
+        ref.watch(syncQueueControllerProvider.notifier).lastSyncedAt;
     final allSynced = items.isEmpty;
 
     return Scaffold(
@@ -56,19 +57,29 @@ class _SyncCentreScreenState extends ConsumerState<SyncCentreScreen> {
             child: Column(
               children: [
                 Icon(
-                  allSynced ? Icons.check_circle_rounded : Icons.sync_problem_rounded,
+                  allSynced
+                      ? Icons.check_circle_rounded
+                      : Icons.sync_problem_rounded,
                   color: allSynced ? AppColors.success : AppColors.warning,
                   size: 36,
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  allSynced ? 'All Synced' : '${items.length} Item${items.length == 1 ? '' : 's'} Pending',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: allSynced ? AppColors.success : AppColors.warning),
+                  allSynced
+                      ? 'All Synced'
+                      : '${items.length} Item${items.length == 1 ? '' : 's'} Pending',
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 17,
+                      color: allSynced ? AppColors.success : AppColors.warning),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  lastSynced == null ? 'No sync yet this session' : 'Last synced ${AppFormatters.timeAgo(lastSynced)}',
-                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5),
+                  lastSynced == null
+                      ? 'No sync yet this session'
+                      : 'Last synced ${AppFormatters.timeAgo(lastSynced)}',
+                  style: const TextStyle(
+                      color: AppColors.textSecondary, fontSize: 12.5),
                 ),
                 if (!allSynced) ...[
                   const SizedBox(height: 16),
@@ -77,7 +88,11 @@ class _SyncCentreScreenState extends ConsumerState<SyncCentreScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _retrying ? null : _retry,
                       icon: _retrying
-                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
                           : const Icon(Icons.refresh_rounded, size: 18),
                       label: const Text('Retry Sync'),
                     ),
@@ -101,13 +116,21 @@ class _SyncCentreScreenState extends ConsumerState<SyncCentreScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(item.summary, style: const TextStyle(fontWeight: FontWeight.w700)),
+                            Text(item.summary,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700)),
                             const SizedBox(height: 2),
-                            Text(AppFormatters.timeAgo(item.createdAt), style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                            Text(AppFormatters.timeAgo(item.createdAt),
+                                style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 12)),
                             if (item.lastError != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),
-                                child: Text('Retry ${item.retryCount} · ${item.lastError}', style: const TextStyle(color: AppColors.danger, fontSize: 11)),
+                                child: Text(
+                                    'Retry ${item.retryCount} · ${item.lastError}',
+                                    style: const TextStyle(
+                                        color: AppColors.danger, fontSize: 11)),
                               ),
                           ],
                         ),
@@ -120,7 +143,8 @@ class _SyncCentreScreenState extends ConsumerState<SyncCentreScreen> {
             const AppStateView(
               icon: Icons.cloud_done_outlined,
               title: 'Nothing to Sync',
-              message: 'Everything you have submitted is safely stored on CPMSPro.',
+              message:
+                  'Everything you have submitted is safely stored on CPMSPro.',
             ),
         ],
       ),

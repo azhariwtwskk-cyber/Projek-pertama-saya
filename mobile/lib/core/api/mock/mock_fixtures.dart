@@ -69,7 +69,8 @@ class MockFixtures {
     Announcement(
       id: 'ANN-1',
       title: 'Water supply maintenance this weekend',
-      body: 'Main water supply will be interrupted Saturday 9AM-12PM for tank cleaning.',
+      body:
+          'Main water supply will be interrupted Saturday 9AM-12PM for tank cleaning.',
       postedAt: DateTime.now().subtract(const Duration(hours: 5)),
     ),
   ];
@@ -83,10 +84,20 @@ class MockFixtures {
 
   DashboardData buildDashboard() {
     final active = tasks.where((t) => t.status != TaskStatus.verified).toList();
-    final completed = tasks.where((t) => t.status == TaskStatus.verified || t.status == TaskStatus.pendingVerification).length;
+    final completed = tasks
+        .where((t) =>
+            t.status == TaskStatus.verified ||
+            t.status == TaskStatus.pendingVerification)
+        .length;
     final overdue = tasks.where((t) => t.isOverdue).length;
-    final priority = active.where((t) => t.priority == TaskPriority.urgent || t.priority == TaskPriority.high).isNotEmpty
-        ? active.firstWhere((t) => t.priority == TaskPriority.urgent, orElse: () => active.firstWhere((t) => t.priority == TaskPriority.high))
+    final priority = active
+            .where((t) =>
+                t.priority == TaskPriority.urgent ||
+                t.priority == TaskPriority.high)
+            .isNotEmpty
+        ? active.firstWhere((t) => t.priority == TaskPriority.urgent,
+            orElse: () =>
+                active.firstWhere((t) => t.priority == TaskPriority.high))
         : (active.isNotEmpty ? active.first : null);
 
     return DashboardData(
@@ -109,7 +120,8 @@ class MockFixtures {
         id: 'WO-2026-0082',
         taskNumber: 'WO-2026-0082',
         title: 'Corridor Light Not Working',
-        description: 'Resident reported flickering and non-functional corridor light near unit B-02-05.',
+        description:
+            'Resident reported flickering and non-functional corridor light near unit B-02-05.',
         category: TaskCategory.workOrder,
         priority: TaskPriority.high,
         status: TaskStatus.newTask,
@@ -123,7 +135,8 @@ class MockFixtures {
         id: 'ICA-2026-0341',
         taskNumber: 'ICA-2026-0341',
         title: 'Dirty Staircase Requires Cleaning',
-        description: 'Weekly inspection flagged staircase cleanliness below standard.',
+        description:
+            'Weekly inspection flagged staircase cleanliness below standard.',
         category: TaskCategory.inspectionCorrectiveAction,
         priority: TaskPriority.normal,
         status: TaskStatus.accepted,
@@ -136,11 +149,13 @@ class MockFixtures {
           issue: 'Dirty staircase',
           location: 'Block C — Level 3',
           severity: 'Medium',
-          inspectorRemark: 'Staircase requires cleaning, especially near the fire door.',
+          inspectorRemark:
+              'Staircase requires cleaning, especially near the fire door.',
           beforePhotos: [
             EvidencePhoto(
               id: 'before_1',
-              url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
+              url:
+                  'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800',
               uploadedAt: now.subtract(const Duration(days: 1)),
               uploadedByRole: 'Inspector',
             ),
@@ -151,7 +166,8 @@ class MockFixtures {
         id: 'PM-2026-0119',
         taskNumber: 'PM-2026-0119',
         title: 'Water Pump Inspection',
-        description: 'Scheduled monthly preventive maintenance for main water pump.',
+        description:
+            'Scheduled monthly preventive maintenance for main water pump.',
         category: TaskCategory.preventiveMaintenance,
         priority: TaskPriority.urgent,
         status: TaskStatus.newTask,
@@ -179,7 +195,8 @@ class MockFixtures {
         id: 'WO-2026-0071',
         taskNumber: 'WO-2026-0071',
         title: 'Leaking Pipe Under Sink',
-        description: 'Unit A-11-02 reported a slow leak under the kitchen sink.',
+        description:
+            'Unit A-11-02 reported a slow leak under the kitchen sink.',
         category: TaskCategory.workOrder,
         priority: TaskPriority.high,
         status: TaskStatus.pendingVerification,
@@ -188,13 +205,15 @@ class MockFixtures {
         assignedBy: 'Property Admin — Siti Aminah',
         assignedDate: now.subtract(const Duration(days: 2)),
         dueDate: now.subtract(const Duration(hours: 4)),
-        completionRemarks: 'Replaced worn washer and tightened fitting. Tested for 10 minutes, no leak.',
+        completionRemarks:
+            'Replaced worn washer and tightened fitting. Tested for 10 minutes, no leak.',
         materialsUsed: 'Rubber washer x1, PTFE tape',
         timeSpentMinutes: 45,
         afterPhotos: [
           EvidencePhoto(
             id: 'after_1',
-            url: 'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=800',
+            url:
+                'https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=800',
             uploadedAt: now.subtract(const Duration(hours: 4)),
           ),
         ],
@@ -212,12 +231,14 @@ class MockFixtures {
         assignedBy: 'Inspector — Kumar Raj',
         assignedDate: now.subtract(const Duration(days: 3)),
         dueDate: now.subtract(const Duration(days: 1)),
-        rejectionReason: 'Please retake the photo showing the entire staircase and handrail bracket.',
+        rejectionReason:
+            'Please retake the photo showing the entire staircase and handrail bracket.',
         completionRemarks: 'Re-tightened bracket bolts.',
         afterPhotos: [
           EvidencePhoto(
             id: 'after_rej_1',
-            url: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800',
+            url:
+                'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800',
             uploadedAt: now.subtract(const Duration(days: 1)),
           ),
         ],
@@ -229,7 +250,8 @@ class MockFixtures {
           beforePhotos: [
             EvidencePhoto(
               id: 'before_2',
-              url: 'https://images.unsplash.com/photo-1523419409543-8c1a91125d5b?w=800',
+              url:
+                  'https://images.unsplash.com/photo-1523419409543-8c1a91125d5b?w=800',
               uploadedAt: now.subtract(const Duration(days: 3)),
               uploadedByRole: 'Inspector',
             ),
@@ -264,7 +286,8 @@ class MockFixtures {
         location: 'Pump Room',
         pmType: 'Monthly Inspection',
         scheduledDate: DateTime(now.year, now.month, now.day, 10, 30),
-        instructions: 'Follow lock-out/tag-out procedure before inspecting the pump.',
+        instructions:
+            'Follow lock-out/tag-out procedure before inspecting the pump.',
         status: PmStatus.today,
         checklist: const [
           PmChecklistItem(id: 'c1', label: 'Inspect pump condition'),
@@ -281,7 +304,8 @@ class MockFixtures {
         location: 'Block A Lobby',
         pmType: 'Quarterly Service',
         scheduledDate: now.add(const Duration(days: 3)),
-        instructions: 'Coordinate with lift vendor if certified technician is required.',
+        instructions:
+            'Coordinate with lift vendor if certified technician is required.',
         status: PmStatus.upcoming,
         checklist: const [
           PmChecklistItem(id: 'c1', label: 'Check door sensors'),
@@ -315,7 +339,8 @@ class MockFixtures {
         status: PmStatus.completed,
         checklist: const [
           PmChecklistItem(id: 'c1', label: 'Check oil level', isChecked: true),
-          PmChecklistItem(id: 'c2', label: 'Test run 10 minutes', isChecked: true),
+          PmChecklistItem(
+              id: 'c2', label: 'Test run 10 minutes', isChecked: true),
         ],
       ),
     ];
@@ -336,7 +361,8 @@ class MockFixtures {
         id: 'N2',
         type: NotificationType.taskRejected,
         title: 'Task Requires Attention — ICA-2026-0330',
-        body: 'Completion evidence was rejected. Reason: Please retake the photo showing the entire staircase.',
+        body:
+            'Completion evidence was rejected. Reason: Please retake the photo showing the entire staircase.',
         createdAt: now.subtract(const Duration(hours: 2)),
         deepLinkRoute: '/tasks/ICA-2026-0330',
       ),
@@ -398,7 +424,8 @@ class MockFixtures {
     return List.generate(12, (i) {
       final day = now.subtract(Duration(days: i + 1));
       if (day.weekday == DateTime.sunday) {
-        return AttendanceRecord(date: day, hoursWorked: 0, isLate: false, overtimeMinutes: 0);
+        return AttendanceRecord(
+            date: day, hoursWorked: 0, isLate: false, overtimeMinutes: 0);
       }
       final lateMinutes = rnd.nextInt(20);
       final clockIn = DateTime(day.year, day.month, day.day, 8, lateMinutes);

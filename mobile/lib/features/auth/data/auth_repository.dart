@@ -39,7 +39,8 @@ class RefreshResult {
 /// expired, revoked, or already rotated (reused) — the caller's only
 /// correct response is to force a full logout, never retry.
 class RefreshTokenInvalid implements Exception {
-  const RefreshTokenInvalid([this.message = 'Refresh token is invalid or expired.']);
+  const RefreshTokenInvalid(
+      [this.message = 'Refresh token is invalid or expired.']);
   final String message;
 }
 
@@ -48,7 +49,8 @@ class RefreshTokenInvalid implements Exception {
 /// `POST /cpms/api/v1/auth/login.php` implementation — swap via
 /// `AppConfig.useMockApi` in `auth_providers.dart`, nothing else changes.
 abstract class AuthRepository {
-  Future<LoginResult> login({required String usernameOrEmail, required String password});
+  Future<LoginResult> login(
+      {required String usernameOrEmail, required String password});
   Future<void> logout();
   Future<StaffUser> fetchProfile();
 

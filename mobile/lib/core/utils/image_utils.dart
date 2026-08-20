@@ -25,15 +25,21 @@ class ImageUtils {
     final resized = needsResize
         ? img.copyResize(
             decoded,
-            width: decoded.width >= decoded.height ? AppConfig.evidenceImageMaxDimension : null,
-            height: decoded.height > decoded.width ? AppConfig.evidenceImageMaxDimension : null,
+            width: decoded.width >= decoded.height
+                ? AppConfig.evidenceImageMaxDimension
+                : null,
+            height: decoded.height > decoded.width
+                ? AppConfig.evidenceImageMaxDimension
+                : null,
           )
         : decoded;
 
-    final Uint8List encoded = img.encodeJpg(resized, quality: AppConfig.evidenceImageQuality);
+    final Uint8List encoded =
+        img.encodeJpg(resized, quality: AppConfig.evidenceImageQuality);
 
     final dir = await getTemporaryDirectory();
-    final outPath = p.join(dir.path, 'evidence_${DateTime.now().millisecondsSinceEpoch}.jpg');
+    final outPath = p.join(
+        dir.path, 'evidence_${DateTime.now().millisecondsSinceEpoch}.jpg');
     final outFile = File(outPath);
     await outFile.writeAsBytes(encoded);
     return outFile;

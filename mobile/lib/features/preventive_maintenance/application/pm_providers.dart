@@ -18,7 +18,8 @@ final pmTasksProvider = FutureProvider.autoDispose<List<PmTask>>((ref) {
   return ref.watch(pmRepositoryProvider).fetchTasks();
 });
 
-final pmTaskDetailProvider = FutureProvider.autoDispose.family<PmTask, String>((ref, id) {
+final pmTaskDetailProvider =
+    FutureProvider.autoDispose.family<PmTask, String>((ref, id) {
   return ref.watch(pmRepositoryProvider).fetchTask(id);
 });
 
@@ -26,13 +27,19 @@ class PmActionsController {
   PmActionsController(this._ref);
   final Ref _ref;
 
-  Future<void> toggleChecklistItem(String taskId, String itemId, bool checked) async {
-    await _ref.read(pmRepositoryProvider).toggleChecklistItem(taskId, itemId, checked);
+  Future<void> toggleChecklistItem(
+      String taskId, String itemId, bool checked) async {
+    await _ref
+        .read(pmRepositoryProvider)
+        .toggleChecklistItem(taskId, itemId, checked);
     _ref.invalidate(pmTaskDetailProvider(taskId));
   }
 
-  Future<void> complete(String taskId, {required List<File> evidencePhotos, String? notes}) async {
-    await _ref.read(pmRepositoryProvider).completeTask(taskId, evidencePhotos: evidencePhotos, notes: notes);
+  Future<void> complete(String taskId,
+      {required List<File> evidencePhotos, String? notes}) async {
+    await _ref
+        .read(pmRepositoryProvider)
+        .completeTask(taskId, evidencePhotos: evidencePhotos, notes: notes);
     _ref.invalidate(pmTaskDetailProvider(taskId));
     _ref.invalidate(pmTasksProvider);
   }

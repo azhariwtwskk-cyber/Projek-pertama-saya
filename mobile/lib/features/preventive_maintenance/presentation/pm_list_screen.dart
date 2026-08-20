@@ -18,10 +18,17 @@ class PmListScreen extends ConsumerStatefulWidget {
   ConsumerState<PmListScreen> createState() => _PmListScreenState();
 }
 
-class _PmListScreenState extends ConsumerState<PmListScreen> with SingleTickerProviderStateMixin {
-  late final TabController _tabController = TabController(length: 4, vsync: this);
+class _PmListScreenState extends ConsumerState<PmListScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController =
+      TabController(length: 4, vsync: this);
 
-  static const _statuses = [PmStatus.today, PmStatus.upcoming, PmStatus.overdue, PmStatus.completed];
+  static const _statuses = [
+    PmStatus.today,
+    PmStatus.upcoming,
+    PmStatus.overdue,
+    PmStatus.completed
+  ];
 
   @override
   void dispose() {
@@ -39,12 +46,20 @@ class _PmListScreenState extends ConsumerState<PmListScreen> with SingleTickerPr
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
-          tabs: const [Tab(text: 'Today'), Tab(text: 'Upcoming'), Tab(text: 'Overdue'), Tab(text: 'Completed')],
+          tabs: const [
+            Tab(text: 'Today'),
+            Tab(text: 'Upcoming'),
+            Tab(text: 'Overdue'),
+            Tab(text: 'Completed')
+          ],
         ),
       ),
       body: tasksAsync.when(
-        loading: () => const Padding(padding: EdgeInsets.all(16), child: SkeletonList()),
-        error: (e, _) => Center(child: AppStateView.error(onRetry: () => ref.invalidate(pmTasksProvider))),
+        loading: () =>
+            const Padding(padding: EdgeInsets.all(16), child: SkeletonList()),
+        error: (e, _) => Center(
+            child: AppStateView.error(
+                onRetry: () => ref.invalidate(pmTasksProvider))),
         data: (tasks) => TabBarView(
           controller: _tabController,
           children: _statuses.map((status) {
@@ -64,7 +79,9 @@ class _PmListScreenState extends ConsumerState<PmListScreen> with SingleTickerPr
                 padding: const EdgeInsets.all(16),
                 itemCount: filtered.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, i) => _PmCard(task: filtered[i], onTap: () => context.push('/pm/${filtered[i].id}')),
+                itemBuilder: (context, i) => _PmCard(
+                    task: filtered[i],
+                    onTap: () => context.push('/pm/${filtered[i].id}')),
               ),
             );
           }).toList(),
@@ -89,18 +106,28 @@ class _PmCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text(task.assetName, style: const TextStyle(fontWeight: FontWeight.w700))),
-              Text(task.assetId, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+              Expanded(
+                  child: Text(task.assetName,
+                      style: const TextStyle(fontWeight: FontWeight.w700))),
+              Text(task.assetId,
+                  style: const TextStyle(
+                      color: AppColors.textSecondary, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 4),
-          Text('${task.pmType} · ${task.location}', style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary)),
+          Text('${task.pmType} · ${task.location}',
+              style: const TextStyle(
+                  fontSize: 12.5, color: AppColors.textSecondary)),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(DateFormat('d MMM, h:mm a').format(task.scheduledDate), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-              Text('$doneCount/${task.checklist.length} checklist', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              Text(DateFormat('d MMM, h:mm a').format(task.scheduledDate),
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.w600)),
+              Text('$doneCount/${task.checklist.length} checklist',
+                  style: const TextStyle(
+                      fontSize: 12, color: AppColors.textSecondary)),
             ],
           ),
         ],

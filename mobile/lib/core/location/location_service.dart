@@ -1,6 +1,7 @@
 import 'package:geolocator/geolocator.dart';
 
 class LocationPermissionDenied implements Exception {}
+
 class LocationServiceDisabled implements Exception {}
 
 /// Thin wrapper around geolocator used ONLY for attendance clock-in/out
@@ -18,9 +19,11 @@ class LocationService {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
       throw LocationPermissionDenied();
     }
-    return Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    return Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
   }
 }
