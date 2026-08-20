@@ -14,7 +14,7 @@ Every response is wrapped `{"ok":true,"data":{...}}` / `{"ok":false,"error":{"co
 | 3 | Logout | POST | `cpms/api/v1/auth/logout.php` | — (bearer only) | `logged_out: true` | `cpms_api_tokens.revoked_at` |
 | 4 | Fetch profile | GET | `cpms/api/v1/me.php` | — | `user:{id,name,username,role}`, `property:{id,code,name}` | `cpms_api_tokens` join `system_users`/`cpms_properties` |
 | 5 | Dashboard | GET | `cpms/api/v1/dashboard.php` | — | role-dependent; staff: `shift`,`attendanceState`,`withinLocation`,`stats:{workOrders,pmTasks,attendanceDays,leaveDays}`,`tasks[]`,`pm_tasks[]` | `work_orders`, `cpms_pm_schedules`, `cpms_attendance_sessions`, `cpms_leave_*` |
-| 6 | Task list | GET | `cpms/api/v1/staff/tasks.php` | — | `tasks:[{database_id,id,title,location,due,status,priority,image_url}]` — `status` collapsed to `pending`/`in_progress`/`completed` | `work_orders` (+ latest `work_order_images` thumbnail) |
+| 6 | Task list | GET | `cpms/api/v1/staff/tasks.php` | — | `tasks:[{database_id,id,title,location,due,status,priority,image_url,rejection_reason}]` — `status` collapsed to `pending`/`in_progress`/`completed`; `rejection_reason` (NEW, real-device follow-up pass) is non-null only while the *latest* linked `daily_work_logs` entry is still `Rejected` | `work_orders` (+ latest `work_order_images` thumbnail, + latest linked `daily_work_logs` decision) |
 | 7 | Task detail | — | **none** — client re-fetches list and finds by reference | — | — | — |
 | 8 | Upload task evidence | POST multipart | `cpms/api/v1/staff/task-photo.php` | `work_order_reference`, `image_type` (`Before`\|`During`\|`After`\|`Supporting`), `photo` (file) | `uploaded:true`, `image_id`, `work_order_reference`, `image_url` | `work_order_images` (insert, append-only) |
 | 9 | Complete task | POST multipart | `cpms/api/v1/staff/daily-work/submit.php` (**no discrete complete endpoint — see Work Order Workflow note below**) | `work_order_id`, `work_date`, `work_category`, `block_location`, `specific_location?`, `work_description`, `materials_used?`, `issue_notes?`, `work_status`, `before_images[]?`, `during_images[]?`, `after_images[]?` (after required when status=`Completed`) | `accepted:true`, `reference` | `daily_work_logs` (insert), `daily_work_images` (insert), side-effect `UPDATE work_orders SET status=...`, `work_order_history` (insert) |
@@ -49,19 +49,48 @@ exactly what produced the original "Work Order History is broken" symptom:
   reconciled from its **most recent linked `daily_work_logs` row** (via `work_order_id`), not from
   `work_orders.status` alone. `staff/work-history.php` (new) does exactly this reconciliation
   server-side so Flutter never has to guess it client-side.
+- **Real-device follow-up pass, UPDATE:** a `Rejected` decision on a `Completed`/`Verified` work
+  order **does now** touch `work_orders` — `daily_work_review.php` reopens it to **`In Progress`**
+  (an existing status, not a new one) plus one `work_order_history` row, specifically so the work
+  order flows back into `staff/tasks.php`'s active queue and is actionable again in the Flutter app
+  (see AUDIT_REPORT.md §7.2). This is additive to the bullet above, not a contradiction of it:
+  `daily_work_logs` remains the authoritative *verification decision* record (untouched, never
+  overwritten or deleted); only the work order's own operational status is synced so staff aren't
+  stuck looking at a permanently-disabled "Completed" button with no way to resubmit.
 
 ## Image URL contract
 
 Every uploaded-file URL returned by any endpoint above (`image_url`, `images[].url`) is
-**root-relative** (e.g. `/cpms/uploads/daily_work/xxxxxxxxxxxxxxxx.jpg`), following the same
-convention `cpmsApiSaveImage()` and the Property Admin's own review page use server-side. Flutter
-resolves these against `AppConfig.apiBaseUrl` via `AppConfig.resolveUrl()` before ever handing a
-URL to an image widget — this is required, not optional, because `FullScreenImageViewer`
-distinguishes "local file" vs. "remote URL" purely by whether the string starts with `http`.
+**root-relative** (e.g. `/cpms/uploads/daily_work/xxxxxxxxxxxxxxxx.jpg` or
+`/uploads/daily_work/property_5/xxxxxxxxxxxxxxxx.jpg`). Flutter resolves these against
+`AppConfig.apiBaseUrl` via `AppConfig.resolveUrl()` before ever handing a URL to an image widget —
+this is required, not optional, because `FullScreenImageViewer` distinguishes "local file" vs.
+"remote URL" purely by whether the string starts with `http`.
+
+**Real-device follow-up pass, UPDATE — `daily_work_images` has two disagreeing writers.** Confirmed
+by reading both upload code paths (not guessed) — this was the confirmed root cause of Before/After
+photos 404ing on a real device even though the API returned a URL (see AUDIT_REPORT.md §7.1):
+- **`cpms/api/v1/staff/daily-work/submit.php`** (this mobile app): flat, no property subfolder,
+  under `cpms/`. **Now also populates `image_path`** for its own uploads (previously it didn't).
+- **`backend/staff_work_submit.php`** (legacy Staff Web Portal — still live in production, linked
+  from `staff_dashboard.php`'s "Add Daily Work"): property-subfolder, **outside** `cpms/`
+  (`<site_root>/uploads/daily_work/property_<id>/...`), and already populates `image_path`.
+
+Every endpoint that turns a stored `daily_work_images` row into a URL **must** go through
+`cpmsApiDailyWorkImageUrl()` (→ `cpmsApiResolveUploadedImageUrl()`) in
+`cpms/api/v1/services.php` — the one canonical, `is_file()`-verifying resolver, checking
+`image_path` first and then the same four fallback candidates the legacy pages
+(`daily_work_review.php`, `staff_work_history.php`) already use. **Do not** rebuild this logic
+inline in a new endpoint; call the shared helper.
+
+`work_order_images` has only one writer (`task-photo.php`, confirmed via a repository-wide
+search) and already stores the full, correct relative path in `image_name` — routed through
+`cpmsApiWorkOrderImageUrl()` for consistency, not because it was broken.
 
 Confirmed real filesystem locations (traced from the actual upload code, not guessed):
 - Work order evidence (`task-photo.php`): `cpms/uploads/work_orders/property_<id>/<random>.{jpg,png,webp}`
-- Daily Work photos (`daily-work/submit.php`): `cpms/uploads/daily_work/<random>.{jpg,png,webp}` (flat, no property subfolder)
+- Daily Work photos, mobile app (`cpms/api/v1/staff/daily-work/submit.php`): `cpms/uploads/daily_work/<random>.{jpg,png,webp}` (flat, no property subfolder)
+- Daily Work photos, legacy Staff Web Portal (`staff_work_submit.php`): `uploads/daily_work/property_<id>/<random>.{jpg,png,webp}` (**outside** `cpms/`, property subfolder)
 - PM evidence: `cpms/uploads/preventive_maintenance/...`
 - Asset inspection photos: `uploads/asset_inspections/...` (outside `cpms/` — a pre-existing
   inconsistency in the backend, not introduced by this pass; noted for awareness only since Flutter

@@ -141,3 +141,70 @@ source-tree sync earlier in this session introduced inconsistent line endings ac
 and `test/` trees; `dart format` and this pass's cleanup normalized them). This includes
 `mobile/test/*.dart`, `mobile/lib/l10n/*.arb`, and several files in `dashboard/`, `assets/`,
 `preventive_maintenance/`, `sync/` not otherwise mentioned above.
+
+---
+
+# Real-device follow-up pass
+
+Two HIGH-severity issues reported after installing the release APK on a real Android phone:
+Before/After evidence images still not rendering in Work Order History, and a submitted task
+appearing to vanish with no way for staff to find it. Root causes and fixes documented in full in
+`AUDIT_REPORT.md` §7; request/response shape changes in `API_CONTRACT.md`; test run in
+`TEST_REPORT.md`. The previous Work Order History fix was **not** assumed correct — everything was
+re-traced from source.
+
+## New files
+
+| File | Purpose |
+|---|---|
+| `mobile/test/work_history_parsing_test.dart` | Unit coverage: `WorkOrderHistoryItem.fromJson` image parsing + Completed/Verified/Rejected verification-status mapping |
+| `mobile/test/empty_active_tasks_test.dart` | Widget coverage: the "no active tasks" empty state surfaces a working CTA into Work Order History |
+
+## Modified files with functional changes
+
+Backend — canonical image URL resolution (root cause of the missing Before/After images):
+- `backend/cpms/api/v1/services.php` — added `cpmsApiResolveUploadedImageUrl()` (the one shared,
+  `is_file()`-verifying resolver, anchored at the real site root), `cpmsApiDailyWorkImageCandidates()`
+  + `cpmsApiDailyWorkImageUrl()` (the confirmed four-candidate list matching the legacy pages'
+  own resolution logic), and `cpmsApiWorkOrderImageUrl()`. `cpmsApiTaskRows()` also now joins the
+  latest linked `daily_work_logs` entry per work order and returns `rejection_reason`.
+- `backend/cpms/api/v1/staff/work-history.php` — Daily Work and Work Order image URLs now resolved
+  via the shared helpers instead of hand-built flat paths; `daily_work_images` query now also
+  selects `image_path` (guarded); added temporary, safe `error_log()` counts
+  (`work_order_id`/`daily_work_id`/images found) for on-device verification.
+- `backend/cpms/api/v1/staff/daily-work/list.php` — same image-URL fix as above.
+- `backend/cpms/api/v1/staff/daily-work/submit.php` — now also populates `daily_work_images.image_path`
+  for its own future uploads (guarded by column-existence), so this write path agrees with the
+  legacy Staff Web Portal's own convention instead of leaving read-side endpoints to guess a flat
+  layout; added the same temporary `error_log()` counts on submit.
+
+Backend — reject flow (root cause of "rejected work never becomes actionable again"):
+- `backend/cpms/property_portal/daily_work_review.php` — a `Rejected` decision on a
+  `Completed`/`Verified` work order now also reopens `work_orders.status` to `In Progress` (an
+  existing status) and writes one `work_order_history` row; `daily_work_logs` itself
+  (remarks/images/verified_by/verified_at) is never touched or deleted.
+
+Mobile — provider invalidation (root cause of stale "task disappeared" caches):
+- `lib/features/tasks/application/tasks_providers.dart` — `TaskActionsController._invalidate()`
+  now also invalidates `workHistoryProvider` and `dashboardDataProvider`, not just
+  `taskDetailProvider`/`tasksListProvider`, after a successful complete/upload.
+
+Mobile — task disappearing / findability UX:
+- `lib/shared/widgets/empty_state.dart` — new `AppStateView.noActiveTasks({onViewHistory})`
+  factory: "No Active Tasks — Completed work is available in Work Order History" + a
+  "View Work Order History" button.
+- `lib/features/tasks/presentation/task_inbox_screen.dart` — app-bar action changed from a bare
+  icon to a labelled `History` button; empty state now uses `AppStateView.noActiveTasks`.
+- `lib/features/dashboard/presentation/home_screen.dart` — Recent Tasks' empty state now uses
+  `AppStateView.noActiveTasks` too, wired to `/work-history`.
+- `lib/features/dashboard/data/api_dashboard_repository.dart` — `priorityTask` fallback now skips
+  an already-terminal (`TaskStatus.verified`) task instead of always taking `tasks.first`
+  (`staff/tasks.php` can still include `Completed` work orders).
+- `lib/features/tasks/presentation/task_detail_screen.dart` — new "Rejected – Action Required"
+  banner (reason + guidance) rendered whenever `task.rejectionReason` is present.
+
+Mobile — image visibility (compounding UX bug on top of the URL fix):
+- `lib/features/work_history/presentation/work_history_screen.dart` — Before/During/After/Supporting
+  photo rows now render unconditionally whenever photos exist, instead of being hidden behind an
+  extra tap-to-expand; an explicit "No evidence photos found" line replaces silence when a work
+  order genuinely has none.

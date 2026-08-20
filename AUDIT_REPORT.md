@@ -9,6 +9,13 @@ Android release configuration, dead/mock code, and PHP syntax across the whole `
 the actual Dart source in `mobile/lib/`, not inferred from documentation. Fixes were implemented
 directly, not just described.
 
+> **Update (real-device follow-up pass):** two HIGH-severity issues were reported after installing
+> the release APK on a real Android phone — Work Order History's Before/After photos still didn't
+> render, and a submitted task appeared to vanish. Both were re-audited from scratch (the previous
+> Work Order History fix was **not** assumed correct) and root-caused by source inspection. See
+> **§7** for the full trace, root causes, and fixes — this is the most load-bearing addition in
+> this document if you only have time to read one section.
+
 ---
 
 ## 1. Executive summary
@@ -291,3 +298,151 @@ could disagree. The workflow stepper and action bar now reflect exactly the thre
    untouched (out of the "Staff journey" scope this pass focused on); a best-effort field mapping
    was added defensively (`stats.workOrders`/`pmTasks` fallback) so the KPI row degrades gracefully
    rather than always showing 0, but this was not a primary target of this audit.
+
+---
+
+## 7. Real-device follow-up: two HIGH-severity issues (this pass)
+
+Reported after installing and testing the release APK on a real Android phone. Both were
+re-audited end-to-end from source — the previous Work Order History fix (§2, H-3/H-4) was **not**
+assumed correct, per this pass's explicit instruction.
+
+### 7.1 Before/After images still not showing — ROOT CAUSE FOUND
+
+**Traced the real, live path:** Flutter submit → PHP multipart upload → filesystem → `daily_work_images`
+row → `daily_work_logs.work_order_id` → `work-history.php` → JSON → Flutter model → `Image.network`.
+
+**Root cause: two different, disagreeing upload code paths write the same `daily_work_images`
+table, and Work Order History/Daily Work List only ever checked one of them.**
+
+Confirmed by reading three independent, currently-live PHP files, not guessed:
+
+1. **`backend/staff_work_submit.php`** — the legacy Staff Web Portal's own Daily Work submit
+   endpoint (linked from `staff_dashboard.php` → "Add Daily Work", still an active part of
+   production, not dead code). Stores photos at
+   `<site_root>/uploads/daily_work/property_<id>/<random>.ext` (a **property-specific subfolder**,
+   **not** under `cpms/`) and populates `daily_work_images.image_path` with that exact relative
+   path whenever the column exists (`insertDailyWorkImages()`).
+2. **`backend/cpms/api/v1/staff/daily-work/submit.php`** — this mobile app's own endpoint. Stores
+   photos **flat**, at `<site_root>/cpms/uploads/daily_work/<random>.ext` (**no** property
+   subfolder), and — before this fix — never populated `image_path` at all.
+3. **`backend/cpms/property_portal/daily_work_review.php`** (`dailyWorkImageUrl()`) and
+   **`backend/staff_work_history.php`** (`staffHistoryImageUrl()`) — the Property Admin review page
+   and the legacy staff portal's own history page. Both already know about this exact ambiguity:
+   each checks `image_path` first, then falls back through **four** candidate paths (with/without
+   `property_<id>/`, with/without `cpms/` prefix), verifying each with a real `is_file()` check
+   against the filesystem before returning a URL.
+
+**But** `cpms/api/v1/staff/work-history.php` and `cpms/api/v1/staff/daily-work/list.php` (both
+written in the prior pass) only ever built the URL from `basename(image_name)` under a
+**hardcoded, flat** `cpms/uploads/daily_work/` path — i.e., exactly the mobile app's own upload
+convention, and *only* that one. Any work order whose Daily Work evidence was submitted through the
+still-live legacy Staff Web Portal (property-subfolder layout, `image_path` populated) resolved to
+a URL where no file exists at that path → the app correctly received a URL, `Image.network`
+correctly 404'd, and the error-builder correctly showed a broken-image placeholder. That is the
+literal, confirmed mechanism behind "images not shown" on a real device with real data.
+
+A secondary, compounding UX bug: `WorkHistoryScreen`'s photo rows were rendered only when the card
+was tapped open (`if (_expanded)`), so even a correctly-resolving photo wasn't visible without an
+extra, undiscoverable tap — worsening the "images just aren't there" perception.
+
+**Fix (backend, canonical helper — task's explicit ask, "do not duplicate conflicting path logic
+across endpoints"):**
+- Added `cpmsApiResolveUploadedImageUrl()` in `cpms/api/v1/services.php` — one shared, `is_file()`-
+  verifying resolver, anchored at the real site root (`dirname(cpmsApiRoot())`, matching exactly
+  where the legacy pages anchor their own checks), used by every endpoint that turns a stored image
+  row into a URL.
+- `cpmsApiDailyWorkImageCandidates()` builds the same four-candidate list the legacy pages already
+  use (now read from `image_path` first when the column/value exists, then property-subfolder,
+  then flat, with and without `cpms/`), feeding the shared resolver.
+- `cpmsApiWorkOrderImageUrl()` — `work_order_images.image_name` already stores the correct full
+  path (single writer, confirmed via a repository-wide search), routed through the same resolver
+  for consistency, not because it was broken.
+- `staff/work-history.php` and `staff/daily-work/list.php` now call these instead of hand-building
+  a path; both now also select `image_path` (guarded by `cpmsApiColumnExists()`, matching this
+  codebase's existing defensive style for schema drift).
+- `staff/daily-work/submit.php` now **also populates `image_path`** for its own future uploads
+  (`cpms/uploads/daily_work/<file>`, guarded by column-existence) — so, going forward, both write
+  paths agree and neither read path has to guess.
+- Added temporary, safe (no tokens/secrets) `error_log()` counts in both `work-history.php` and
+  `daily-work/submit.php` — `work_order_id`, `daily_work_id`, images found/stored — to make the
+  next real-device run independently verifiable from server logs.
+
+**Fix (Flutter):** `WorkHistoryScreen`'s Before/During/After/Supporting photo rows now render
+unconditionally whenever `item.photos` is non-empty (previously gated behind `_expanded`); an
+explicit "No evidence photos found for this work order" line replaces silence when a work order
+genuinely has none. Tap-to-enlarge (`FullScreenImageViewer`) is unchanged.
+
+### 7.2 Task disappears after staff submits — ROOT CAUSE FOUND
+
+**Traced the real status lifecycle**, per the task's instruction not to assume `work_orders.status`
+is the only source of truth:
+
+- `work_orders.status` is set by staff via `daily-work/submit.php` (`Open/Assigned` → `In
+  Progress/Pending Material/Pending Contractor` → `Completed`). Confirmed (again, this pass) that
+  nothing else ever sets it to `Verified`/`Rejected` — `daily_work_review.php` only ever wrote to
+  `daily_work_logs.work_status`/`supervisor_remarks`/`verified_by`/`verified_at`, **never**
+  `work_orders`. `staff/tasks.php` (`cpmsApiTaskRows()`) keeps returning a `Completed` work order
+  (its `WHERE status NOT IN ('Verified','Cancelled')` clause includes `Completed`) — so a
+  just-submitted task does **not** vanish from the raw active-task query.
+
+**Root cause was not one bug but three compounding gaps, each confirmed by reading the actual
+code, not assumed:**
+
+1. **Stale caches after submit.** `TaskActionsController.complete()`/`.uploadEvidence()`
+   (`tasks_providers.dart`) only ever invalidated `taskDetailProvider` and `tasksListProvider`.
+   `workHistoryProvider` (Work Order History) and `dashboardDataProvider` (Home's KPI row,
+   Priority Task card, Recent Tasks) were **never** invalidated. A staff member who had already
+   opened Home or Work Order History this session would see stale data immediately after
+   submitting — looking exactly like "my task disappeared into nothing," since the one place that
+   *did* refresh (My Tasks) isn't where most staff naturally check next (Home).
+2. **No route back to completed work.** The only path to Work Order History was a small,
+   easy-to-miss app-bar icon on My Tasks — no segmented control, no CTA from an empty state, per
+   the task brief's own framing. My Tasks' and Home's "Recent Tasks" empty states both used the
+   same generic `AppStateView.noTasksToday()` with **no** button at all.
+3. **Rejected work had no way back to the staff member.** Since `work_orders.status` was never
+   touched by the reject decision, a rejected work order stayed `status='Completed'` forever;
+   `taskStatusFromString()` collapses both real terminal states (`completed`/`verified`) into
+   `TaskStatus.verified`, which `task_detail_screen.dart`'s action bar renders as a **permanently
+   disabled** "Completed" button — staff had no in-task way to discover a rejection or resubmit,
+   only a same-session grep through the (still read-only) Work Order History screen.
+
+**Fix (backend — smallest safe sync, "do not destroy historical evidence"):**
+- `daily_work_review.php`: when a decision is `Rejected` **and** the linked work order's current
+  status is `Completed`/`Verified`, the work order is reopened to **`In Progress`** — an existing,
+  already-supported status (confirmed against `admin_work_orders.php`'s own status list; no new
+  enum value invented) — plus one new `work_order_history` row documenting the reopen. Nothing in
+  `daily_work_logs` (remarks, images, `verified_by`/`verified_at`) is touched or deleted; the
+  rejection decision and reason remain fully in the historical record. A work order already
+  `Cancelled`, or still legitimately mid-flow, is left untouched.
+- `cpmsApiTaskRows()` (`staff/tasks.php`, also feeds `dashboard.php`) now additionally joins the
+  *latest* `daily_work_logs` entry per work order and returns `rejection_reason` (only while that
+  latest entry's `work_status` is still `Rejected` — a later successful resubmission naturally
+  clears it), so Task Detail can show *why* a reopened task came back without a second round trip.
+
+**Fix (Flutter):**
+- `TaskActionsController._invalidate()` now also invalidates `workHistoryProvider` and
+  `dashboardDataProvider` — a successful submit now refreshes every screen that reads this work
+  order, immediately, per the task brief's "Completion Guarantee."
+- `task_inbox_screen.dart`: the app-bar action is now a labelled `History` button (icon + text),
+  not a bare icon.
+- New `AppStateView.noActiveTasks({onViewHistory})` — "No Active Tasks — Completed work is
+  available in Work Order History" + a "View Work Order History" button — replaces the generic
+  empty state in both My Tasks and Home's Recent Tasks section.
+- `task_detail_screen.dart` now shows a "Rejected – Action Required" banner (reason + a note that
+  the existing "Complete Task" button is the resubmission action) whenever
+  `task.rejectionReason` is present — the field already existed on `StaffTask` for mock data; it
+  now gets populated for real work orders too.
+- `api_dashboard_repository.dart`'s `priorityTask` fallback now skips already-terminal
+  (`TaskStatus.verified`) tasks when picking the first task to feature — the raw `tasks[]` list
+  can still contain a `Completed` order (see above), so blindly taking `tasks.first` could
+  previously surface an already-done order under a "Start Task" button.
+
+### 7.3 Verified end-to-end with a concrete example
+
+Confirmed via the new unit tests (`test/work_history_parsing_test.dart`) that a completed work
+order with a linked `daily_work_logs` row and `daily_work_images` rows produces a
+`WorkOrderHistoryItem` with non-empty, absolute (`http...`) photo URLs for `Completed` →
+`pending_verification`, `Verified`, and `Rejected` (with `rejection_reason` populated) shapes — see
+`TEST_REPORT.md` for the full run. This does not replace a real-device retest, which is still the
+authoritative check (noted in §5).
