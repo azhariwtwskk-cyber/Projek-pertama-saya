@@ -10,7 +10,9 @@ class MockPmRepository implements PmRepository {
 
   int _indexOf(String id) {
     final i = _tasks.indexWhere((t) => t.id == id);
-    if (i == -1) throw const ApiException(ApiFailureType.notFound, 'PM task not found.');
+    if (i == -1) {
+      throw const ApiException(ApiFailureType.notFound, 'PM task not found.');
+    }
     return i;
   }
 
@@ -27,10 +29,13 @@ class MockPmRepository implements PmRepository {
   }
 
   @override
-  Future<PmTask> toggleChecklistItem(String taskId, String itemId, bool checked) async {
+  Future<PmTask> toggleChecklistItem(
+      String taskId, String itemId, bool checked) async {
     final i = _indexOf(taskId);
     final task = _tasks[i];
-    final updatedChecklist = task.checklist.map((c) => c.id == itemId ? c.copyWith(isChecked: checked) : c).toList();
+    final updatedChecklist = task.checklist
+        .map((c) => c.id == itemId ? c.copyWith(isChecked: checked) : c)
+        .toList();
     _tasks[i] = PmTask(
       id: task.id,
       assetName: task.assetName,
@@ -47,15 +52,18 @@ class MockPmRepository implements PmRepository {
   }
 
   @override
-  Future<PmTask> completeTask(String taskId, {required List<File> evidencePhotos, String? notes}) async {
+  Future<PmTask> completeTask(String taskId,
+      {required List<File> evidencePhotos, String? notes}) async {
     await Future.delayed(const Duration(milliseconds: 700));
     final i = _indexOf(taskId);
     final task = _tasks[i];
     if (!task.allMandatoryChecked) {
-      throw const ApiException(ApiFailureType.validation, 'Please complete all mandatory checklist items first.');
+      throw const ApiException(ApiFailureType.validation,
+          'Please complete all mandatory checklist items first.');
     }
     if (task.requiresPhotoEvidence && evidencePhotos.isEmpty) {
-      throw const ApiException(ApiFailureType.validation, 'Please attach evidence photos before completing this PM task.');
+      throw const ApiException(ApiFailureType.validation,
+          'Please attach evidence photos before completing this PM task.');
     }
     _tasks[i] = PmTask(
       id: task.id,

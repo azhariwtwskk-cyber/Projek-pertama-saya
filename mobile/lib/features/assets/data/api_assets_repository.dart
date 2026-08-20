@@ -10,17 +10,22 @@ class ApiAssetsRepository implements AssetsRepository {
   @override
   Future<PropertyAsset> fetchAsset(String id) {
     return _client.request(
-      (dio) => dio.get(ApiEndpoints.asset(id)),
+      (dio) =>
+          dio.get(ApiEndpoints.assetLookup, queryParameters: {'token': id}),
       (data) {
-        final json = data as Map<String, dynamic>;
+        final root =
+            data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
+        final json = root['asset'] is Map
+            ? Map<String, dynamic>.from(root['asset'] as Map)
+            : root;
         return PropertyAsset(
-          id: json['id'] as String,
-          name: json['name'] as String,
-          propertyName: json['property_name'] as String? ?? '',
-          location: json['location'] as String? ?? '',
-          status: json['status'] as String? ?? '',
-          lastMaintenanceDate: json['last_maintenance_date'] == null ? null : DateTime.parse(json['last_maintenance_date'] as String),
-          nextMaintenanceDate: json['next_maintenance_date'] == null ? null : DateTime.parse(json['next_maintenance_date'] as String),
+          id: (json['code'] ?? id).toString(),
+          name: (json['name'] ?? '').toString(),
+          propertyName: '',
+          location: (json['location'] ?? '').toString(),
+          status: (json['category'] ?? '').toString(),
+          lastMaintenanceDate: null,
+          nextMaintenanceDate: null,
         );
       },
     );
