@@ -18,6 +18,7 @@ import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/sync/presentation/sync_centre_screen.dart';
 import '../../features/tasks/presentation/task_detail_screen.dart';
 import '../../features/tasks/presentation/task_inbox_screen.dart';
+import '../../features/work_history/presentation/work_history_screen.dart';
 import 'app_shell.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -45,29 +46,40 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) => AppShell(navigationShell: navigationShell),
+        builder: (context, state, navigationShell) =>
+            AppShell(navigationShell: navigationShell),
         branches: [
           StatefulShellBranch(routes: [
-            GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+            GoRoute(
+                path: '/home', builder: (context, state) => const HomeScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/tasks', builder: (context, state) => const TaskInboxScreen()),
+            GoRoute(
+                path: '/tasks',
+                builder: (context, state) => const TaskInboxScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/attendance', builder: (context, state) => const AttendanceScreen()),
+            GoRoute(
+                path: '/attendance',
+                builder: (context, state) => const AttendanceScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/notifications', builder: (context, state) => const NotificationsScreen()),
+            GoRoute(
+                path: '/notifications',
+                builder: (context, state) => const NotificationsScreen()),
           ]),
           StatefulShellBranch(routes: [
-            GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
+            GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen()),
           ]),
         ],
       ),
       GoRoute(
         path: '/tasks/:id',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => TaskDetailScreen(taskId: state.pathParameters['id']!),
+        builder: (context, state) =>
+            TaskDetailScreen(taskId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/attendance/history',
@@ -84,6 +96,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const DailyWorkHistoryScreen(),
       ),
+      // Deliberately a separate route/screen from /daily-work/history —
+      // this is the management verification record for work orders
+      // (references WO-xxxxxxxx), not the staff member's own daily log
+      // (references DW-xxxxxxxx). See
+      // mobile/docs/INTEGRATION_REPAIR_REPORT.md, "Work Order History".
+      GoRoute(
+        path: '/work-history',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const WorkHistoryScreen(),
+      ),
       GoRoute(
         path: '/pm',
         parentNavigatorKey: _rootNavigatorKey,
@@ -92,7 +114,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pm/:id',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => PmDetailScreen(taskId: state.pathParameters['id']!),
+        builder: (context, state) =>
+            PmDetailScreen(taskId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/assets/scan',
@@ -102,7 +125,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/assets/:id',
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => AssetDetailScreen(assetId: state.pathParameters['id']!),
+        builder: (context, state) =>
+            AssetDetailScreen(assetId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/sync',

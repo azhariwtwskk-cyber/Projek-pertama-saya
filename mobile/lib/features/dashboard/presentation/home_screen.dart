@@ -48,8 +48,10 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               dashboardAsync.when(
                 loading: () => const _DashboardSkeleton(),
-                error: (e, _) => AppStateView.error(onRetry: () => ref.invalidate(dashboardDataProvider)),
-                data: (data) => _DashboardContent(data: data, permissions: user.permissions),
+                error: (e, _) => AppStateView.error(
+                    onRetry: () => ref.invalidate(dashboardDataProvider)),
+                data: (data) => _DashboardContent(
+                    data: data, permissions: user.permissions),
               ),
             ],
           ),
@@ -71,11 +73,16 @@ class _Header extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 26,
-          backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-          backgroundImage: user.profileImageUrl.isNotEmpty ? NetworkImage(user.profileImageUrl) : null,
+          backgroundColor:
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+          backgroundImage: user.profileImageUrl.isNotEmpty
+              ? NetworkImage(user.profileImageUrl)
+              : null,
           child: user.profileImageUrl.isEmpty
               ? Text(user.name.isNotEmpty ? user.name[0] : '?',
-                  style: TextStyle(fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.primary))
+                  style: TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: Theme.of(context).colorScheme.primary))
               : null,
         ),
         const SizedBox(width: 12),
@@ -84,18 +91,25 @@ class _Header extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('${AppFormatters.greetingForNow(now)}, ${user.name}',
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w800, fontSize: 17)),
               const SizedBox(height: 2),
               Row(
                 children: [
-                  const Icon(Icons.apartment_rounded, size: 13, color: AppColors.textSecondary),
+                  const Icon(Icons.apartment_rounded,
+                      size: 13, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Flexible(
                     child: Text(user.branding.propertyName,
-                        overflow: TextOverflow.ellipsis, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5)),
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: AppColors.textSecondary, fontSize: 12.5)),
                   ),
-                  const Text('  ·  ', style: TextStyle(color: AppColors.textSecondary)),
-                  Text(AppFormatters.friendlyDate.format(now), style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5)),
+                  const Text('  ·  ',
+                      style: TextStyle(color: AppColors.textSecondary)),
+                  Text(AppFormatters.friendlyDate.format(now),
+                      style: const TextStyle(
+                          color: AppColors.textSecondary, fontSize: 12.5)),
                 ],
               ),
             ],
@@ -113,9 +127,16 @@ class _Header extends StatelessWidget {
                 right: 6,
                 top: 6,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                  decoration: BoxDecoration(color: AppColors.danger, borderRadius: BorderRadius.circular(999)),
-                  child: Text('$unreadCount', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(
+                      color: AppColors.danger,
+                      borderRadius: BorderRadius.circular(999)),
+                  child: Text('$unreadCount',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700)),
                 ),
               ),
           ],
@@ -129,7 +150,8 @@ class _AttendanceQuickCard extends ConsumerStatefulWidget {
   const _AttendanceQuickCard();
 
   @override
-  ConsumerState<_AttendanceQuickCard> createState() => _AttendanceQuickCardState();
+  ConsumerState<_AttendanceQuickCard> createState() =>
+      _AttendanceQuickCardState();
 }
 
 class _AttendanceQuickCardState extends ConsumerState<_AttendanceQuickCard> {
@@ -142,11 +164,14 @@ class _AttendanceQuickCardState extends ConsumerState<_AttendanceQuickCard> {
           ? await ref.read(attendanceControllerProvider).clockIn()
           : await ref.read(attendanceControllerProvider).clockOut();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result.message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(result.message)));
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unable to reach CPMSPro. Please try again.'), backgroundColor: AppColors.danger),
+          const SnackBar(
+              content: Text('Unable to reach CPMSPro. Please try again.'),
+              backgroundColor: AppColors.danger),
         );
       }
     } finally {
@@ -170,11 +195,19 @@ class _AttendanceQuickCardState extends ConsumerState<_AttendanceQuickCard> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: (isClockedIn ? AppColors.success : AppColors.textSecondary).withValues(alpha: 0.1),
+                  color: (isClockedIn
+                          ? AppColors.success
+                          : AppColors.textSecondary)
+                      .withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(isClockedIn ? Icons.check_circle_rounded : Icons.schedule_rounded,
-                    color: isClockedIn ? AppColors.success : AppColors.textSecondary),
+                child: Icon(
+                    isClockedIn
+                        ? Icons.check_circle_rounded
+                        : Icons.schedule_rounded,
+                    color: isClockedIn
+                        ? AppColors.success
+                        : AppColors.textSecondary),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -182,14 +215,23 @@ class _AttendanceQuickCardState extends ConsumerState<_AttendanceQuickCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(isClockedIn ? 'CLOCKED IN' : 'NOT CLOCKED IN',
-                        style: TextStyle(fontWeight: FontWeight.w800, color: isClockedIn ? AppColors.success : AppColors.textSecondary, letterSpacing: 0.3)),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: isClockedIn
+                                ? AppColors.success
+                                : AppColors.textSecondary,
+                            letterSpacing: 0.3)),
                     if (isClockedIn && status.clockInTime != null)
-                      Text(AppFormatters.time12h.format(status.clockInTime!), style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(AppFormatters.time12h.format(status.clockInTime!),
+                          style: const TextStyle(fontWeight: FontWeight.w600)),
                   ],
                 ),
               ),
               _busy
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2))
                   : ElevatedButton(
                       onPressed: () => _toggleClock(!isClockedIn),
                       style: ElevatedButton.styleFrom(
@@ -243,7 +285,10 @@ class _DashboardContent extends StatelessWidget {
         const SectionHeader(title: 'Quick Actions'),
         _QuickActionsGrid(permissions: permissions),
         const SizedBox(height: 24),
-        SectionHeader(title: 'Recent Tasks', actionLabel: 'View All', onAction: () => context.push('/tasks')),
+        SectionHeader(
+            title: 'Recent Tasks',
+            actionLabel: 'View All',
+            onAction: () => context.push('/tasks')),
         if (data.recentTasks.isEmpty)
           AppStateView.noTasksToday()
         else
@@ -279,9 +324,18 @@ class _KpiRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
               child: Column(
                 children: [
-                  Text('${items[i].$2}', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: items[i].$3)),
+                  Text('${items[i].$2}',
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: items[i].$3)),
                   const SizedBox(height: 4),
-                  Text(items[i].$1, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                  Text(items[i].$1,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600)),
                 ],
               ),
             ),
@@ -306,20 +360,31 @@ class _PriorityTaskCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text(task.title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16))),
+              Expanded(
+                  child: Text(task.title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w800, fontSize: 16))),
               PriorityBadge(priority: task.priority),
             ],
           ),
           const SizedBox(height: 10),
           Row(
             children: [
-              const Icon(Icons.schedule_rounded, size: 15, color: AppColors.textSecondary),
+              const Icon(Icons.schedule_rounded,
+                  size: 15, color: AppColors.textSecondary),
               const SizedBox(width: 4),
-              Text('Due: ${AppFormatters.time12h.format(task.dueDate)}', style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary)),
+              Text('Due: ${AppFormatters.time12h.format(task.dueDate)}',
+                  style: const TextStyle(
+                      fontSize: 12.5, color: AppColors.textSecondary)),
               const SizedBox(width: 14),
-              const Icon(Icons.place_outlined, size: 15, color: AppColors.textSecondary),
+              const Icon(Icons.place_outlined,
+                  size: 15, color: AppColors.textSecondary),
               const SizedBox(width: 4),
-              Expanded(child: Text(task.location, style: const TextStyle(fontSize: 12.5, color: AppColors.textSecondary), overflow: TextOverflow.ellipsis)),
+              Expanded(
+                  child: Text(task.location,
+                      style: const TextStyle(
+                          fontSize: 12.5, color: AppColors.textSecondary),
+                      overflow: TextOverflow.ellipsis)),
             ],
           ),
           const SizedBox(height: 14),
@@ -327,7 +392,9 @@ class _PriorityTaskCard extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () => context.push('/tasks/${task.id}'),
-              style: isUrgent ? ElevatedButton.styleFrom(backgroundColor: AppColors.urgent) : null,
+              style: isUrgent
+                  ? ElevatedButton.styleFrom(backgroundColor: AppColors.urgent)
+                  : null,
               child: const Text('Start Task'),
             ),
           ),
@@ -343,13 +410,53 @@ class _QuickActionsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // "Work Order History" (/work-history) and "Daily Work History"
+    // (/daily-work/history) are two genuinely different records — a
+    // work order's verification decision vs. a staff member's own daily
+    // log — and must stay separately labelled/routed, never merged
+    // (see mobile/docs/INTEGRATION_REPAIR_REPORT.md, "Work Order History").
     final actions = <(IconData, String, String, String)>[
-      if (permissions.can(StaffPermission.workOrderView)) (Icons.assignment_outlined, 'My Tasks', '/tasks', StaffPermission.workOrderView),
-      if (permissions.can(StaffPermission.dailyWorkCreate)) (Icons.add_task_rounded, 'Add Daily Work', '/daily-work/add', StaffPermission.dailyWorkCreate),
-      if (permissions.can(StaffPermission.assetView)) (Icons.qr_code_scanner_rounded, 'Scan QR', '/assets/scan', StaffPermission.assetView),
-      (Icons.camera_alt_outlined, 'Camera Evidence', '/tasks', ''),
-      if (permissions.can(StaffPermission.pmView)) (Icons.build_circle_outlined, 'PM Tasks', '/pm', StaffPermission.pmView),
-      (Icons.work_history_outlined, 'Work History', '/daily-work/history', ''),
+      if (permissions.can(StaffPermission.workOrderView))
+        (
+          Icons.assignment_outlined,
+          'My Tasks',
+          '/tasks',
+          StaffPermission.workOrderView
+        ),
+      if (permissions.can(StaffPermission.dailyWorkCreate))
+        (
+          Icons.add_task_rounded,
+          'Add Daily Work',
+          '/daily-work/add',
+          StaffPermission.dailyWorkCreate
+        ),
+      if (permissions.can(StaffPermission.assetView))
+        (
+          Icons.qr_code_scanner_rounded,
+          'Scan QR',
+          '/assets/scan',
+          StaffPermission.assetView
+        ),
+      if (permissions.can(StaffPermission.workOrderView))
+        (
+          Icons.fact_check_outlined,
+          'Work Order History',
+          '/work-history',
+          StaffPermission.workOrderView
+        ),
+      if (permissions.can(StaffPermission.pmView))
+        (
+          Icons.build_circle_outlined,
+          'PM Tasks',
+          '/pm',
+          StaffPermission.pmView
+        ),
+      (
+        Icons.work_history_outlined,
+        'Daily Work History',
+        '/daily-work/history',
+        ''
+      ),
     ];
 
     return GridView.count(
@@ -361,14 +468,16 @@ class _QuickActionsGrid extends StatelessWidget {
       childAspectRatio: 0.95,
       children: actions.map((a) {
         final (icon, label, route, _) = a;
-        return _QuickActionButton(icon: icon, label: label, onTap: () => context.push(route));
+        return _QuickActionButton(
+            icon: icon, label: label, onTap: () => context.push(route));
       }).toList(),
     );
   }
 }
 
 class _QuickActionButton extends StatelessWidget {
-  const _QuickActionButton({required this.icon, required this.label, required this.onTap});
+  const _QuickActionButton(
+      {required this.icon, required this.label, required this.onTap});
   final IconData icon;
   final String label;
   final VoidCallback onTap;
@@ -384,11 +493,20 @@ class _QuickActionButton extends StatelessWidget {
           Container(
             width: 42,
             height: 42,
-            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-            child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 20),
+            decoration: BoxDecoration(
+                color: Theme.of(context)
+                    .colorScheme
+                    .primary
+                    .withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12)),
+            child: Icon(icon,
+                color: Theme.of(context).colorScheme.primary, size: 20),
           ),
           const SizedBox(height: 8),
-          Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
+          Text(label,
+              textAlign: TextAlign.center,
+              style:
+                  const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -411,9 +529,16 @@ class _RecentTaskTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(task.taskNumber, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w700)),
+                  Text(task.taskNumber,
+                      style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w700)),
                   const SizedBox(height: 2),
-                  Text(task.title, style: const TextStyle(fontWeight: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(task.title,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis),
                 ],
               ),
             ),
@@ -443,11 +568,16 @@ class _AnnouncementTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(announcement.title, style: const TextStyle(fontWeight: FontWeight.w700)),
+                  Text(announcement.title,
+                      style: const TextStyle(fontWeight: FontWeight.w700)),
                   const SizedBox(height: 4),
-                  Text(announcement.body, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12.5)),
+                  Text(announcement.body,
+                      style: const TextStyle(
+                          color: AppColors.textSecondary, fontSize: 12.5)),
                   const SizedBox(height: 4),
-                  Text(AppFormatters.timeAgo(announcement.postedAt), style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                  Text(AppFormatters.timeAgo(announcement.postedAt),
+                      style: const TextStyle(
+                          color: AppColors.textSecondary, fontSize: 11)),
                 ],
               ),
             ),

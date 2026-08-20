@@ -42,7 +42,16 @@ class _TaskInboxScreenState extends ConsumerState<TaskInboxScreen> {
     final filtered = ref.watch(filteredTasksProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Tasks')),
+      appBar: AppBar(
+        title: const Text('My Tasks'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.fact_check_outlined),
+            tooltip: 'Work Order History',
+            onPressed: () => context.push('/work-history'),
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: () async => ref.invalidate(tasksListProvider),
         child: CustomScrollView(
@@ -52,7 +61,8 @@ class _TaskInboxScreenState extends ConsumerState<TaskInboxScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                 child: TextField(
                   controller: _searchController,
-                  onChanged: (v) => ref.read(taskSearchQueryProvider.notifier).state = v,
+                  onChanged: (v) =>
+                      ref.read(taskSearchQueryProvider.notifier).state = v,
                   decoration: const InputDecoration(
                     hintText: 'Search by task ID, title or location',
                     prefixIcon: Icon(Icons.search_rounded),
@@ -74,14 +84,18 @@ class _TaskInboxScreenState extends ConsumerState<TaskInboxScreen> {
                     return ChoiceChip(
                       label: Text(label),
                       selected: selected,
-                      onSelected: (_) => ref.read(taskInboxTabProvider.notifier).state = tab,
+                      onSelected: (_) =>
+                          ref.read(taskInboxTabProvider.notifier).state = tab,
                       selectedColor: Theme.of(context).colorScheme.primary,
                       labelStyle: TextStyle(
-                        color: selected ? Colors.white : AppColors.textSecondary,
+                        color:
+                            selected ? Colors.white : AppColors.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                       backgroundColor: Theme.of(context).cardTheme.color,
-                      side: BorderSide(color: selected ? Colors.transparent : AppColors.border),
+                      side: BorderSide(
+                          color:
+                              selected ? Colors.transparent : AppColors.border),
                     );
                   },
                 ),
@@ -94,7 +108,9 @@ class _TaskInboxScreenState extends ConsumerState<TaskInboxScreen> {
                 sliver: SliverToBoxAdapter(child: SkeletonList(count: 4)),
               ),
               error: (e, _) => SliverFillRemaining(
-                child: Center(child: AppStateView.error(onRetry: () => ref.invalidate(tasksListProvider))),
+                child: Center(
+                    child: AppStateView.error(
+                        onRetry: () => ref.invalidate(tasksListProvider))),
               ),
               data: (tasks) {
                 if (tasks.isEmpty) {
@@ -109,7 +125,9 @@ class _TaskInboxScreenState extends ConsumerState<TaskInboxScreen> {
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, i) {
                       final task = tasks[i];
-                      return TaskCard(task: task, onTap: () => context.push('/tasks/${task.id}'));
+                      return TaskCard(
+                          task: task,
+                          onTap: () => context.push('/tasks/${task.id}'));
                     },
                   ),
                 );
