@@ -38,7 +38,9 @@ extension NotificationTypeMeta on NotificationType {
   }
 
   bool get isUrgent =>
-      this == NotificationType.urgentTask || this == NotificationType.pmOverdue || this == NotificationType.taskRejected;
+      this == NotificationType.urgentTask ||
+      this == NotificationType.pmOverdue ||
+      this == NotificationType.taskRejected;
 }
 
 class AppNotification {

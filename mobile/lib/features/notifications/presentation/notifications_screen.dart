@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
@@ -18,21 +17,39 @@ class NotificationsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationsAsync = ref.watch(notificationsProvider);
+    final hasUnread = notificationsAsync.maybeWhen(
+      data: (items) => items.any((n) => !n.isRead),
+      orElse: () => false,
+    );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifications')),
+      appBar: AppBar(
+        title: const Text('Notifications'),
+        actions: [
+          if (hasUnread)
+            TextButton(
+              onPressed: () =>
+                  ref.read(notificationsControllerProvider).markAllRead(),
+              child: const Text('Mark all read'),
+            ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: () async => ref.invalidate(notificationsProvider),
         child: notificationsAsync.when(
-          loading: () => const Padding(padding: EdgeInsets.all(16), child: SkeletonList()),
-          error: (e, _) => Center(child: AppStateView.error(onRetry: () => ref.invalidate(notificationsProvider))),
+          loading: () =>
+              const Padding(padding: EdgeInsets.all(16), child: SkeletonList()),
+          error: (e, _) => Center(
+              child: AppStateView.error(
+                  onRetry: () => ref.invalidate(notificationsProvider))),
           data: (items) {
             if (items.isEmpty) {
               return const Center(
                 child: AppStateView(
                   icon: Icons.notifications_none_rounded,
                   title: 'No Notifications',
-                  message: 'You will see work orders, PM reminders and announcements here.',
+                  message:
+                      'You will see work orders, PM reminders and announcements here.',
                 ),
               );
             }
@@ -42,11 +59,9 @@ class NotificationsScreen extends ConsumerWidget {
               separatorBuilder: (_, __) => const SizedBox(height: 10),
               itemBuilder: (context, i) => _NotificationCard(
                 notification: items[i],
-                onTap: () {
-                  ref.read(notificationsControllerProvider).markRead(items[i].id);
-                  final route = items[i].deepLinkRoute;
-                  if (route != null) context.push(route);
-                },
+                onTap: () => ref
+                    .read(notificationsControllerProvider)
+                    .markRead(items[i].id),
               ),
             );
           },
@@ -87,7 +102,8 @@ class _NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUrgent = notification.type.isUrgent;
-    final color = isUrgent ? AppColors.danger : Theme.of(context).colorScheme.primary;
+    final color =
+        isUrgent ? AppColors.danger : Theme.of(context).colorScheme.primary;
 
     return AppSectionCard(
       onTap: onTap,
@@ -99,14 +115,20 @@ class _NotificationCard extends StatelessWidget {
               Container(
                 width: 42,
                 height: 42,
-                decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12)),
                 child: Icon(_icon, color: color, size: 20),
               ),
               if (!notification.isRead)
                 Positioned(
                   right: 0,
                   top: 0,
-                  child: Container(width: 9, height: 9, decoration: const BoxDecoration(color: AppColors.danger, shape: BoxShape.circle)),
+                  child: Container(
+                      width: 9,
+                      height: 9,
+                      decoration: const BoxDecoration(
+                          color: AppColors.danger, shape: BoxShape.circle)),
                 ),
             ],
           ),
@@ -118,13 +140,28 @@ class _NotificationCard extends StatelessWidget {
                 if (isUrgent)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
-                    child: Text('URGENT', style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 11, letterSpacing: 0.4)),
+                    child: Text('URGENT',
+                        style: TextStyle(
+                            color: color,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11,
+                            letterSpacing: 0.4)),
                   ),
-                Text(notification.title, style: TextStyle(fontWeight: notification.isRead ? FontWeight.w600 : FontWeight.w800)),
+                Text(notification.title,
+                    style: TextStyle(
+                        fontWeight: notification.isRead
+                            ? FontWeight.w600
+                            : FontWeight.w800)),
                 const SizedBox(height: 4),
-                Text(notification.body, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text(notification.body,
+                    style: const TextStyle(
+                        color: AppColors.textSecondary, fontSize: 13),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 6),
-                Text(AppFormatters.timeAgo(notification.createdAt), style: const TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                Text(AppFormatters.timeAgo(notification.createdAt),
+                    style: const TextStyle(
+                        color: AppColors.textSecondary, fontSize: 11)),
               ],
             ),
           ),

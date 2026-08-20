@@ -7,12 +7,14 @@ import '../data/mock_notifications_repository.dart';
 import '../data/notifications_repository.dart';
 import '../domain/notification_models.dart';
 
-final notificationsRepositoryProvider = Provider<NotificationsRepository>((ref) {
+final notificationsRepositoryProvider =
+    Provider<NotificationsRepository>((ref) {
   if (AppConfig.useMockApi) return MockNotificationsRepository();
   return ApiNotificationsRepository(ref.watch(apiClientProvider));
 });
 
-final notificationsProvider = FutureProvider.autoDispose<List<AppNotification>>((ref) {
+final notificationsProvider =
+    FutureProvider.autoDispose<List<AppNotification>>((ref) {
   return ref.watch(notificationsRepositoryProvider).fetchNotifications();
 });
 
@@ -31,6 +33,12 @@ class NotificationsController {
     await _ref.read(notificationsRepositoryProvider).markRead(id);
     _ref.invalidate(notificationsProvider);
   }
+
+  Future<void> markAllRead() async {
+    await _ref.read(notificationsRepositoryProvider).markAllRead();
+    _ref.invalidate(notificationsProvider);
+  }
 }
 
-final notificationsControllerProvider = Provider((ref) => NotificationsController(ref));
+final notificationsControllerProvider =
+    Provider((ref) => NotificationsController(ref));
