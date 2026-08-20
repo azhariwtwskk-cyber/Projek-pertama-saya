@@ -110,7 +110,17 @@ try {
                 throw new RuntimeException('Gambar gagal disimpan.');
             }
             $storedPaths[] = $dest;
-            $storedImages[] = ['name' => $filename, 'type' => $type];
+            // Site-root-relative path (this endpoint's real physical
+            // location, confirmed from $uploadDir above) — populated so
+            // this write path agrees with the legacy Staff Web Portal's
+            // own image_path convention instead of leaving read-side
+            // endpoints to guess a flat layout from image_name alone (see
+            // cpmsApiDailyWorkImageCandidates() in services.php).
+            $storedImages[] = [
+                'name' => $filename,
+                'path' => 'cpms/uploads/daily_work/' . $filename,
+                'type' => $type,
+            ];
         }
     }
 
@@ -142,9 +152,16 @@ try {
     $insert->close();
 
     if ($storedImages) {
-        $imgStmt = $db->prepare('INSERT INTO daily_work_images (daily_work_id, image_name, image_type) VALUES (?, ?, ?)');
+        $hasImagePath = cpmsApiColumnExists($db, 'daily_work_images', 'image_path');
+        $imgStmt = $hasImagePath
+            ? $db->prepare('INSERT INTO daily_work_images (daily_work_id, image_name, image_type, image_path) VALUES (?, ?, ?, ?)')
+            : $db->prepare('INSERT INTO daily_work_images (daily_work_id, image_name, image_type) VALUES (?, ?, ?)');
         foreach ($storedImages as $img) {
-            $imgStmt->bind_param('iss', $logId, $img['name'], $img['type']);
+            if ($hasImagePath) {
+                $imgStmt->bind_param('isss', $logId, $img['name'], $img['type'], $img['path']);
+            } else {
+                $imgStmt->bind_param('iss', $logId, $img['name'], $img['type']);
+            }
             if (!$imgStmt->execute()) {
                 throw new RuntimeException('Rekod gambar gagal disimpan.');
             }
@@ -192,5 +209,19 @@ try {
 }
 
 cpmsApiAudit($db, $identity, 'staff.daily_work_submit', 'success', 'daily_work_log', $logId, ['reference' => $ref]);
+
+// Temporary, safe debug logging for the real-device "task disappears" /
+// "images not showing" investigation — counts and ids only, never
+// tokens/credentials/PII. Goes to the PHP error log, not the HTTP
+// response. Remove once confirmed fixed on a real device.
+if (function_exists('error_log')) {
+    error_log(sprintf(
+        '[cpms.daily_work_submit] daily_work_id=%d work_order_id=%d work_status=%s images_stored=%d',
+        $logId,
+        $workOrderId,
+        $status,
+        count($storedImages)
+    ));
+}
 
 cpmsApiRespond(['accepted' => true, 'reference' => $ref], 201);

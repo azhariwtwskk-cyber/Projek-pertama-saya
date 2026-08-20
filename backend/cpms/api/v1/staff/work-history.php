@@ -148,8 +148,10 @@ if ($orderIds && $hasWorkOrderId) {
 
         if ($dailyWorkIds && cpmsApiTableExists($db, 'daily_work_images')) {
             $imgPlaceholders = implode(',', array_fill(0, count($dailyWorkIds), '?'));
+            $hasImagePath = cpmsApiColumnExists($db, 'daily_work_images', 'image_path');
+            $imagePathSelect = $hasImagePath ? 'image_path,' : "'' AS image_path,";
             $imgStmt = $db->prepare(
-                "SELECT daily_work_id, image_name, image_type
+                "SELECT daily_work_id, image_name, {$imagePathSelect} image_type
                  FROM daily_work_images
                  WHERE daily_work_id IN ({$imgPlaceholders})
                  ORDER BY id ASC"
@@ -172,13 +174,13 @@ if ($orderIds && $hasWorkOrderId) {
                     if ($workOrderId === null || !isset($orders[$workOrderId])) {
                         continue;
                     }
-                    $name = basename((string) $image['image_name']);
-                    if ($name === '') {
+                    $url = cpmsApiDailyWorkImageUrl($image, $propertyId);
+                    if ($url === '') {
                         continue;
                     }
                     $orders[$workOrderId]['images'][] = [
                         'type' => (string) ($image['image_type'] ?? 'Supporting'),
-                        'url' => '/cpms/uploads/daily_work/' . rawurlencode($name),
+                        'url' => $url,
                     ];
                 }
                 $imgStmt->close();
@@ -207,16 +209,34 @@ if ($orderIds && cpmsApiTableExists($db, 'work_order_images')) {
             if (!isset($orders[$workOrderId])) {
                 continue;
             }
-            $path = ltrim((string) $image['image_name'], '/');
-            if ($path === '') {
+            $url = cpmsApiWorkOrderImageUrl($image);
+            if ($url === '') {
                 continue;
             }
             $orders[$workOrderId]['images'][] = [
                 'type' => (string) ($image['image_type'] ?? 'Supporting'),
-                'url' => '/cpms/' . implode('/', array_map('rawurlencode', explode('/', $path))),
+                'url' => $url,
             ];
         }
         $woImgStmt->close();
+    }
+}
+
+// Temporary, safe debug logging for the real-device "images not showing"
+// investigation — counts only, never tokens/credentials/PII. Goes to the
+// PHP error log, not the HTTP response. Remove once confirmed fixed on a
+// real device.
+if (function_exists('error_log')) {
+    foreach ($orders as $orderId => $order) {
+        $imageCount = count($order['images']);
+        $dailyWorkCount = count($order['daily_work_entries']);
+        error_log(sprintf(
+            '[cpms.work_history] work_order_id=%d daily_work_count=%d images_found=%d verification_status=%s',
+            $orderId,
+            $dailyWorkCount,
+            $imageCount,
+            $order['verification_status']
+        ));
     }
 }
 

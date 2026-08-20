@@ -76,15 +76,20 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Photos are stored flat under cpms/uploads/daily_work/ (confirmed from
-// staff/daily-work/submit.php's upload path) with no image_path column
-// populated on this schema version — build the real, working URL from
-// image_name the same way cpms/property_portal/daily_work_review.php
-// (Property Admin's own review screen) already does, instead of guessing.
+// Photos are written by two different upload flows with two different
+// physical layouts — the legacy Staff Web Portal (still live in
+// production) stores under uploads/daily_work/property_<id>/ and this
+// mobile API stores flat under cpms/uploads/daily_work/ — so the URL must
+// be resolved through the shared candidate-list helper
+// (cpmsApiDailyWorkImageUrl in services.php), not guessed from image_name
+// alone. See that function's doc comment for the confirmed root cause.
 if ($ids && cpmsApiTableExists($db, 'daily_work_images')) {
+    $propertyId = (int) ($identity['property_id'] ?? 0);
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $hasImagePath = cpmsApiColumnExists($db, 'daily_work_images', 'image_path');
+    $imagePathSelect = $hasImagePath ? 'image_path,' : "'' AS image_path,";
     $imgStmt = $db->prepare(
-        "SELECT daily_work_id, image_name, image_type
+        "SELECT daily_work_id, image_name, {$imagePathSelect} image_type
          FROM daily_work_images
          WHERE daily_work_id IN ({$placeholders})
          ORDER BY id ASC"
@@ -98,13 +103,13 @@ if ($ids && cpmsApiTableExists($db, 'daily_work_images')) {
             if (!isset($rows[$workId])) {
                 continue;
             }
-            $name = basename((string) $image['image_name']);
-            if ($name === '') {
+            $url = cpmsApiDailyWorkImageUrl($image, $propertyId);
+            if ($url === '') {
                 continue;
             }
             $rows[$workId]['images'][] = [
                 'type' => (string) ($image['image_type'] ?? 'Supporting'),
-                'url' => '/cpms/uploads/daily_work/' . rawurlencode($name),
+                'url' => $url,
             ];
         }
         $imgStmt->close();
