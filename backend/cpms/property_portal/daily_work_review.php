@@ -171,6 +171,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $stmt->execute();
                         $stmt->close();
                         $notice = 'Rekod kerja harian berjaya dikemas kini.';
+
+                        // Smallest safe sync: nothing else ever sets
+                        // work_orders.status to Verified/Rejected (confirmed
+                        // by reading admin_work_orders.php, cpms/api/v1/staff/
+                        // tasks.php and daily-work/submit.php) — a Rejected
+                        // decision on a Completed work order would otherwise
+                        // leave it stuck showing "Completed" in the Staff app
+                        // forever, with no way to resubmit corrective work
+                        // (see cpms/api/v1/staff/work-history.php's own
+                        // root-cause note on this exact gap). Reopen it to
+                        // "In Progress" — an existing status, not a new one —
+                        // so it flows back into the staff's active task queue
+                        // exactly like any other in-progress work order.
+                        // History is preserved: this only adds a
+                        // work_order_history row; daily_work_logs and its
+                        // images/remarks/verified_by/verified_at are never
+                        // touched or deleted.
+                        if ($decision === 'Rejected'
+                            && dailyWorkColumnExists($conn, 'daily_work_logs', 'work_order_id')) {
+                            $woStmt = $conn->prepare(
+                                'SELECT d.work_order_id, w.status FROM daily_work_logs d
+                                 JOIN work_orders w ON w.id = d.work_order_id
+                                 WHERE d.id = ? LIMIT 1'
+                            );
+                            if ($woStmt) {
+                                $woStmt->bind_param('i', $workId);
+                                $woStmt->execute();
+                                $woRow = $woStmt->get_result()->fetch_assoc();
+                                $woStmt->close();
+                                if (is_array($woRow) && $woRow['work_order_id'] !== null) {
+                                    $workOrderId = (int) $woRow['work_order_id'];
+                                    $currentStatus = (string) $woRow['status'];
+                                    // Only reopen from a terminal-for-staff
+                                    // state — never touch a work order that's
+                                    // already Cancelled, or still legitimately
+                                    // mid-flow (In Progress/Pending
+                                    // Material/Pending Contractor already show
+                                    // up in the staff queue as-is).
+                                    if (in_array($currentStatus, ['Completed', 'Verified'], true)) {
+                                        $newWoStatus = 'In Progress';
+                                        $reopen = $conn->prepare('UPDATE work_orders SET status=? WHERE id=?');
+                                        if ($reopen) {
+                                            $reopen->bind_param('si', $newWoStatus, $workOrderId);
+                                            $reopen->execute();
+                                            $reopen->close();
+
+                                            $historyStmt = $conn->prepare(
+                                                'INSERT INTO work_order_history
+                                                    (work_order_id, old_status, new_status, remarks, updated_by)
+                                                 VALUES (?, ?, ?, ?, ?)'
+                                            );
+                                            if ($historyStmt) {
+                                                $historyRemarks = 'Rejected by Property Admin: ' . $remarks;
+                                                $historyUpdatedBy = (string) (
+                                                    $_SESSION['property_admin_name'] ?? 'Property Portal'
+                                                );
+                                                $historyStmt->bind_param(
+                                                    'issss',
+                                                    $workOrderId,
+                                                    $currentStatus,
+                                                    $newWoStatus,
+                                                    $historyRemarks,
+                                                    $historyUpdatedBy
+                                                );
+                                                $historyStmt->execute();
+                                                $historyStmt->close();
+                                            }
+                                            $notice .= ' Work order dibuka semula untuk tindakan susulan staff.';
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
