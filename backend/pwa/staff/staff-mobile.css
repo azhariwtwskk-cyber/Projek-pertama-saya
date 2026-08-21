@@ -1,0 +1,70 @@
+:root{
+  --cpms-primary:#6f3f2c;
+  --cpms-secondary:#d4a85f;
+  --cpms-surface:#ffffff;
+  --cpms-bg:#f4f6f8;
+  --cpms-text:#172033;
+  --cpms-muted:#667085;
+  --cpms-radius:18px;
+}
+html{background:var(--cpms-bg)}
+body{padding-bottom:env(safe-area-inset-bottom)}
+.cpms-install-app{
+  position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));
+  z-index:9999;border:0;border-radius:999px;padding:13px 18px;
+  background:var(--cpms-primary);color:#fff;font-weight:700;
+  box-shadow:0 12px 32px rgba(0,0,0,.22)
+}
+.cpms-mobile-nav{display:none}
+html[data-network="offline"] body::before{
+  content:"Offline – paparan tersimpan sahaja";
+  position:fixed;top:0;left:0;right:0;z-index:10000;
+  padding:7px 12px;text-align:center;background:#9a3412;color:#fff;
+  font:600 12px/1.2 Arial,sans-serif
+}
+@media (max-width:820px){
+  body.pms-body{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+  .pms-shell{display:block!important}
+  .pms-sidebar{display:none!important}
+  .pms-main{width:100%!important;max-width:none!important;padding:16px!important}
+  .pms-topbar{align-items:flex-start!important;gap:10px!important}
+  .pms-topbar h1{font-size:24px!important;line-height:1.2!important}
+  .pms-grid,.pms-grid-4{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+  .pms-card{border-radius:var(--cpms-radius)!important}
+  .pms-stat{min-height:112px!important;padding:18px 14px!important}
+  .pms-stat strong{font-size:30px!important}
+  .pms-table-wrap{overflow:visible!important;padding:0!important;background:transparent!important;box-shadow:none!important}
+  .pms-table{display:block!important}
+  .pms-table thead{display:none!important}
+  .pms-table tbody{display:grid!important;gap:12px!important}
+  .pms-table tr{display:block!important;background:#fff!important;border-radius:16px!important;padding:15px!important;box-shadow:0 8px 24px rgba(15,23,42,.08)!important}
+  .pms-table td{display:flex!important;justify-content:space-between!important;gap:16px!important;border:0!important;padding:7px 0!important;text-align:right!important}
+  .pms-table td::before{content:attr(data-label);font-weight:700;color:var(--cpms-muted);text-align:left}
+  .pms-table td[colspan]{display:block!important;text-align:center!important}
+  input,select,textarea,button,.pms-button,.pms-button-secondary{font-size:16px!important}
+  input,select,textarea{min-height:48px!important;border-radius:12px!important}
+  input[type="file"]{padding:12px!important;background:#fff!important}
+  .login-card{width:min(92vw,430px)!important;border-radius:22px!important}
+  .cpms-mobile-nav{
+    display:grid;grid-template-columns:repeat(4,1fr);position:fixed;
+    left:0;right:0;bottom:0;z-index:9990;
+    padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+    background:rgba(255,255,255,.96);backdrop-filter:blur(14px);
+    border-top:1px solid rgba(15,23,42,.1)
+  }
+  .cpms-mobile-nav a{
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:#667085;text-decoration:none;font:600 12px/1.2 Arial,sans-serif
+  }
+  .cpms-mobile-nav a span{font-size:22px;line-height:1}
+  .cpms-mobile-nav a.active{color:var(--cpms-primary)}
+}
+@media (max-width:430px){
+  .pms-grid,.pms-grid-4{grid-template-columns:1fr 1fr!important}
+  .pms-main{padding:12px!important}
+}
+@media (prefers-color-scheme:dark){
+  :root{--cpms-surface:#151a24;--cpms-bg:#0c111b;--cpms-text:#f8fafc;--cpms-muted:#a8b0bf}
+  body.pms-body{background:var(--cpms-bg)!important;color:var(--cpms-text)!important}
+  .pms-card,.pms-topbar,.pms-table tr,.cpms-mobile-nav{background:var(--cpms-surface)!important;color:var(--cpms-text)!important}
+}

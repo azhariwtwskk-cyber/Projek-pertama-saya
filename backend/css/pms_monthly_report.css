@@ -1,0 +1,361 @@
+/* =========================================================
+   MONTHLY MANAGEMENT REPORT
+========================================================= */
+
+.report-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.report-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+}
+
+.report-document {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 34px;
+    background: #ffffff;
+    border: 1px solid #e4ded4;
+    border-radius: 14px;
+    box-shadow: 0 12px 34px rgba(47, 28, 20, 0.09);
+}
+
+.report-cover {
+    min-height: 720px;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    text-align: center;
+    page-break-after: always;
+}
+
+.report-cover img {
+    width: 280px;
+    max-width: 70%;
+    margin-bottom: 28px;
+}
+
+.report-cover h1 {
+    margin: 0;
+    color: #4a2b20;
+    font-size: 38px;
+    line-height: 1.25;
+}
+
+.report-cover h2 {
+    margin: 14px 0 8px;
+    color: #b59b20;
+    font-size: 25px;
+}
+
+.report-cover p {
+    margin: 5px 0;
+    color: #666666;
+    font-size: 15px;
+}
+
+.report-section {
+    margin-top: 32px;
+    page-break-inside: avoid;
+}
+
+.report-section.page-break {
+    page-break-before: always;
+}
+
+.report-section h2 {
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #b59b20;
+    color: #4a2b20;
+    font-size: 23px;
+}
+
+.report-section h3 {
+    margin: 22px 0 10px;
+    color: #4a2b20;
+    font-size: 17px;
+}
+
+.report-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.report-kpi-card {
+    padding: 18px;
+    border: 1px solid #e5dfd6;
+    border-radius: 10px;
+    background: #fbfaf7;
+    text-align: center;
+}
+
+.report-kpi-card strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #b59b20;
+    font-size: 30px;
+}
+
+.report-kpi-card span {
+    color: #666666;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+}
+
+.report-table th,
+.report-table td {
+    padding: 10px 11px;
+    border: 1px solid #ded8ce;
+    text-align: left;
+    vertical-align: top;
+    font-size: 12px;
+}
+
+.report-table th {
+    background: #f3eee5;
+    color: #4a2b20;
+}
+
+.report-chart {
+    width: 100%;
+    max-height: 320px;
+    margin: 14px 0 8px;
+}
+
+.report-photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.report-photo-card {
+    overflow: hidden;
+    border: 1px solid #d8d0c4;
+    border-radius: 11px;
+    background: #ffffff;
+    box-shadow: 0 5px 16px rgba(47, 28, 20, 0.07);
+    break-inside: avoid;
+}
+
+.report-photo-card img {
+    display: block;
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+    object-position: center;
+    background: #f4f2ee;
+}
+
+.report-photo-card div {
+    padding: 12px 14px 14px;
+    border-top: 1px solid #eee8df;
+}
+
+.report-photo-card strong {
+    display: block;
+    margin-bottom: 7px;
+    color: #4a2b20;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.report-photo-card span {
+    display: block;
+    color: #5f5f5f;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.report-signature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 50px;
+    margin-top: 70px;
+}
+
+.report-signature {
+    padding-top: 50px;
+    border-top: 1px solid #555555;
+    text-align: center;
+    font-size: 12px;
+}
+
+.report-empty {
+    padding: 22px;
+    border: 1px dashed #c9c1b5;
+    border-radius: 9px;
+    color: #777777;
+    text-align: center;
+}
+
+.report-note {
+    padding: 14px 16px;
+    border-left: 4px solid #b59b20;
+    background: #fffaf0;
+    color: #5f5134;
+    line-height: 1.7;
+}
+
+@media (max-width: 800px) {
+    .report-kpi-grid,
+    .report-photo-grid,
+    .report-signature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .report-document {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 520px) {
+    .report-kpi-grid,
+    .report-photo-grid,
+    .report-signature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-photo-card img {
+        height: 340px;
+    }
+
+    .report-cover {
+        min-height: auto;
+        padding: 70px 0;
+    }
+}
+
+@media print {
+    @page {
+        size: A4;
+        margin: 14mm;
+    }
+
+    body {
+        background: #ffffff !important;
+    }
+
+    .pms-sidebar,
+    .pms-topbar,
+    .report-toolbar,
+    .no-print {
+        display: none !important;
+    }
+
+    .pms-shell,
+    .pms-main {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .report-document {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .report-section {
+        break-inside: avoid;
+    }
+
+    .report-photo-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        grid-auto-rows: 122mm;
+        gap: 6mm;
+        margin: 0;
+        align-items: stretch;
+    }
+
+    .report-photo-card {
+        height: 122mm;
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        overflow: hidden;
+        border: 0.35mm solid #cfc7bb;
+        border-radius: 2mm;
+        box-shadow: none;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    .report-photo-card:nth-child(4n) {
+        page-break-after: always;
+    }
+
+    .report-photo-card:last-child {
+        page-break-after: auto;
+    }
+
+    .report-photo-card img {
+        width: 100%;
+        height: 86mm;
+        flex: 0 0 86mm;
+        object-fit: contain;
+        object-position: center;
+        background: #ffffff;
+        border-bottom: 0.3mm solid #ded7cd;
+    }
+
+    .report-photo-card div {
+        flex: 1;
+        min-height: 0;
+        padding: 3mm 3.5mm;
+        border-top: none;
+        overflow: hidden;
+    }
+
+    .report-photo-card strong {
+        margin: 0 0 1.5mm;
+        font-size: 10pt;
+        line-height: 1.25;
+    }
+
+    .report-photo-card span {
+        font-size: 8.5pt;
+        line-height: 1.35;
+    }
+
+    .report-table {
+        break-inside: auto;
+    }
+
+    .report-table tr {
+        break-inside: avoid;
+    }
+
+    a {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+
+    /* Daily Work Photo Report: exactly 4 cards per A4 portrait page */
+    .report-section:nth-of-type(5) {
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+    }
+
+}

@@ -1,0 +1,132 @@
+/* =========================================================
+   WORK ORDER MODULE
+========================================================= */
+
+.wo-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.wo-summary-card {
+    padding: 20px;
+    border: 1px solid var(--pms-border);
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 7px 22px rgba(47, 28, 20, .07);
+}
+
+.wo-summary-card strong {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--pms-gold);
+    font-size: 30px;
+}
+
+.wo-summary-card span {
+    color: var(--pms-muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.wo-filter-grid {
+    display: grid;
+    grid-template-columns: 1.2fr repeat(3, minmax(130px, .7fr)) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.wo-reference {
+    color: var(--pms-primary);
+    font-family: Consolas, monospace;
+    font-weight: 800;
+}
+
+.wo-detail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    padding: 18px;
+    background: #fbfaf7;
+    border-radius: 10px;
+}
+
+.wo-detail-item {
+    padding: 13px;
+    background: #ffffff;
+    border: 1px solid var(--pms-border);
+    border-radius: 8px;
+}
+
+.wo-detail-item strong {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--pms-primary);
+    font-size: 12px;
+}
+
+.wo-detail-item p {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 13px;
+}
+
+.wo-full {
+    grid-column: 1 / -1;
+}
+
+.wo-update-box {
+    margin-top: 18px;
+    padding: 18px;
+    border: 1px solid #dfd0a0;
+    border-radius: 10px;
+    background: #fffaf0;
+}
+
+.wo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.wo-view-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 7px;
+    background: var(--pms-primary);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.wo-status-open { background:#fff2df;color:#a56500; }
+.wo-status-assigned { background:#eaf3fc;color:#2d75b8; }
+.wo-status-progress { background:#e9f1ff;color:#315da8; }
+.wo-status-pending { background:#fff1e7;color:#a75a15; }
+.wo-status-completed { background:#e8f7ed;color:#238b45; }
+.wo-status-verified { background:#dff4e5;color:#176b36; }
+.wo-status-cancelled { background:#f1f1f1;color:#666; }
+
+@media (max-width: 950px) {
+    .wo-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .wo-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .wo-summary-grid,
+    .wo-filter-grid,
+    .wo-detail {
+        grid-template-columns: 1fr;
+    }
+
+    .wo-full {
+        grid-column: auto;
+    }
+}

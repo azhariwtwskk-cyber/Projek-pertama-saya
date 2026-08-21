@@ -1,0 +1,72 @@
+.commercial-forgot-password {
+    margin: 0 0 18px;
+    text-align: right;
+}
+
+.commercial-forgot-password a,
+.password-recovery-actions a {
+    color: var(--login-primary, #2563eb);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.commercial-forgot-password a:hover,
+.password-recovery-actions a:hover {
+    text-decoration: underline;
+}
+
+.password-recovery-page {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, .14), transparent 34%),
+        #f4f7fb;
+}
+
+.password-recovery-card {
+    width: min(100%, 540px);
+    padding: 38px;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: 0 24px 70px rgba(15, 23, 42, .13);
+}
+
+.password-recovery-card h1 {
+    margin: 8px 0 10px;
+    color: #0f172a;
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.1;
+}
+
+.password-recovery-card > p {
+    margin: 0 0 24px;
+    color: #64748b;
+    line-height: 1.7;
+}
+
+.password-recovery-actions {
+    margin-top: 22px;
+    text-align: center;
+}
+
+.password-recovery-actions-primary a {
+    display: block;
+    padding: 14px 18px;
+    border-radius: 12px;
+    color: #ffffff;
+    background: var(--login-primary, #2563eb);
+}
+
+.password-recovery-actions-primary a:hover {
+    text-decoration: none;
+    filter: brightness(.96);
+}
+
+@media (max-width: 600px) {
+    .password-recovery-page { padding: 14px; }
+    .password-recovery-card { padding: 26px 20px; border-radius: 18px; }
+}

@@ -1,0 +1,14 @@
+CPMSPRO GENESIS GLOBAL UI v1 — FOUNDATION ONLY
+
+Purpose:
+- Adds one shared Genesis presentation layer.
+- Does NOT replace existing portal PHP files.
+- Does NOT change property_id, sessions, permissions, SQL or database structure.
+
+Upload these NEW files only:
+cpms/assets/genesis/cpms-genesis-core.css
+cpms/assets/genesis/cpms-genesis.js
+cpms/includes/genesis_ui.php
+
+Do NOT connect genesis_ui.php to every page yet.
+Next rollout should connect portal shared layouts one portal at a time after backup/testing.

@@ -1,0 +1,92 @@
+.cpms-install-app {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    z-index: 10000;
+    min-height: 46px;
+    padding: 11px 16px;
+    border: 0;
+    border-radius: 999px;
+    background: #173b73;
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .28);
+    cursor: pointer;
+    font: 700 14px/1.2 Arial, sans-serif;
+}
+
+.cpms-push-button {
+    position: fixed;
+    right: 16px;
+    bottom: 74px;
+    z-index: 9998;
+    border: 0;
+    border-radius: 999px;
+    padding: 11px 16px;
+    background: #174789;
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .22);
+}
+
+.cpms-push-button.is-active {
+    background: #087b32;
+}
+
+.cpms-push-button:disabled {
+    opacity: .6;
+}
+
+.cpms-install-app[hidden] {
+    display: none !important;
+}
+
+.cpms-network-status {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    z-index: 11000;
+    width: min(92vw, 560px);
+    padding: 11px 15px;
+    border-radius: 0 0 10px 10px;
+    color: #fff;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -110%);
+    transition: opacity .2s ease, transform .2s ease;
+    text-align: center;
+    font: 700 13px/1.4 Arial, sans-serif;
+}
+
+.cpms-network-status.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.cpms-network-status.is-offline {
+    background: #b42318;
+}
+
+.cpms-network-status.is-online {
+    background: #087b35;
+}
+
+@media (display-mode: standalone) {
+    .cpms-install-app {
+        display: none !important;
+    }
+
+    body {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+@media (max-width: 680px) {
+    input[type="file"] {
+        width: 100%;
+        min-height: 48px;
+        padding: 9px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        background: #fff;
+    }
+}

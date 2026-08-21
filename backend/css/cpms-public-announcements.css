@@ -1,0 +1,301 @@
+.public-notice-hero {
+    position: relative;
+    min-height: 360px;
+    display: grid;
+    isolation: isolate;
+    overflow: hidden;
+    color: #fff;
+    background:
+        radial-gradient(circle at 82% 18%, rgba(81, 139, 205, .48), transparent 34%),
+        linear-gradient(135deg, #071d39, var(--hub-primary));
+}
+
+.public-notice-hero > img {
+    position: absolute;
+    z-index: -3;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.public-notice-overlay {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(5, 24, 50, .97), rgba(7, 36, 72, .78)),
+        linear-gradient(0deg, rgba(4, 19, 39, .22), rgba(4, 19, 39, .22));
+}
+
+.public-notice-hero-inner {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 72px;
+}
+
+.public-access-label {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 22px;
+    padding: 7px 12px;
+    border: 1px solid rgba(255, 255, 255, .36);
+    border-radius: 999px;
+    color: #fff;
+    background: rgba(255, 255, 255, .12);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .12em;
+}
+
+.public-notice-hero h1 {
+    max-width: 800px;
+    margin: 13px 0 15px;
+    font-size: clamp(38px, 6vw, 64px);
+    line-height: 1.03;
+    letter-spacing: -.04em;
+}
+
+.public-notice-hero p {
+    max-width: 700px;
+    margin: 0;
+    color: rgba(255, 255, 255, .82);
+    font-size: clamp(15px, 2vw, 19px);
+}
+
+.public-notice-count {
+    margin-top: 25px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--hub-on-secondary);
+    background: var(--hub-secondary);
+    font-size: 13px;
+    font-weight: 900;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .18);
+}
+
+.public-notice-section {
+    min-height: 430px;
+    padding: 64px 0 80px;
+    background: var(--hub-soft);
+}
+
+.public-notice-list {
+    display: grid;
+    gap: 18px;
+}
+
+.public-notice-card {
+    padding: 28px;
+    overflow: hidden;
+    border: 1px solid var(--hub-line);
+    border-left: 5px solid var(--hub-primary);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(15, 35, 65, .07);
+}
+
+.public-notice-card.is-emergency {
+    border-color: #fecaca;
+    border-left-color: var(--hub-danger);
+    background: #fffafa;
+}
+
+.public-notice-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+}
+
+.public-notice-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.notice-type,
+.notice-priority {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .025em;
+}
+
+.notice-type {
+    color: var(--hub-on-primary);
+    background: var(--hub-primary);
+}
+
+.notice-priority {
+    color: #5f450b;
+    background: #fff2c7;
+}
+
+.is-emergency .notice-type {
+    color: #fff;
+    background: var(--hub-danger);
+}
+
+.public-notice-card time {
+    flex: 0 0 auto;
+    color: var(--hub-muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.public-notice-card h2 {
+    margin: 20px 0 10px;
+    color: var(--hub-ink);
+    font-size: clamp(21px, 3vw, 28px);
+    line-height: 1.2;
+    letter-spacing: -.02em;
+}
+
+.public-notice-message {
+    color: #334155;
+    font-size: 15px;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+}
+
+.public-notice-until {
+    margin: 18px 0 0;
+    color: var(--hub-muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.public-confirmation-note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: 24px;
+    padding: 15px 17px;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    color: #1e3a5f;
+    background: #eff6ff;
+}
+
+.public-confirmation-note p {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.public-confirmation-note a {
+    flex: 0 0 auto;
+    padding: 9px 12px;
+    border-radius: 9px;
+    color: var(--hub-on-primary);
+    background: var(--hub-primary);
+    font-size: 12px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.public-confirmation-note a:hover,
+.public-confirmation-note a:focus-visible {
+    box-shadow: 0 8px 20px rgba(15, 53, 99, .2);
+    transform: translateY(-1px);
+    outline: 2px solid var(--hub-secondary);
+    outline-offset: 2px;
+}
+
+.public-notice-empty {
+    padding: 55px 30px;
+    border: 1px solid var(--hub-line);
+    border-radius: 20px;
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(15, 35, 65, .05);
+}
+
+.public-notice-empty > span {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 17px;
+    border-radius: 50%;
+    color: #166534;
+    background: #dcfce7;
+    font-size: 25px;
+    font-weight: 900;
+}
+
+.public-notice-empty h2 {
+    margin: 0 0 7px;
+    font-size: 24px;
+}
+
+.public-notice-empty p {
+    margin: 0;
+    color: var(--hub-muted);
+}
+
+.public-back-link {
+    display: inline-flex;
+    margin-top: 28px;
+    color: var(--hub-primary);
+    font-size: 13px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.public-back-link:hover,
+.public-back-link:focus-visible {
+    text-decoration: underline;
+    outline: none;
+}
+
+@media (max-width: 760px) {
+    .public-notice-hero {
+        min-height: 320px;
+    }
+
+    .public-notice-hero-inner {
+        padding-block: 55px;
+    }
+
+    .public-notice-overlay {
+        background: rgba(5, 28, 58, .88);
+    }
+
+    .public-notice-section {
+        padding-block: 45px 60px;
+    }
+
+    .public-notice-card {
+        padding: 22px;
+    }
+
+    .public-notice-card-head,
+    .public-confirmation-note {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .public-notice-card time {
+        flex: auto;
+    }
+}
+
+@media (max-width: 540px) {
+    .public-notice-hero h1 {
+        font-size: 39px;
+    }
+
+    .public-confirmation-note a {
+        width: 100%;
+        text-align: center;
+    }
+}

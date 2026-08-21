@@ -1,0 +1,6 @@
+﻿asset_code,asset_name,asset_category,location,block_location,brand,model,serial_number,installation_date,warranty_expiry,vendor_name,vendor_phone,maintenance_frequency,last_service_date,asset_status,notes
+LP-A-001,Tiang Lampu Block A No. 1,Lamp Post,Laluan hadapan Block A,Block A,,,,,,,,Monthly,2026-07-01,Active,Lampu LED common area
+LP-A-002,Tiang Lampu Block A No. 2,Lamp Post,Laluan belakang Block A,Block A,,,,,,,,Monthly,2026-07-01,Active,Lampu LED common area
+WP-001,Pam Air Utama,Water Pump,Pump Room,,,,,,,,,Monthly,2026-07-01,Active,Duty water pump
+WP-002,Pam Air Standby,Water Pump,Pump Room,,,,,,,,,Monthly,2026-07-01,Active,Standby water pump
+WPP-001,Panel Kawalan Pam Air,Pump Control Panel,Pump Room,,,,,,,,,Monthly,2026-07-01,Active,Main water pump control panel

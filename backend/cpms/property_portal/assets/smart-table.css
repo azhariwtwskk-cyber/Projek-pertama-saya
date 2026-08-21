@@ -1,0 +1,50 @@
+
+/* CPMS V24 FOUNDATION PHASE 9 — SMART TABLE ENGINE */
+.smart-table-shell{display:grid;gap:14px}
+.smart-table-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px;border:1px solid #e7ebf1;border-radius:15px;background:#fff}
+.smart-table-toolbar-left,.smart-table-toolbar-right{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.smart-table-search{position:relative;min-width:min(320px,100%)}
+.smart-table-search input{width:100%;min-height:40px;padding:9px 13px 9px 37px;border:1px solid #dce3ec;border-radius:10px;background:#fff;color:#172033;outline:none}
+.smart-table-search input:focus{border-color:var(--property-primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--property-primary) 12%,transparent)}
+.smart-table-search::before{content:"⌕";position:absolute;left:13px;top:8px;color:#8490a3;font-size:18px}
+.smart-table-button,.smart-table-select{min-height:40px;border:1px solid #dce3ec;border-radius:10px;background:#fff;color:#475467;font:inherit;font-size:11px;font-weight:800}
+.smart-table-button{display:inline-flex;align-items:center;justify-content:center;padding:0 13px;cursor:pointer}
+.smart-table-button:hover{border-color:var(--property-primary);color:var(--property-primary)}
+.smart-table-select{padding:0 28px 0 11px}
+.smart-table-menu-wrap{position:relative}
+.smart-table-menu{position:absolute;z-index:30;right:0;top:46px;min-width:215px;display:none;padding:10px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;box-shadow:0 18px 45px rgba(15,23,42,.15)}
+.smart-table-menu.is-open{display:grid;gap:7px}
+.smart-table-menu label{display:flex;align-items:center;gap:8px;padding:7px;border-radius:8px;color:#475467;font-size:11px;cursor:pointer}
+.smart-table-menu label:hover{background:#f7f9fc}
+.smart-table-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#7b8798;font-size:11px}
+.smart-table-pagination{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.smart-page-button{min-width:34px;height:34px;border:1px solid #dfe5ed;border-radius:9px;background:#fff;color:#526075;cursor:pointer;font-size:11px;font-weight:800}
+.smart-page-button:hover,.smart-page-button.is-active{border-color:var(--property-primary);background:var(--property-primary);color:#fff}
+.smart-page-button:disabled{opacity:.4;cursor:not-allowed}
+.smart-table-empty{display:none;padding:30px;text-align:center;color:#667085}
+.smart-sortable{cursor:pointer;user-select:none}
+.smart-sortable::after{content:" ↕";color:#a6afbd;font-size:9px}
+.smart-sortable[data-sort-direction="asc"]::after{content:" ↑";color:var(--property-primary)}
+.smart-sortable[data-sort-direction="desc"]::after{content:" ↓";color:var(--property-primary)}
+.smart-table-hidden-column{display:none!important}
+.smart-table-mobile-label{display:none}
+@media(max-width:760px){
+ .smart-table-toolbar{align-items:stretch}
+ .smart-table-toolbar-left,.smart-table-toolbar-right{width:100%}
+ .smart-table-search{width:100%}
+ .smart-table-toolbar-right>*{flex:1}
+ table[data-smart-table] thead{display:none}
+ table[data-smart-table],table[data-smart-table] tbody,table[data-smart-table] tr,table[data-smart-table] td{display:block;width:100%}
+ table[data-smart-table] tr{margin:0 0 12px;padding:12px;border:1px solid #e4e9f0;border-radius:13px;background:#fff;box-shadow:0 5px 15px rgba(15,23,42,.04)}
+ table[data-smart-table] td{display:grid;grid-template-columns:minmax(105px,38%) 1fr;gap:10px;padding:8px 4px!important;border:0!important;text-align:left!important}
+ table[data-smart-table] td::before{content:attr(data-label);color:#8a96a8;font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.04em}
+ table[data-smart-table] td.table-action-cell{display:flex;justify-content:flex-end}
+ table[data-smart-table] td.table-action-cell::before{display:none}
+}
+@media print{
+ .admin-sidebar,.admin-topbar,.page-heading,.complaint-filter-panel,.simple-filter-form,.smart-table-toolbar,.smart-table-summary,.admin-footer,.sidebar-overlay{display:none!important}
+ .admin-shell,.admin-content,.panel{display:block!important;margin:0!important;padding:0!important;box-shadow:none!important;border:0!important}
+ .table-wrap{overflow:visible!important}
+ table[data-smart-table]{width:100%!important;border-collapse:collapse!important}
+ table[data-smart-table] th,table[data-smart-table] td{padding:7px!important;border:1px solid #cfd6df!important;font-size:9px!important}
+}

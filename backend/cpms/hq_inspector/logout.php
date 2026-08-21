@@ -1,0 +1,1 @@
+<?php declare(strict_types=1);require_once __DIR__.'/bootstrap.php';unset($_SESSION['hq_inspector_id'],$_SESSION['hqi_csrf'],$_SESSION['hq_inspector_last_activity']);session_regenerate_id(true);hqiRedirect('login.php');

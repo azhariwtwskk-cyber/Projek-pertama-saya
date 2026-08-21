@@ -1,0 +1,41 @@
+CPMS v3.2.7.4 — BEFORE PHOTO ISSUE LIST
+========================================
+
+TUJUAN
+------
+Menambah butang senarai kerosakan / masalah pada setiap gambar Before dalam
+HQ Inspection Report.
+
+PENAMBAHBAIKAN
+---------------
+- Butang ISSUE FOUND / MASALAH DIKESAN di bawah setiap gambar Before.
+- Butang memaparkan nama finding yang dipilih oleh Inspector.
+- Klik butang untuk melihat:
+  * Finding / masalah
+  * Category
+  * Severity
+  * Location
+  * Remarks
+  * Recommendation
+- Maklumat menggunakan rekod Finding Master sedia ada.
+- Dalam Print / Save as PDF, senarai masalah dibuka secara automatik dan butang
+  tidak dicetak.
+- Saiz gambar seragam daripada v3.2.7.3 dikekalkan.
+
+FAIL YANG DIKEMAS KINI
+----------------------
+cpms/hq_inspector/inspection_report.php
+
+CARA UPLOAD DI CPANEL
+---------------------
+1. Buka cPanel > File Manager.
+2. Masuk ke folder public_html yang mengandungi sistem CPMS sedia ada.
+3. Upload CPMS_v3.2.7.4_CPanel_Before_Issue_List.zip.
+4. Extract di folder public_html yang sama.
+5. Pilih Overwrite / Replace apabila diminta.
+6. Tiada migration perlu dijalankan.
+7. Padam fail ZIP daripada server selepas extract selesai.
+8. Buka semula HQ Inspection Report dan tekan Ctrl+F5.
+9. Klik ISSUE FOUND / MASALAH DIKESAN untuk menguji senarai.
+10. Uji Print / Save as PDF dengan kertas A4.
+

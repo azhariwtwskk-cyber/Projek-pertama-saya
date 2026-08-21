@@ -1,0 +1,136 @@
+.resident-registration-queue {
+    margin-bottom: 18px;
+    padding: 20px;
+    border: 1px solid #efd28a;
+    border-left: 5px solid #d39b18;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #fffef9, #fff9e8);
+}
+
+.resident-registration-queue-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 14px;
+}
+
+.resident-registration-queue-head h2 {
+    margin: 4px 0;
+}
+
+.resident-registration-queue-head p {
+    margin: 0;
+    color: #64748b;
+}
+
+.resident-registration-queue-head > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 13px;
+    border-radius: 10px;
+    color: #65480a;
+    background: #ffefbc;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.resident-registration-queue-head > a strong {
+    display: grid;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 7px;
+    place-items: center;
+    border-radius: 999px;
+    color: #fff;
+    background: #a86f05;
+    font-size: 14px;
+}
+
+.resident-registration-queue-list {
+    display: grid;
+    gap: 8px;
+}
+
+.resident-registration-queue-list article {
+    display: grid;
+    grid-template-columns: minmax(180px, 1.4fr) 130px 100px 130px auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 13px;
+    border: 1px solid #eadfbf;
+    border-radius: 11px;
+    background: #fff;
+}
+
+.resident-registration-queue-list article div {
+    display: grid;
+    gap: 3px;
+}
+
+.resident-registration-queue-list small {
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: .05em;
+}
+
+.resident-registration-queue-list span,
+.resident-registration-queue-list time {
+    color: #475569;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.resident-registration-queue-list article > a {
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #fff;
+    background: var(--property-primary, #174e84);
+    text-align: center;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.resident-registration-queue-empty {
+    padding: 18px;
+    border-radius: 10px;
+    color: #166534;
+    background: #f0fdf4;
+    text-align: center;
+    font-weight: 750;
+}
+
+@media (max-width: 900px) {
+    .resident-registration-queue-list article {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .resident-registration-queue-list article > a {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 620px) {
+    .resident-registration-queue-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .resident-registration-queue-head > a {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .resident-registration-queue-list article {
+        grid-template-columns: 1fr;
+    }
+
+    .resident-registration-queue-list article > a {
+        grid-column: auto;
+    }
+}

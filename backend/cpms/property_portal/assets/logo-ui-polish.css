@@ -1,0 +1,150 @@
+/* CPMS V24 FOUNDATION PHASE 10.1
+   LOGO & BRANDING UI POLISH
+*/
+
+/* Sidebar brand area */
+.sidebar-brand {
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-brand-logo,
+.sidebar-logo,
+.admin-sidebar .brand-logo {
+    width: 72px !important;
+    height: 56px !important;
+    min-width: 72px !important;
+    flex: 0 0 72px !important;
+    display: grid !important;
+    place-items: center !important;
+    overflow: hidden !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(255,255,255,.14) !important;
+    box-shadow: 0 8px 22px rgba(15,23,42,.16) !important;
+    padding: 5px !important;
+}
+
+.sidebar-brand-logo img,
+.sidebar-logo img,
+.admin-sidebar .brand-logo img,
+.sidebar-brand img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    border-radius: 7px !important;
+    background: #ffffff !important;
+    padding: 0 !important;
+}
+
+.sidebar-brand-copy,
+.sidebar-brand-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.sidebar-brand-copy strong,
+.sidebar-brand-text strong,
+.sidebar-brand-title {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-brand-copy span,
+.sidebar-brand-text span,
+.sidebar-brand-subtitle {
+    display: block;
+    margin-top: 4px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Branding settings preview */
+.branding-upload-preview {
+    width: 110px !important;
+    min-width: 110px !important;
+    height: 82px !important;
+    padding: 7px !important;
+    background: #ffffff !important;
+}
+
+.branding-upload-preview img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    background: #ffffff !important;
+    border-radius: 7px !important;
+}
+
+/* Commercial login logo */
+.commercial-brand-logo {
+    width: 84px !important;
+    height: 62px !important;
+    flex-basis: 84px !important;
+    border-radius: 14px !important;
+    padding: 6px !important;
+}
+
+.commercial-brand-logo img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    border-radius: 8px !important;
+}
+
+.mobile-login-brand .commercial-brand-logo {
+    width: 72px !important;
+    height: 54px !important;
+    flex-basis: 72px !important;
+}
+
+/* Keep logos readable against dark sidebar */
+.admin-sidebar .sidebar-brand {
+    min-height: 92px;
+}
+
+/* Mobile */
+@media (max-width: 760px) {
+    .sidebar-brand-logo,
+    .sidebar-logo,
+    .admin-sidebar .brand-logo {
+        width: 64px !important;
+        height: 50px !important;
+        min-width: 64px !important;
+        flex-basis: 64px !important;
+    }
+
+    .branding-upload-preview {
+        width: 100% !important;
+        height: 150px !important;
+    }
+}
+
+/* Phase 10.2 image fallback */
+.branding-image-missing{
+    display:grid!important;
+    place-items:center!important;
+    background:#fff!important;
+}
+.branding-fallback-mark{
+    display:grid;
+    place-items:center;
+    width:100%;
+    height:100%;
+    color:#64748b;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.08em;
+}

@@ -1,0 +1,25 @@
+{
+  "version": "24.0.5-foundation.5",
+  "release_name": "CPMS V24 Foundation Phase 5",
+  "phase": "Administration Suite",
+  "database_contract": "foundation-v2",
+  "protected_portals": [
+    "System Owner",
+    "Property Administrator",
+    "Manager",
+    "Clerk"
+  ],
+  "role_matrix": {
+    "property_admin": "Full property operational access",
+    "manager": "Operations, work orders and reports",
+    "clerk": "Complaints and resident administration"
+  },
+  "legacy_portals_modified": false,
+  "administration_features": [
+    "Create Property Administrator, Manager and Clerk accounts",
+    "Property-scoped account listing",
+    "Account status management",
+    "Secure password reset",
+    "Role-aware navigation"
+  ]
+}

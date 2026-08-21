@@ -1,0 +1,16 @@
+/* CPMS Genesis UI Final — smooth interaction layer. Frontend only. */
+html{scroll-behavior:smooth}body{opacity:.985;transition:opacity .16s ease;background:#FAFAFA}.genesis-ready{opacity:1}
+.admin-main,.admin-content{min-width:0}.admin-content{animation:genesisPageIn .22s ease both}
+@keyframes genesisPageIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.sidebar-link,a.btn,button,input,select,textarea,.card,.kpi,.ai-card,.genesis-action-card{transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease,transform .18s ease,opacity .18s ease}
+.sidebar-link:hover{transform:translateX(2px)}a.btn:hover,button:not(.sidebar-toggle):hover{transform:translateY(-1px)}a.btn:active,button:not(.sidebar-toggle):active{transform:translateY(0)}
+.card:hover,.kpi:hover,.ai-card:hover,.genesis-action-card:hover{border-color:#DDDDE5;box-shadow:0 8px 30px rgba(0,0,0,.055)}
+.genesis-reveal{opacity:0;transform:translateY(5px)}.genesis-ready .genesis-reveal{opacity:1;transform:none;transition-delay:var(--reveal-delay,0ms)}
+.admin-topbar{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}.topbar-search{position:relative}.topbar-search:after{content:'Ctrl K';font-size:9px;color:#9C9C9C;border:1px solid #E8E8EC;border-radius:4px;padding:2px 5px;white-space:nowrap}.topbar-search:focus-within{border-color:#6366F1;box-shadow:0 0 0 3px rgba(99,102,241,.12);background:#fff}
+input:focus,select:focus,textarea:focus{outline:none!important;border-color:#6366F1!important;box-shadow:0 0 0 3px rgba(99,102,241,.12)!important}
+tbody tr{transition:background-color .15s ease}.table-wrap,.genesis-data-table{scrollbar-width:thin;scrollbar-color:#D4D4D8 transparent}
+.status,.badge,.chip{white-space:nowrap}.page-heading{letter-spacing:-.035em}.page-intro{max-width:820px}
+img{max-width:100%}.photo-cell img{transition:transform .2s ease}.photo-cell:hover img{transform:scale(1.008)}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}.genesis-reveal{opacity:1;transform:none}}
+@media(max-width:820px){body:has(.admin-sidebar.open){overflow:hidden}.admin-sidebar{box-shadow:16px 0 40px rgba(0,0,0,.14)}.admin-topbar{height:58px;min-height:58px}.admin-content{padding:14px 12px 24px}.topbar-search:after{display:none}.card,.form-card,.ai-card{border-radius:10px!important}}
+@media(max-width:560px){.topbar-actions{gap:6px}.topbar-user-chip>span{width:28px;height:28px}.page-heading{font-size:25px!important}.grid{grid-template-columns:1fr!important}.kpis{grid-template-columns:1fr 1fr!important}.btn,a.btn,button{min-height:40px}.inspection-steps{overflow-x:auto;grid-template-columns:repeat(4,minmax(130px,1fr))!important;padding-bottom:3px}.genesis-data-table,.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}}

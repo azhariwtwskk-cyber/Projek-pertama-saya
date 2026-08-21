@@ -1,0 +1,36 @@
+.foundation-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 18px;
+}
+.foundation-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+.foundation-item small {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+}
+.foundation-pass,
+.foundation-fail {
+    display: inline-flex;
+    justify-content: center;
+    min-width: 58px;
+    padding: 6px 8px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 900;
+}
+.foundation-pass {
+    color: #166534;
+    background: #dcfce7;
+}
+.foundation-fail {
+    color: #991b1b;
+    background: #fee2e2;
+}

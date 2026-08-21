@@ -1,0 +1,12 @@
+<?php
+declare(strict_types=1); session_start(); require_once 'db.php';
+if(!isset($_SESSION['admin'])){header('Location: admin_login.php');exit;}
+function e(?string $v):string{return htmlspecialchars($v??'',ENT_QUOTES,'UTF-8');}
+$conn->query("UPDATE assets SET public_token=LOWER(HEX(RANDOM_BYTES(24))) WHERE public_token IS NULL OR public_token=''");
+$assets=[];$r=$conn->query("SELECT id,asset_code,public_token,asset_name,location FROM assets WHERE asset_status<>'Disposed' ORDER BY asset_name");if($r){while($x=$r->fetch_assoc())$assets[]=$x;}$conn->close();
+$base='https://v23complaintform.page.gd/staff_asset_inspection.php?token=';
+?>
+<!doctype html><html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Asset QR Codes</title><link rel="stylesheet" href="css/pms.css?v=8"><link rel="stylesheet" href="css/pms_asset_qr.css?v=1"></head><body class="pms-body"><div class="pms-shell"><aside class="pms-sidebar"><div class="pms-brand"><img src="images/logo.png?v=4" alt="V23"><div><strong>V23 Malawa Ria</strong><span>Property Management System</span></div></div><nav class="pms-nav"><a href="admin_dashboard.php">Dashboard</a><a href="admin_assets.php">Asset Management</a><a class="active" href="admin_asset_qr.php">Asset QR Codes</a><a href="admin_asset_inspections.php">Asset Inspections</a></nav><div class="pms-sidebar-footer"><a href="admin_logout.php">Logout Admin</a></div></aside><main class="pms-main"><header class="pms-topbar"><div><h1>Asset QR Codes</h1><p>Cetak dan tampal QR Code pada aset.</p></div><button class="pms-button no-print" onclick="window.print()">Cetak Semua QR</button></header><section class="asset-qr-grid">
+<?php foreach($assets as $a): $url=$base.rawurlencode((string)$a['public_token']); $id='qr-'.(int)$a['id']; ?>
+<article class="asset-qr-card"><div id="<?=e($id)?>" class="asset-qr-box"></div><h3><?=e((string)$a['asset_name'])?></h3><p><?=e((string)$a['location'])?></p><div class="asset-qr-code"><?=e((string)$a['asset_code'])?></div><p>Scan untuk pemeriksaan aset</p></article>
+<?php endforeach; ?></section></main></div><script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script><script>const items=<?=json_encode(array_map(fn($a)=>['id'=>'qr-'.(int)$a['id'],'url'=>$base.rawurlencode((string)$a['public_token'])],$assets),JSON_UNESCAPED_SLASHES)?>;for(const i of items){new QRCode(document.getElementById(i.id),{text:i.url,width:168,height:168,correctLevel:QRCode.CorrectLevel.H});}</script></body></html>

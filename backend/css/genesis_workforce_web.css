@@ -1,0 +1,44 @@
+/* CPMSPro Genesis Rollout 3.1 — Actual Staff & Security Web Portal
+   Presentation only. Existing PHP, property_id, session, permission and API logic remain unchanged. */
+:root{
+ --gen-primary:#6366F1;--gen-primary-hover:#4F46E5;--gen-bg:#F7F8FB;
+ --gen-surface:#fff;--gen-text:#0A0A0A;--gen-text2:#6B6B6B;
+ --gen-border:#E8E8EC;--gen-success:#10B981;--gen-warning:#F59E0B;--gen-error:#EF4444;
+ --gen-motion:180ms ease;
+}
+html{background:var(--gen-bg)}
+body{background:var(--gen-bg)!important;color:var(--gen-text)!important}
+.sidebar,.staff-sidebar,.security-sidebar{background:#111827!important;border-right:1px solid #20293A!important;box-shadow:none!important}
+.sidebar a,.staff-sidebar a,.security-sidebar a,.nav-link{border-radius:7px!important;transition:background var(--gen-motion),color var(--gen-motion),transform var(--gen-motion)!important}
+.sidebar a:hover,.staff-sidebar a:hover,.security-sidebar a:hover,.nav-link:hover{transform:translateX(1px)}
+.sidebar a.active,.staff-sidebar a.active,.security-sidebar a.active,.nav-link.active{background:var(--gen-primary)!important;color:#fff!important}
+.topbar,.header,.page-header,.staff-header,.security-header{background:rgba(255,255,255,.94)!important;backdrop-filter:blur(14px);border-bottom:1px solid var(--gen-border)!important;box-shadow:none!important}
+.card,.panel,.summary-card,.stat-card,.task-card,.work-card,.action-card,.patrol-card,.visitor-card,.notice,.alert{
+ background:var(--gen-surface)!important;border:1px solid var(--gen-border)!important;border-radius:12px!important;
+ box-shadow:none!important;transition:transform var(--gen-motion),box-shadow var(--gen-motion),border-color var(--gen-motion)!important
+}
+.card:hover,.task-card:hover,.work-card:hover,.action-card:hover,.patrol-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.05)!important}
+button,.btn,.button,a.btn,input[type=submit],input[type=button]{
+ border-radius:7px!important;min-height:40px;transition:transform var(--gen-motion),box-shadow var(--gen-motion),background var(--gen-motion)!important
+}
+button:hover,.btn:hover,.button:hover,a.btn:hover{transform:translateY(-1px)}
+.btn-primary,.primary-btn,button.primary{background:var(--gen-primary)!important;border-color:var(--gen-primary)!important;color:#fff!important}
+.btn-primary:hover,.primary-btn:hover,button.primary:hover{background:var(--gen-primary-hover)!important}
+input:not([type=checkbox]):not([type=radio]),select,textarea{
+ border:1px solid var(--gen-border)!important;border-radius:7px!important;background:#fff!important;min-height:42px
+}
+textarea{min-height:96px}
+input:focus,select:focus,textarea:focus{outline:none!important;border-color:var(--gen-primary)!important;box-shadow:0 0 0 3px rgba(99,102,241,.12)!important}
+table{border-collapse:separate!important;border-spacing:0!important}
+table th{background:#FAFAFA!important;color:var(--gen-text2)!important;font-size:11px!important;font-weight:600!important}
+table td{border-color:#F0F0F2!important}
+.badge,.status,.status-badge,.chip,.pill{border-radius:9999px!important}
+img{max-width:100%}.photo-grid img,.evidence img,.preview-image{border-radius:8px!important;border:1px solid var(--gen-border)!important;object-fit:cover}
+@media(max-width:760px){
+ body{padding-bottom:max(18px,env(safe-area-inset-bottom))!important}
+ .main,.content,.main-content,.page-content{padding-left:14px!important;padding-right:14px!important}
+ .card,.panel,.summary-card,.stat-card,.task-card,.work-card,.action-card,.patrol-card,.visitor-card{border-radius:10px!important}
+ button,.btn,.button,a.btn,input[type=submit],input[type=button]{min-height:46px}
+ input:not([type=checkbox]):not([type=radio]),select{min-height:46px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
