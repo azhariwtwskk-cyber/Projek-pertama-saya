@@ -2,6 +2,48 @@
 declare(strict_types=1);
 
 /**
+ * Production hotfix (real-device forensic-trace follow-up): a live cPanel
+ * deployment logged "Call to undefined function cpmsApiColumnExists()"
+ * from cpmsApiTaskRows() below. bootstrap.php DOES define cpmsApiColumnExists()/
+ * cpmsApiTableExists() (see cpms/api/v1/bootstrap.php) and every endpoint
+ * that calls into this file reaches it only via bootstrap.php's own
+ * `require_once __DIR__ . '/services.php'`, so in a fully up-to-date
+ * deployment both would already be defined before this file ever runs.
+ * The fatal error means the live bootstrap.php on that server is an
+ * older copy that predates those two helpers — confirmed by searching
+ * the whole repo for any equivalent under another name: every other
+ * legacy page (staff_work_submit.php's staffWorkColumnExists(),
+ * staff_work_history.php's staffHistoryColumnExists(),
+ * daily_work_review.php's dailyWorkColumnExists(), admin_daily_work.php's
+ * adminDailyWorkColumnExists()) already independently defines its own
+ * private copy for exactly this reason — this codebase's own established
+ * pattern is "don't assume a shared helper is loaded; guard it" (see
+ * cpmsApiBrandingAssetUrl()'s own doc comment below). Rather than require
+ * re-deploying bootstrap.php (an unrelated, unverified production file
+ * this pass was never asked to touch), guarantee both helpers exist here
+ * too, guarded so they never conflict with bootstrap.php's own versions
+ * when it does have them.
+ */
+if (!function_exists('cpmsApiTableExists')) {
+    function cpmsApiTableExists(mysqli $db, string $table): bool
+    {
+        $safe = $db->real_escape_string($table);
+        $result = $db->query("SHOW TABLES LIKE '{$safe}'");
+        return $result instanceof mysqli_result && $result->num_rows > 0;
+    }
+}
+
+if (!function_exists('cpmsApiColumnExists')) {
+    function cpmsApiColumnExists(mysqli $db, string $table, string $column): bool
+    {
+        $safeTable = $db->real_escape_string($table);
+        $safeColumn = $db->real_escape_string($column);
+        $result = $db->query("SHOW COLUMNS FROM `{$safeTable}` LIKE '{$safeColumn}'");
+        return $result instanceof mysqli_result && $result->num_rows > 0;
+    }
+}
+
+/**
  * Turns a cpms_properties.logo_path value (stored relative, e.g.
  * "images/logo.png" or "uploads/branding/xyz.png") into a root-relative
  * URL the mobile app can load directly, using the same "/cpms/<path>"
