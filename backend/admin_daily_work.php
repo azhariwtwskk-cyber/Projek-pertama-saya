@@ -32,6 +32,49 @@ function badgeClass(string $status): string
     };
 }
 
+function adminDailyWorkColumnExists(mysqli $conn, string $table, string $column): bool
+{
+    $escaped = $conn->real_escape_string($column);
+    $result = $conn->query("SHOW COLUMNS FROM `{$table}` LIKE '{$escaped}'");
+    return $result instanceof mysqli_result && $result->num_rows > 0;
+}
+
+/**
+ * Same candidate-list resolution as cpms/property_portal/
+ * daily_work_review.php's dailyWorkImageUrl() and staff_work_history.php's
+ * staffHistoryImageUrl() — this page previously used a naive, unqualified
+ * "uploads/daily_work/<basename>" href with no image_path check and no
+ * property subfolder, which 404s for any evidence submitted through the
+ * legacy Staff Web Portal (uploads/daily_work/property_<id>/...). Kept as
+ * a local function (matching this codebase's existing per-legacy-page
+ * pattern) rather than a shared include, since this file has no
+ * require_once chain to cpms/api/v1/services.php.
+ */
+function adminDailyWorkImageUrl(array $image, int $propertyId): string
+{
+    $path = trim((string) ($image["image_path"] ?? ""));
+    $name = basename((string) ($image["image_name"] ?? ""));
+    if ($path === "" && $name === "") {
+        return "";
+    }
+    $candidates = [];
+    if ($path !== "") {
+        $candidates[] = ltrim($path, "/");
+    }
+    if ($name !== "") {
+        $candidates[] = "uploads/daily_work/property_" . $propertyId . "/" . $name;
+        $candidates[] = "uploads/daily_work/" . $name;
+        $candidates[] = "cpms/uploads/daily_work/property_" . $propertyId . "/" . $name;
+        $candidates[] = "cpms/uploads/daily_work/" . $name;
+    }
+    foreach ($candidates as $candidate) {
+        if (is_file(__DIR__ . "/" . rawurldecode($candidate))) {
+            return implode("/", array_map("rawurlencode", explode("/", $candidate)));
+        }
+    }
+    return (string) ($candidates[0] ?? "");
+}
+
 if (
     !isset($_SESSION["admin_daily_csrf"]) ||
     !is_string($_SESSION["admin_daily_csrf"])
@@ -388,11 +431,14 @@ if (count($records) > 0) {
     $idTypes =
         str_repeat("i", count($ids));
 
+    $hasAdminImagePath = adminDailyWorkColumnExists($conn, "daily_work_images", "image_path");
+    $adminImagePathSelect = $hasAdminImagePath ? "image_path," : "'' AS image_path,";
     $imageStmt = $conn->prepare(
         "
         SELECT
             daily_work_id,
             image_name,
+            {$adminImagePathSelect}
             image_type
         FROM daily_work_images
         WHERE daily_work_id IN ({$placeholders})
@@ -916,32 +962,21 @@ $conn->close();
                                             $images as $image
                                         ): ?>
 
+                                            <?php
+                                            $adminImageUrl = adminDailyWorkImageUrl(
+                                                $image,
+                                                (int) ($record["property_id"] ?? 0)
+                                            );
+                                            ?>
+
                                             <a
-                                                href="uploads/daily_work/<?php
-                                                    echo rawurlencode(
-                                                        basename(
-                                                            (string)
-                                                            $image[
-                                                                "image_name"
-                                                            ]
-                                                        )
-                                                    );
-                                                ?>"
+                                                href="<?php echo e($adminImageUrl); ?>"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 class="daily-work-image-card"
                                             >
                                                 <img
-                                                    src="uploads/daily_work/<?php
-                                                        echo rawurlencode(
-                                                            basename(
-                                                                (string)
-                                                                $image[
-                                                                    "image_name"
-                                                                ]
-                                                            )
-                                                        );
-                                                    ?>"
+                                                    src="<?php echo e($adminImageUrl); ?>"
                                                     alt="<?php
                                                         echo e(
                                                             (string)
