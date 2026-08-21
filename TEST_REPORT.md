@@ -216,3 +216,88 @@ AUDIT_REPORT.md L-2), nothing newly broken.
 | `flutter test` | ✅ PASS (29/29 — 21 pre-existing + 8 new) |
 | `flutter build apk --release` | ⛔ Not run — Android SDK unavailable in this sandbox |
 | `php -l` (5 modified files + full `backend/` tree) | ✅ all modified files clean; same 1 pre-existing, unrelated failure as before, nothing newly broken |
+
+---
+
+# Production verification, hotfix, and cleanup pass — Test Report
+
+## 1. Real-device production verification
+
+After deploying the six PHP files from the forensic-trace pass (`services.php`,
+`staff/work-history.php`, `staff/daily-work/list.php`, `staff/daily-work/submit.php`,
+`property_portal/daily_work_review.php`, `admin_daily_work.php`), the live server logged a fatal:
+`Call to undefined function cpmsApiColumnExists()`. Root-caused and fixed with a
+`function_exists()`-guarded fallback added to `services.php` only (see AUDIT_REPORT.md §7.4).
+
+**After deploying that one-file hotfix, real-device production testing PASSED:**
+- Work Order History loads correctly.
+- Before/During/After images are visible for both the legacy Staff Web Portal and mobile API
+  upload layouts.
+- The `cpmsApiColumnExists()` fatal is gone.
+- No APK rebuild was required for this fix — it was a backend-only defect and backend-only hotfix.
+
+## 2. Cleanup pass — instrumentation removal
+
+With production verification passed, all temporary forensic/debug instrumentation added during
+the trace pass was removed (see AUDIT_REPORT.md §7.6 for the itemized list). Re-ran every check
+afterward to confirm the cleanup introduced no regression:
+
+### `flutter pub get`
+```
+Got dependencies!
+```
+**PASS.**
+
+### `flutter analyze`
+```
+Analyzing mobile...
+No issues found! (ran in 11.6s)
+```
+**PASS — 0 issues.**
+
+### `flutter test`
+```
+00:03 +28: .../test/empty_active_tasks_test.dart: AppStateView.noActiveTasks points to Work Order History and its button navigates there
+00:03 +29: All tests passed!
+```
+**PASS — 29/29**, unchanged from before cleanup (no test relied on the removed debug output).
+
+### `php -l` on every modified file
+```
+=== cpms/api/v1/services.php ===                    No syntax errors detected
+=== cpms/api/v1/staff/work-history.php ===           No syntax errors detected
+=== cpms/api/v1/staff/daily-work/submit.php ===      No syntax errors detected
+=== cpms/api/v1/image_url_resolver_test.php ===      No syntax errors detected
+```
+**PASS.** Full `backend/` tree re-scan: same single pre-existing, unrelated
+`property_portal_v4_check.php` failure as every prior pass — nothing newly broken by the cleanup.
+
+### Image URL resolver test (`php cpms/api/v1/image_url_resolver_test.php`)
+```
+== cpmsApiDailyWorkImageUrl() / cpmsApiResolveUploadedImageUrl() ==
+  PASS: mobile upload path (flat, cpms/uploads/daily_work/, no image_path) resolves correctly
+  PASS: legacy Staff Web Portal upload path (property subfolder + image_path) resolves correctly
+  PASS: legacy-layout file with NO image_path value is still found via fallback candidate
+  PASS: Before and After images (different physical layouts) both resolve, independently
+  PASS: a missing/never-uploaded image still returns a best-effort URL string, never throws or returns null
+  PASS: a row with no image_name and no image_path resolves to empty string
+
+== cpmsApiWorkOrderImageUrl() ==
+  PASS: work_order_images (task-photo.php uploads) resolve correctly via the same canonical resolver
+
+0 failed, 7 passed.
+```
+**PASS — 7/7**, re-run after the cleanup (this test file itself only received a documentation
+update clarifying it must not be deployed to production — no logic changed).
+
+## Summary (cleanup pass)
+
+| Check | Result |
+|---|---|
+| Real-device production verification | ✅ PASSED (Work History + Before/After images + no fatal) |
+| `flutter pub get` | ✅ PASS |
+| `flutter analyze` | ✅ PASS (0 issues) |
+| `flutter test` | ✅ PASS (29/29) |
+| `php -l` (all modified files + full `backend/` tree) | ✅ clean; same 1 pre-existing, unrelated failure, nothing newly broken |
+| `image_url_resolver_test.php` | ✅ PASS (7/7) |
+| APK rebuild needed for this pass | ❌ No — cleanup was backend-only except reverting one Flutter file to its prior, already-shipped behavior |

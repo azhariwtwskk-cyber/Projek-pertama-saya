@@ -446,3 +446,59 @@ order with a linked `daily_work_logs` row and `daily_work_images` rows produces 
 `pending_verification`, `Verified`, and `Rejected` (with `rejection_reason` populated) shapes — see
 `TEST_REPORT.md` for the full run. This does not replace a real-device retest, which is still the
 authoritative check (noted in §5).
+
+### 7.4 Production fatal after deploying the §7.1/§7.2 fix — `cpmsApiColumnExists()` undefined
+
+Deploying the six PHP files for §7.1/§7.2 to the live cPanel server produced a fatal: `Call to
+undefined function cpmsApiColumnExists()`. Root cause: this helper (and its sibling
+`cpmsApiTableExists()`) is defined only in `cpms/api/v1/bootstrap.php` — a file that was never
+part of any deployment manifest given for this fix, on the assumption the live server's copy
+already had it. It didn't; the live `bootstrap.php` predates both helpers. Searched the whole
+repo for an equivalent under another name before adding anything: every other legacy page already
+carries its own private column-exists helper for exactly this reason (`staff_work_submit.php`'s
+`staffWorkColumnExists()`, `staff_work_history.php`'s `staffHistoryColumnExists()`,
+`daily_work_review.php`'s `dailyWorkColumnExists()`, `admin_daily_work.php`'s own
+`adminDailyWorkColumnExists()`) — there is no shared one already reachable from `cpms/api/v1/*`.
+**Fix:** `cpmsApiTableExists()`/`cpmsApiColumnExists()` are now also defined in `services.php`,
+each guarded by `function_exists()` so they never collide with `bootstrap.php`'s own versions when
+it does have them — matching its exact signature/behavior. `services.php` is required by every
+endpoint in this fix via `bootstrap.php`'s own require chain, so this closes the gap everywhere
+it's called from without needing to redeploy `bootstrap.php` itself.
+
+### 7.5 Real-device production verification — PASSED
+
+After deploying the hotfix in §7.4 (`services.php` only, no APK rebuild), the real Android device
+test was re-run and **passed**: Work Order History loads, Before/During/After images render
+correctly for both the legacy Staff Web Portal's property-subfolder layout and this mobile app's
+own flat layout, and the `cpmsApiColumnExists()` fatal is gone. Both original real-device issues
+(§7.1 images, §7.2 disappearing tasks) are now confirmed fixed in production, not just in this
+sandbox.
+
+### 7.6 Cleanup pass — forensic/debug instrumentation removed
+
+§7.1's forensic-trace pass deliberately added temporary `error_log()`/`debugPrint()`
+instrumentation to get a ground-truth answer without guessing further (see §7.4's discovery for
+why that was the right call). With production verification passed, that instrumentation has now
+been removed — it served its purpose and had no reason to stay:
+
+- `staff/work-history.php`: removed the `HANDLER_VERSION` marker + column-existence log, the
+  per-image resolution trace (`daily_work_images` and `work_order_images` loops), the "zero rows
+  linked"/"zero images found" diagnostic lines, and the aggregate per-order summary log. The file
+  is now identical to its state right after the original §7.1 fix, functionally.
+- `staff/daily-work/submit.php`: removed the temporary `error_log()` counting
+  `daily_work_id`/`work_order_id`/`work_status`/images stored on submit.
+- `mobile/lib/features/work_history/data/api_work_history_repository.dart`: reverted to its
+  pre-forensic-pass state — no `debugPrint()` calls; a malformed work-order row is once again
+  silently skipped rather than logged (matching this codebase's existing "one bad row must never
+  take down the whole screen" pattern from before this investigation).
+
+**Confirmed still present after cleanup** (the real fixes, none of which were touched):
+`cpmsApiResolveUploadedImageUrl()`, `cpmsApiDailyWorkImageUrl()`, `cpmsApiWorkOrderImageUrl()`,
+the `function_exists()`-guarded `cpmsApiTableExists()`/`cpmsApiColumnExists()` fallbacks,
+`image_path` support (read and write) on both legacy and mobile upload layouts, Work Order History
+evidence merging, `workHistoryProvider`/`dashboardDataProvider` invalidation after a successful
+submit, the empty-active-tasks CTA into Work Order History, the rejected-work-order reopen/sync,
+the "Rejected – Action Required" banner, the labelled History navigation button, and the Admin
+Daily Work image-resolver fix. `backend/cpms/api/v1/image_url_resolver_test.php` is kept in the
+repo (CI/local verification only, explicitly documented in its own header as **not** for
+production deployment) and still passes 7/7 assertions.

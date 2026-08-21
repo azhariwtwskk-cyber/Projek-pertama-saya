@@ -2,20 +2,30 @@
 declare(strict_types=1);
 
 /*
- * Standalone CLI test for the canonical evidence-image URL resolver
- * (cpmsApiResolveUploadedImageUrl / cpmsApiDailyWorkImageCandidates /
- * cpmsApiWorkOrderImageUrl in services.php) — the fix for the real-device
- * "Before/After images not showing in Work Order History" bug.
+ * DEVELOPMENT / CI TEST ONLY — DO NOT DEPLOY TO PRODUCTION CPANEL.
  *
- * No database connection required: builds a throwaway fake site root
- * under the system temp directory, writes zero-byte files at the exact
- * relative paths the two real upload code paths (legacy Staff Web Portal
- * vs this mobile app's own endpoint) are confirmed to use, then asserts
- * the resolver finds the right one and produces a working root-relative
- * URL for each. Run with: php cpms/api/v1/image_url_resolver_test.php
+ * This is a standalone CLI self-test for the canonical evidence-image URL
+ * resolver (cpmsApiResolveUploadedImageUrl / cpmsApiDailyWorkImageCandidates
+ * / cpmsApiWorkOrderImageUrl in services.php) — the fix for the real-device
+ * "Before/After images not showing in Work Order History" bug. It is not
+ * an API endpoint, has no route in the mobile app or web portal, and is
+ * never called by production code. Keep it in the repo for local/CI
+ * verification only; it does not belong on the live cPanel server and is
+ * not part of any deployment manifest for this fix.
  *
- * This does NOT touch any real uploads directory — everything happens
- * inside a fresh sys_get_temp_dir() subfolder that is deleted afterward.
+ * No database connection required. It writes small test files directly
+ * under this repo's real `backend/` directory (both the legacy Staff Web
+ * Portal's property-subfolder layout and this mobile app's own flat
+ * layout — the same structure production actually has, using an
+ * implausible fake property id so it never collides with real data),
+ * asserts the resolver finds the right file for each layout, and deletes
+ * every file/directory it created before exiting. Run with:
+ *   php cpms/api/v1/image_url_resolver_test.php
+ * If this script is ever present on a live server, running it will create
+ * and remove a handful of harmless throwaway files under your real
+ * uploads/ and cpms/uploads/ directories — it touches no real data and no
+ * database, but there is still no reason to have it there; delete it from
+ * any production deployment if you find it uploaded by mistake.
  */
 
 // Define cpmsApiRoot() locally instead of requiring the full

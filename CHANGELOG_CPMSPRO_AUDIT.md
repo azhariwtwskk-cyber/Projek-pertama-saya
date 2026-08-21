@@ -208,3 +208,52 @@ Mobile — image visibility (compounding UX bug on top of the URL fix):
   photo rows now render unconditionally whenever photos exist, instead of being hidden behind an
   extra tap-to-expand; an explicit "No evidence photos found" line replaces silence when a work
   order genuinely has none.
+
+---
+
+# Production hotfix + cleanup pass
+
+**Real-device production verification: PASSED.** Work Order History loads, Before/During/After
+images are visible on the actual device, and the production fatal below is fixed. Full detail in
+`AUDIT_REPORT.md` §7.4–§7.6; test run in `TEST_REPORT.md`.
+
+## Hotfix: `cpmsApiColumnExists()` undefined in production
+
+`backend/cpms/api/v1/services.php` — added `function_exists()`-guarded fallback definitions of
+`cpmsApiTableExists()`/`cpmsApiColumnExists()`, matching `bootstrap.php`'s own signature/behavior
+exactly. Root cause: both helpers are defined only in `bootstrap.php`, a file never included in
+any deployment manifest for this fix, on the (wrong) assumption the live server's copy already
+defined them. **No APK rebuild was required** — this was a backend-only defect and a
+backend-only, one-file fix.
+
+## Cleanup: forensic/debug instrumentation removed after successful verification
+
+The forensic-trace pass deliberately added temporary logging to get a ground-truth answer instead
+of guessing further. With production verification passed, it has been removed:
+
+- `backend/cpms/api/v1/staff/work-history.php` — removed the `HANDLER_VERSION` + column-existence
+  marker log, the per-image resolution trace for both `daily_work_images` and `work_order_images`,
+  the "zero rows linked"/"zero images found" diagnostic lines, and the aggregate per-order summary
+  log. Now functionally identical to its state immediately after the original image-URL fix.
+- `backend/cpms/api/v1/staff/daily-work/submit.php` — removed the temporary submit-time
+  `error_log()` counter.
+- `mobile/lib/features/work_history/data/api_work_history_repository.dart` — reverted byte-for-byte
+  to its state before the forensic pass (no `debugPrint()`; malformed rows are silently skipped
+  again, matching this codebase's pre-existing "one bad row never takes down the screen" pattern).
+- `backend/cpms/api/v1/image_url_resolver_test.php` — kept (useful for CI/local verification), but
+  its header comment was corrected (it was inaccurately describing a "fake site root under
+  sys_get_temp_dir()" when the actual implementation uses the real repo `backend/` tree with an
+  implausible fake property id) and now explicitly states **DO NOT DEPLOY TO PRODUCTION CPANEL** —
+  it is dev/CI-only, not part of any deployment manifest, and has no route in production.
+
+## What was NOT touched (verified still present, unchanged)
+
+`cpmsApiResolveUploadedImageUrl()`, `cpmsApiDailyWorkImageUrl()`, `cpmsApiWorkOrderImageUrl()`, the
+`cpmsApiTableExists()`/`cpmsApiColumnExists()` guarded fallbacks (the hotfix itself), `image_path`
+read/write support on both legacy and mobile upload layouts, Work Order History's evidence
+merging, `workHistoryProvider`/`dashboardDataProvider` invalidation after a successful submit, the
+empty-active-tasks CTA into Work Order History, the rejected-work-order reopen/sync in
+`daily_work_review.php`, the "Rejected – Action Required" banner, the labelled History navigation
+button, and the Admin Daily Work image-resolver fix. `git diff` against the commit right after the
+original image-URL fix confirms `work-history.php` and `daily-work/submit.php` are now identical
+except for the removed debug blocks — no functional line was touched.

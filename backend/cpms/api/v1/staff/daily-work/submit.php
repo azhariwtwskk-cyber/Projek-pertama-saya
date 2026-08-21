@@ -210,18 +210,4 @@ try {
 
 cpmsApiAudit($db, $identity, 'staff.daily_work_submit', 'success', 'daily_work_log', $logId, ['reference' => $ref]);
 
-// Temporary, safe debug logging for the real-device "task disappears" /
-// "images not showing" investigation — counts and ids only, never
-// tokens/credentials/PII. Goes to the PHP error log, not the HTTP
-// response. Remove once confirmed fixed on a real device.
-if (function_exists('error_log')) {
-    error_log(sprintf(
-        '[cpms.daily_work_submit] daily_work_id=%d work_order_id=%d work_status=%s images_stored=%d',
-        $logId,
-        $workOrderId,
-        $status,
-        count($storedImages)
-    ));
-}
-
 cpmsApiRespond(['accepted' => true, 'reference' => $ref], 201);
