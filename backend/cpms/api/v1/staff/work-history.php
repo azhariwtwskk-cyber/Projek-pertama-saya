@@ -32,6 +32,25 @@ $staffId = cpmsApiStaffId($identity);
 
 $hasWorkOrderId = cpmsApiColumnExists($db, 'daily_work_logs', 'work_order_id');
 $hasSupervisorRemarks = cpmsApiColumnExists($db, 'daily_work_logs', 'supervisor_remarks');
+$hasDailyWorkImagePath = cpmsApiColumnExists($db, 'daily_work_images', 'image_path');
+
+// Distinctive, safe (no tokens/PII) marker so a real-device retest can
+// prove from the PHP error log whether this deployed file is actually the
+// fixed version, or a stale copy the last cPanel upload/OPcache reload
+// didn't pick up — the single most common reason a code fix that looks
+// correct in the repo has zero effect on a live server.
+if (function_exists('error_log')) {
+    error_log(sprintf(
+        '[cpms.work_history] HANDLER_VERSION=2026-08-21-forensic-trace '
+        . 'staff_id=%d property_id=%d has_work_order_id_column=%s '
+        . 'has_supervisor_remarks_column=%s has_daily_work_image_path_column=%s',
+        $staffId,
+        $propertyId,
+        $hasWorkOrderId ? 'yes' : 'NO',
+        $hasSupervisorRemarks ? 'yes' : 'NO',
+        $hasDailyWorkImagePath ? 'yes' : 'NO'
+    ));
+}
 
 // A work order belongs in History once it has actually been worked on —
 // either its own status has moved past "just assigned", or the staff has
@@ -128,6 +147,21 @@ if ($orderIds && $hasWorkOrderId) {
         }
         $dwStmt->close();
 
+        if (function_exists('error_log') && $orderIds && !$dailyWorkIds) {
+            // orderIds is non-empty (Work Order History has rows to show)
+            // but not a single daily_work_logs row links back to any of
+            // them via work_order_id — if this fires, the problem is a
+            // genuine data-linkage gap (daily_work_logs.work_order_id is
+            // NULL/wrong for these submissions), not a URL/path bug, and
+            // no amount of image-URL fixing will ever surface a photo.
+            error_log(sprintf(
+                '[cpms.work_history] NO daily_work_logs rows linked via '
+                . 'work_order_id for any of order_ids=[%s] — evidence '
+                . 'photos cannot be found regardless of URL resolution.',
+                implode(',', $orderIds)
+            ));
+        }
+
         // The most recent Daily Work entry's decision is authoritative
         // for the work order as a whole — if staff resubmitted after a
         // rejection, the newer entry's Verified/Rejected/pending state
@@ -168,13 +202,36 @@ if ($orderIds && $hasWorkOrderId) {
                         $dwToOrder[$entry['id']] = $workOrderId;
                     }
                 }
+                $imageRowCount = 0;
                 while ($image = $imgResult->fetch_assoc()) {
+                    $imageRowCount++;
                     $dwId = (int) $image['daily_work_id'];
                     $workOrderId = $dwToOrder[$dwId] ?? null;
                     if ($workOrderId === null || !isset($orders[$workOrderId])) {
+                        if (function_exists('error_log')) {
+                            error_log(sprintf(
+                                '[cpms.work_history] daily_work_images row daily_work_id=%d '
+                                . 'image_type=%s could NOT be mapped back to a work order '
+                                . '(dwToOrder lookup miss) — dropped.',
+                                $dwId,
+                                (string) ($image['image_type'] ?? '')
+                            ));
+                        }
                         continue;
                     }
                     $url = cpmsApiDailyWorkImageUrl($image, $propertyId);
+                    if (function_exists('error_log')) {
+                        error_log(sprintf(
+                            '[cpms.work_history] daily_work_id=%d work_order_id=%d image_type=%s '
+                            . 'image_name=%s image_path=%s -> resolved_url=%s',
+                            $dwId,
+                            $workOrderId,
+                            (string) ($image['image_type'] ?? ''),
+                            (string) ($image['image_name'] ?? ''),
+                            (string) ($image['image_path'] ?? ''),
+                            $url === '' ? '(EMPTY - no candidate resolved)' : $url
+                        ));
+                    }
                     if ($url === '') {
                         continue;
                     }
@@ -182,6 +239,14 @@ if ($orderIds && $hasWorkOrderId) {
                         'type' => (string) ($image['image_type'] ?? 'Supporting'),
                         'url' => $url,
                     ];
+                }
+                if (function_exists('error_log') && $imageRowCount === 0) {
+                    error_log(sprintf(
+                        '[cpms.work_history] daily_work_images has ZERO rows for '
+                        . 'daily_work_id IN (%s) — no evidence was ever inserted for '
+                        . 'these Daily Work submissions.',
+                        implode(',', $dailyWorkIds)
+                    ));
                 }
                 $imgStmt->close();
             }
@@ -204,12 +269,24 @@ if ($orderIds && cpmsApiTableExists($db, 'work_order_images')) {
         $woImgStmt->bind_param(str_repeat('i', count($orderIds)), ...$orderIds);
         $woImgStmt->execute();
         $woImgResult = $woImgStmt->get_result();
+        $woImageRowCount = 0;
         while ($image = $woImgResult->fetch_assoc()) {
+            $woImageRowCount++;
             $workOrderId = (int) $image['work_order_id'];
             if (!isset($orders[$workOrderId])) {
                 continue;
             }
             $url = cpmsApiWorkOrderImageUrl($image);
+            if (function_exists('error_log')) {
+                error_log(sprintf(
+                    '[cpms.work_history] work_order_images: work_order_id=%d image_type=%s '
+                    . 'image_name=%s -> resolved_url=%s',
+                    $workOrderId,
+                    (string) ($image['image_type'] ?? ''),
+                    (string) ($image['image_name'] ?? ''),
+                    $url === '' ? '(EMPTY - no candidate resolved)' : $url
+                ));
+            }
             if ($url === '') {
                 continue;
             }
@@ -217,6 +294,14 @@ if ($orderIds && cpmsApiTableExists($db, 'work_order_images')) {
                 'type' => (string) ($image['image_type'] ?? 'Supporting'),
                 'url' => $url,
             ];
+        }
+        if (function_exists('error_log') && $woImageRowCount === 0) {
+            error_log(sprintf(
+                '[cpms.work_history] work_order_images has ZERO rows for '
+                . 'work_order_id IN (%s) — no task-photo.php evidence exists '
+                . 'for these work orders.',
+                implode(',', $orderIds)
+            ));
         }
         $woImgStmt->close();
     }
