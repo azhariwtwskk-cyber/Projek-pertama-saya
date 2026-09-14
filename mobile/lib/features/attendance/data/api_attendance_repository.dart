@@ -12,17 +12,23 @@ class ApiAttendanceRepository implements AttendanceRepository {
   ApiAttendanceRepository(this._client);
   final ApiClient _client;
 
-  // The real backend has no attendance status/history GET endpoint —
-  // clock state is derived purely from clock-in/clock-out responses
-  // (including ALREADY_CLOCKED_IN/NOT_CLOCKED_IN conflicts) by
-  // AttendanceController, which is the actual source of truth the UI
-  // reads from. This method exists only to satisfy the repository
-  // interface's initial-load contract and never claims a state the
-  // server hasn't confirmed.
+  // Phase M1: `GET attendance/status.php` is a real, working backend
+  // endpoint (confirmed live — see the CPMSPro Mobile Attendance History
+  // Forensic Audit); this is the authoritative persisted clock state,
+  // read on every screen load/refresh. AttendanceController's
+  // `_localClockStatusProvider` overlay still exists on top of this for
+  // the immediate, optimistic update right after a clock-in/out response
+  // — this fetch is what makes that state survive a cold restart instead
+  // of resetting to "not clocked in" once the in-memory overlay is gone.
   @override
-  Future<AttendanceStatus> fetchStatus() async => const AttendanceStatus(
-        status: ClockStatus.clockedOut,
-        propertyName: '',
+  Future<AttendanceStatus> fetchStatus() => _client.request(
+        (dio) => dio.get(ApiEndpoints.attendanceStatus),
+        (data) {
+          final json = data is Map
+              ? Map<String, dynamic>.from(data)
+              : <String, dynamic>{};
+          return AttendanceStatus.fromJson(json);
+        },
       );
 
   @override
@@ -112,14 +118,27 @@ class ApiAttendanceRepository implements AttendanceRepository {
     }
   }
 
+  // Phase M1: `GET attendance/history.php` is a real, working backend
+  // endpoint — `year`/`month` are sent exactly as the caller passes them
+  // (Dart's DateTime.month is already 1-based, matching the backend's
+  // 1-based month clamp; no adjustment applied). Deliberately no
+  // try/catch here: an HTTP failure or a malformed response must
+  // propagate as a thrown exception to the caller (surfacing the
+  // existing error/retry UI state) rather than being swallowed into a
+  // false "no records this month" empty summary.
   @override
   Future<MonthlyAttendanceSummary> fetchHistory(
-          {required int year, required int month}) async =>
-      const MonthlyAttendanceSummary(
-        daysWorked: 0,
-        totalHours: 0,
-        lateArrivals: 0,
-        overtimeHours: 0,
-        records: [],
+          {required int year, required int month}) =>
+      _client.request(
+        (dio) => dio.get(
+          ApiEndpoints.attendanceHistory,
+          queryParameters: {'year': year, 'month': month},
+        ),
+        (data) {
+          final json = data is Map
+              ? Map<String, dynamic>.from(data)
+              : <String, dynamic>{};
+          return MonthlyAttendanceSummary.fromJson(json);
+        },
       );
 }

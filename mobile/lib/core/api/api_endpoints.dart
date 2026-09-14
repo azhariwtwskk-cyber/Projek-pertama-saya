@@ -29,8 +29,14 @@ class ApiEndpoints {
   static const String attendanceClock = '/cpms/api/$_v/attendance/clock.php';
   static const String attendanceClockIn = attendanceClock;
   static const String attendanceClockOut = attendanceClock;
-  // No dedicated history endpoint exists in the supplied backend package.
-  static const String attendanceHistory = '';
+  // Phase M1: history.php/status.php were added to the backend after the
+  // integration audit that produced the "no dedicated history endpoint"
+  // note in mobile/docs/BACKEND_INTEGRATION_AUDIT.md — both are live and
+  // confirmed working (see CPMSPro Mobile Attendance History Forensic
+  // Audit). Real GET endpoints, query-string year/month for history.
+  static const String attendanceHistory =
+      '/cpms/api/$_v/attendance/history.php';
+  static const String attendanceStatus = '/cpms/api/$_v/attendance/status.php';
 
   static const String pmTasks = '/cpms/api/$_v/staff/maintenance/list.php';
   static String pmTask(String id) =>

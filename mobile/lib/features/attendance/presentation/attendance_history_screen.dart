@@ -65,39 +65,44 @@ class _AttendanceHistoryScreenState
                             year: _selectedMonth.year,
                             month: _selectedMonth.month
                           ))))),
-              data: (summary) => ListView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                children: [
-                  AppSectionCard(
-                    child: Row(
-                      children: [
-                        Expanded(
-                            child: _SummaryStat(
-                                label: 'Days Worked',
-                                value: '${summary.daysWorked}')),
-                        Expanded(
-                            child: _SummaryStat(
-                                label: 'Total Hours',
-                                value: summary.totalHours.toStringAsFixed(1))),
-                        Expanded(
-                            child: _SummaryStat(
-                                label: 'Late',
-                                value: '${summary.lateArrivals}')),
-                        Expanded(
-                            child: _SummaryStat(
-                                label: 'OT Hours',
-                                value:
-                                    summary.overtimeHours.toStringAsFixed(1))),
-                      ],
+              data: (summary) => RefreshIndicator(
+                onRefresh: () async => ref.invalidate(attendanceHistoryProvider(
+                    (year: _selectedMonth.year, month: _selectedMonth.month))),
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  children: [
+                    AppSectionCard(
+                      child: Row(
+                        children: [
+                          Expanded(
+                              child: _SummaryStat(
+                                  label: 'Days Worked',
+                                  value: '${summary.daysWorked}')),
+                          Expanded(
+                              child: _SummaryStat(
+                                  label: 'Total Hours',
+                                  value:
+                                      summary.totalHours.toStringAsFixed(1))),
+                          Expanded(
+                              child: _SummaryStat(
+                                  label: 'Late',
+                                  value: '${summary.lateArrivals}')),
+                          Expanded(
+                              child: _SummaryStat(
+                                  label: 'OT Hours',
+                                  value: summary.overtimeHours
+                                      .toStringAsFixed(1))),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const SectionHeader(title: 'Daily Records'),
-                  if (summary.records.isEmpty)
-                    AppStateView.noTasksToday()
-                  else
-                    ...summary.records.map((r) => _RecordTile(record: r)),
-                ],
+                    const SizedBox(height: 20),
+                    const SectionHeader(title: 'Daily Records'),
+                    if (summary.records.isEmpty)
+                      AppStateView.noAttendanceRecords()
+                    else
+                      ...summary.records.map((r) => _RecordTile(record: r)),
+                  ],
+                ),
               ),
             ),
           ),

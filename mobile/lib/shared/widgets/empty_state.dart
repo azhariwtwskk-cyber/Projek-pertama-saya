@@ -30,6 +30,15 @@ class AppStateView extends StatelessWidget {
             "You're all caught up. New assignments will appear here automatically.",
       );
 
+  /// Attendance History's empty state (Phase M1) — previously reused
+  /// [noTasksToday] by mistake, which showed Tasks copy on a screen with
+  /// no tasks concept at all.
+  factory AppStateView.noAttendanceRecords() => const AppStateView(
+        icon: Icons.event_busy_rounded,
+        title: 'No Attendance Records',
+        message: 'No attendance records found for this month.',
+      );
+
   /// Shown wherever an "active work" list can legitimately hit zero
   /// because everything assigned has already been submitted — a
   /// just-completed task moves out of the active queue by design, but
