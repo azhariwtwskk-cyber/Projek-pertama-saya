@@ -220,5 +220,107 @@ void main() {
 
       await expectLater(repository.fetchStatus(), throwsA(isA<ApiException>()));
     });
+
+    group('Phase M2A F5 — clockIn/clockOut error-code English mapping', () {
+      test('INVALID_LOCATION maps to a clear English message', () async {
+        adapter.enqueue(422, {
+          'ok': false,
+          'error': {
+            'code': 'INVALID_LOCATION',
+            'message': 'Bacaan lokasi GPS tidak sah.',
+          },
+        });
+
+        final result =
+            await repository.clockIn(lat: 3.139, lng: 101.6869, accuracy: 10);
+
+        expect(result.allowed, isFalse);
+        expect(result.message,
+            'Unable to verify your GPS location. Please try again.');
+        expect(result.message, isNot(contains('Bacaan')),
+            reason: 'must not leak the raw Malay backend string');
+      });
+
+      test('an unknown/unmapped server error code falls back to a safe '
+          'generic English message, never the raw backend text', () async {
+        adapter.enqueue(500, {
+          'ok': false,
+          'error': {
+            'code': 'SOME_FUTURE_CODE',
+            'message': 'Ralat luar jangka pada pelayan.',
+          },
+        });
+
+        final result =
+            await repository.clockIn(lat: 3.139, lng: 101.6869, accuracy: 10);
+
+        expect(result.allowed, isFalse);
+        expect(result.message, isNot(contains('Ralat')),
+            reason: 'must not expose the raw Malay backend string for an '
+                'unrecognized code');
+        expect(result.message, isNotEmpty);
+      });
+
+      test('the five previously curated codes are unchanged', () async {
+        adapter.enqueue(409, {
+          'ok': false,
+          'error': {'code': 'ALREADY_CLOCKED_IN', 'message': 'Anda sudah clock in.'},
+        });
+        final already =
+            await repository.clockIn(lat: 3.139, lng: 101.6869, accuracy: 10);
+        expect(already.message, 'You are already clocked in.');
+        expect(already.resultingStatus, ClockStatus.clockedIn);
+
+        adapter.enqueue(409, {
+          'ok': false,
+          'error': {
+            'code': 'NOT_CLOCKED_IN',
+            'message': 'Tiada rekod clock in yang masih aktif.'
+          },
+        });
+        final notIn =
+            await repository.clockOut(lat: 3.139, lng: 101.6869, accuracy: 10);
+        expect(notIn.message, 'You are not currently clocked in.');
+        expect(notIn.resultingStatus, ClockStatus.clockedOut);
+
+        adapter.enqueue(422, {
+          'ok': false,
+          'error': {
+            'code': 'OUTSIDE_GEOFENCE',
+            'message': 'Anda berada di luar kawasan tempat kerja.'
+          },
+        });
+        final outside =
+            await repository.clockIn(lat: 3.139, lng: 101.6869, accuracy: 10);
+        expect(outside.message,
+            'You are outside the work location. Move closer and try again.');
+
+        adapter.enqueue(422, {
+          'ok': false,
+          'error': {
+            'code': 'POOR_GPS_ACCURACY',
+            'message': 'Ketepatan GPS terlalu rendah.'
+          },
+        });
+        final poorGps =
+            await repository.clockIn(lat: 3.139, lng: 101.6869, accuracy: 500);
+        expect(poorGps.message,
+            'GPS accuracy is too low. Move to an open area and try again.');
+
+        adapter.enqueue(409, {
+          'ok': false,
+          'error': {
+            'code': 'GEOFENCE_NOT_CONFIGURED',
+            'message': 'Lokasi tempat kerja belum ditetapkan.'
+          },
+        });
+        final noGeofence =
+            await repository.clockIn(lat: 3.139, lng: 101.6869, accuracy: 10);
+        expect(
+            noGeofence.message,
+            'This property has no work location configured yet. Contact your '
+            'Property Admin.');
+      });
+    });
   });
 }

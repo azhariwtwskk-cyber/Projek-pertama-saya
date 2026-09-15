@@ -249,12 +249,35 @@ class _MonthSummaryPreview extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final now = DateTime.now();
-    final summaryAsync = ref
-        .watch(attendanceHistoryProvider((year: now.year, month: now.month)));
+    final monthKey = (year: now.year, month: now.month);
+    final summaryAsync = ref.watch(attendanceHistoryProvider(monthKey));
 
     return summaryAsync.when(
       loading: () => const SkeletonCard(height: 100),
-      error: (_, __) => const SizedBox.shrink(),
+      // Phase M2 finding F4: this previously vanished silently
+      // (SizedBox.shrink()) on any failure — a real API error looked like
+      // a missing feature rather than a recoverable one. Compact inline
+      // error + retry instead, scoped to only this month's provider key.
+      error: (_, __) => AppSectionCard(
+        child: Row(
+          children: [
+            const Icon(Icons.error_outline_rounded,
+                size: 18, color: AppColors.danger),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                "Couldn't load this month's summary.",
+                style:
+                    TextStyle(fontSize: 12.5, color: AppColors.textSecondary),
+              ),
+            ),
+            TextButton(
+              onPressed: () => ref.invalidate(attendanceHistoryProvider(monthKey)),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
       data: (summary) => AppSectionCard(
         child: Row(
           children: [

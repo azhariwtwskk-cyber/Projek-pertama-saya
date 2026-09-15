@@ -112,9 +112,19 @@ class ApiAttendanceRepository implements AttendanceRepository {
             message:
                 'This property has no work location configured yet. Contact your Property Admin.');
       }
-      // Any other server-provided message (already in the user's
-      // language) is still better than a generic fallback.
-      return GeofenceResult(allowed: false, message: e.message);
+      if (e.code == 'INVALID_LOCATION') {
+        return const GeofenceResult(
+            allowed: false,
+            message: 'Unable to verify your GPS location. Please try again.');
+      }
+      // Any other/unknown server code: never surface e.message directly —
+      // the backend's error strings are Malay (see clock.php), and this is
+      // otherwise an all-English UI. A safe, generic English fallback is
+      // shown instead, regardless of what language or detail the server
+      // actually sent.
+      return const GeofenceResult(
+          allowed: false,
+          message: 'Unable to process your attendance request. Please try again.');
     }
   }
 

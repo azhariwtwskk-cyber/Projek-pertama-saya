@@ -38,6 +38,12 @@ final attendanceStatusProvider =
         ? (fallback.clockInTime ?? DateTime.now())
         : null,
     shiftLabel: fallback.shiftLabel,
+    // The local overlay only ever overrides `status`/`clockInTime` — it
+    // has no opinion on lateness/overtime, so the server's own fetched
+    // values must be carried through here rather than silently falling
+    // back to AttendanceStatus's false/0 defaults (Phase M2 finding F1).
+    isLate: fallback.isLate,
+    overtimeMinutes: fallback.overtimeMinutes,
     propertyName: fallback.propertyName,
   );
 });
@@ -72,6 +78,18 @@ class AttendanceController {
     if (result.resultingStatus != null) {
       _ref.read(_localClockStatusProvider.notifier).state =
           result.resultingStatus;
+      // Phase M2 finding F3: a successful clock action (or a recovered
+      // ALREADY_CLOCKED_IN/NOT_CLOCKED_IN conflict — both set
+      // resultingStatus too, since either way the server just confirmed
+      // the real state) changes this month's attendance data, so the
+      // "This Month" preview must not keep showing pre-action totals.
+      // Scoped to the current month only — never invalidate historical
+      // months, and skip this entirely on an outright rejection (GPS/
+      // geofence/etc.) where resultingStatus stays null and nothing
+      // actually changed server-side.
+      final now = DateTime.now();
+      _ref.invalidate(
+          attendanceHistoryProvider((year: now.year, month: now.month)));
     }
     _ref.invalidate(attendanceStatusProvider);
     return result;
